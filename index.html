@@ -593,7 +593,7 @@ td{padding:11px 14px;vertical-align:middle;font-family:var(--sans);font-size:.8r
     </div>
 
     <div class="adm-page" id="page-prompts">
-      <div class="adm-hdr"><h1><i>Prompts</i></h1><p>Gerir biblioteca</p></div>
+      <div class="adm-hdr"><h1><i>Prompts</i></h1><p>Gerir biblioteca — <span id="promptCountLabel" style="color:var(--gold)">0 prompts guardados</span></p></div>
       <div class="toolbar">
         <input type="text" class="tbar-input" id="pSearch" placeholder="Pesquisar..."/>
         <select class="tbar-select" id="pCatFilter"><option value="all">Todas as categorias</option></select>
@@ -804,17 +804,92 @@ let pSearchQ="",pCatF="all";
 let imgData=null;
 let siteSettings={};
 
-// DATA
-function loadData(){
-  try{admData=JSON.parse(localStorage.getItem("gp_prompts"))||[...DEFAULT_PROMPTS];}catch{admData=[...DEFAULT_PROMPTS];}
+// SUPABASE
+const SB_URL = "https://emfupbaljvmurelhcoly.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtZnVwYmFsanZtdXJlbGhjb2x5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MzU1OTEsImV4cCI6MjA5MzQxMTU5MX0.xX5P8pDUvX19U6GbJzK8gNrHehkeFS2NPiInxmNH0Yg";
+
+async function sbFetch(path, opts={}){
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
+    headers: {
+      "apikey": SB_KEY,
+      "Authorization": `Bearer ${SB_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": opts.prefer || "return=representation",
+      ...opts.headers
+    },
+    ...opts
+  });
+  if(!res.ok){ const e=await res.text(); throw new Error(e); }
+  const txt = await res.text();
+  return txt ? JSON.parse(txt) : [];
+}
+
+// DATA — lê do Supabase, fallback para defaults
+async function loadData(){
+  try {
+    showLoading(true);
+    const rows = await sbFetch("prompts?order=id.asc&limit=10000");
+    if(rows && rows.length > 0){
+      admData = rows.map(r=>({
+        id: r.id, title: r.title, category: r.category,
+        image: r.image||"", prompt: r.prompt, instructions: r.instructions||"",
+        premium: r.premium||false
+      }));
+    } else {
+      // primeira vez: insere os prompts default no Supabase
+      admData = [...DEFAULT_PROMPTS];
+      await seedDefaultPrompts();
+    }
+  } catch(e) {
+    console.error("Supabase erro:", e);
+    admData = JSON.parse(localStorage.getItem("gp_prompts")||"null") || [...DEFAULT_PROMPTS];
+  }
   try{admCats=JSON.parse(localStorage.getItem("gp_cats"))||[...DEFAULT_CATS];}catch{admCats=[...DEFAULT_CATS];}
   sitePrompts=[...admData]; siteCats=[...admCats];
+  showLoading(false);
 }
-function saveData(){
-  localStorage.setItem("gp_prompts",JSON.stringify(admData));
-  localStorage.setItem("gp_cats",JSON.stringify(admCats));
+
+async function seedDefaultPrompts(){
+  try {
+    const rows = DEFAULT_PROMPTS.map(p=>({
+      title:p.title, category:p.category, image:p.image,
+      prompt:p.prompt, instructions:p.instructions||"", premium:p.premium||false
+    }));
+    await sbFetch("prompts", {method:"POST", body:JSON.stringify(rows)});
+  } catch(e){ console.error("Seed erro:",e); }
+}
+
+async function saveData(){
   sitePrompts=[...admData]; siteCats=[...admCats];
+  localStorage.setItem("gp_cats",JSON.stringify(admCats));
   renderSite();
+}
+
+async function dbAddPrompt(p){
+  const row = {title:p.title,category:p.category,image:p.image||"",prompt:p.prompt,instructions:p.instructions||"",premium:p.premium||false};
+  const res = await sbFetch("prompts", {method:"POST", body:JSON.stringify(row)});
+  return Array.isArray(res)?res[0]:res;
+}
+
+async function dbUpdatePrompt(id, p){
+  await sbFetch(`prompts?id=eq.${id}`, {method:"PATCH", body:JSON.stringify({
+    title:p.title,category:p.category,image:p.image||"",prompt:p.prompt,instructions:p.instructions||"",premium:p.premium||false
+  })});
+}
+
+async function dbDeletePrompt(id){
+  await sbFetch(`prompts?id=eq.${id}`, {method:"DELETE", prefer:"", headers:{"Prefer":""}});
+}
+
+function showLoading(show){
+  let el=document.getElementById("loadingOverlay");
+  if(!el){
+    el=document.createElement("div");el.id="loadingOverlay";
+    el.style.cssText="position:fixed;inset:0;background:rgba(6,6,10,.92);z-index:9990;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px";
+    el.innerHTML=`<div style="width:40px;height:40px;background:var(--gold);clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);animation:spin 1s linear infinite"></div><div style="font-family:var(--mono);font-size:.68rem;color:var(--text3);letter-spacing:.14em;text-transform:uppercase">A carregar...</div><style>@keyframes spin{to{transform:rotate(360deg)}}</style>`;
+    document.body.appendChild(el);
+  }
+  el.style.display=show?"flex":"none";
 }
 function loadSettings(){
   try{siteSettings={...DEFAULT_SETTINGS,...JSON.parse(localStorage.getItem("gp_settings")||"{}")};}
@@ -1002,13 +1077,13 @@ document.getElementById("logoLink").addEventListener("click",()=>{lc++;clearTime
 // LOGIN
 document.getElementById("loginBtn").addEventListener("click",tryLogin);
 document.getElementById("loginInput").addEventListener("keydown",e=>{if(e.key==="Enter")tryLogin();});
-function tryLogin(){
+async function tryLogin(){
   if(document.getElementById("loginInput").value===ADMIN_PASS){
     document.getElementById("adminLogin").classList.remove("open");
     document.getElementById("adminPanel").classList.add("open");
     document.getElementById("loginInput").value="";
     document.getElementById("loginErr").textContent="";
-    loadData();renderAdmAll();showPage("dashboard");
+    await loadData();renderAdmAll();showPage("dashboard");
   } else {
     document.getElementById("loginErr").textContent="Password incorrecta.";
     document.getElementById("loginInput").value="";
@@ -1056,6 +1131,8 @@ function renderDash(){
 document.getElementById("pSearch").addEventListener("input",e=>{pSearchQ=e.target.value.toLowerCase();renderPTable();});
 document.getElementById("pCatFilter").addEventListener("change",e=>{pCatF=e.target.value;renderPTable();});
 function renderPTable(){
+  const countLbl=document.getElementById("promptCountLabel");
+  if(countLbl) countLbl.textContent=`${admData.length} prompt${admData.length!==1?"s":""} guardados`;
   const f=admData.filter(p=>(pCatF==="all"||p.category===pCatF)&&(!pSearchQ||p.title.toLowerCase().includes(pSearchQ)||p.prompt.toLowerCase().includes(pSearchQ)||p.category.toLowerCase().includes(pSearchQ)));
   document.getElementById("pTable").innerHTML=f.length?f.map(p=>`<tr>
     <td class="td-id">#${p.id}</td>
@@ -1090,7 +1167,7 @@ document.getElementById("fIFile").addEventListener("change",e=>{
   const fr=new FileReader();fr.onload=ev=>{imgData=ev.target.result;document.getElementById("fI").value="";const el=document.getElementById("fIPrev");el.src=imgData;el.className="img-prev vis";};fr.readAsDataURL(file);
 });
 
-document.getElementById("pFormSave").addEventListener("click",()=>{
+document.getElementById("pFormSave").addEventListener("click", async ()=>{
   const title=document.getElementById("fT").value.trim();
   const category=document.getElementById("fC").value;
   const imageUrl=document.getElementById("fI").value.trim();
@@ -1099,21 +1176,38 @@ document.getElementById("pFormSave").addEventListener("click",()=>{
   const instructions=document.getElementById("fInstr").value.trim();
   const premium=document.getElementById("fPremium").checked;
   if(!title){admToast("Adiciona um titulo!",true);return;}
-  if(!image){admToast("Adiciona uma imagem!",true);return;}
   if(!prompt){admToast("Escreve o prompt!",true);return;}
+  const finalImage = image || "https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&q=80";
 
-  // BUG FIX: verifica editPId no momento do save, nao no momento do clique
-  const currentEditId = editPId;
-  if(currentEditId!==null&&currentEditId!==undefined){
-    const idx=admData.findIndex(p=>p.id===currentEditId);
-    if(idx!==-1) admData[idx]={...admData[idx],title,category,image,prompt,instructions,premium};
-    admToast("Prompt actualizado!");
-  } else {
-    const newId=admData.length?Math.max(...admData.map(p=>p.id))+1:1;
-    admData.push({id:newId,title,category,image,prompt,instructions,premium});
-    admToast("Prompt adicionado!");
+  const saveBtn = document.getElementById("pFormSave");
+  saveBtn.textContent = "A guardar...";
+  saveBtn.disabled = true;
+
+  try {
+    const currentEditId = editPId;
+    if(currentEditId!==null&&currentEditId!==undefined){
+      await dbUpdatePrompt(currentEditId, {title,category,image:finalImage,prompt,instructions,premium});
+      const idx=admData.findIndex(p=>p.id===currentEditId);
+      if(idx!==-1) admData[idx]={...admData[idx],title,category,image:finalImage,prompt,instructions,premium};
+      admToast("Prompt actualizado!");
+    } else {
+      const newRow = await dbAddPrompt({title,category,image:finalImage,prompt,instructions,premium});
+      const newId = newRow?.id || (admData.length ? Math.max(...admData.map(p=>p.id))+1 : 1);
+      admData.push({id:newId,title,category,image:finalImage,prompt,instructions,premium});
+      admToast(`Prompt adicionado! Total: ${admData.length}`);
+    }
+    await saveData();
+    closePForm();
+    renderAdmAll();
+    renderPTable();
+    renderDash();
+  } catch(e) {
+    console.error(e);
+    admToast("Erro ao guardar. Verifica a ligacao!",true);
+  } finally {
+    saveBtn.textContent = "Guardar Prompt";
+    saveBtn.disabled = false;
   }
-  saveData();closePForm();renderAdmAll();renderPTable();renderDash();
 });
 
 function openPForm(mode,id=null){
@@ -1158,9 +1252,17 @@ function openPrev(id){
 // DELETE
 const cfmOv=document.getElementById("cfmOv");
 document.getElementById("cfmCncl").addEventListener("click",()=>{cfmOv.classList.remove("open");delPId=null;});
-document.getElementById("cfmDel").addEventListener("click",()=>{
-  admData=admData.filter(p=>p.id!==delPId);cfmOv.classList.remove("open");delPId=null;
-  saveData();renderAdmAll();renderPTable();renderDash();admToast("Prompt apagado!");
+document.getElementById("cfmDel").addEventListener("click", async ()=>{
+  try {
+    await dbDeletePrompt(delPId);
+    admData=admData.filter(p=>p.id!==delPId);
+    cfmOv.classList.remove("open");delPId=null;
+    await saveData();renderAdmAll();renderPTable();renderDash();
+    admToast("Prompt apagado!");
+  } catch(e){
+    admToast("Erro ao apagar!",true);
+    cfmOv.classList.remove("open");delPId=null;
+  }
 });
 function openDelP(id){delPId=id;const p=admData.find(x=>x.id===id);document.getElementById("cfmMsg").textContent=`Vais apagar "${p?.title}".`;cfmOv.classList.add("open");}
 
@@ -1264,9 +1366,12 @@ document.addEventListener("keydown",e=>{
 });
 
 // INIT
-loadData();
-loadSettings();
-renderSite();
+(async()=>{
+  showLoading(true);
+  await loadData();
+  loadSettings();
+  renderSite();
+})();
 </script>
 </body>
 </html>
