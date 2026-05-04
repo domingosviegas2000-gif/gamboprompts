@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>GamboPrompts</title>
+<title>GamboPrompts — Biblioteca de Prompts IA</title>
+<meta name="description" content="A maior biblioteca de prompts de inteligencia artificial. Copia prompts para Midjourney, DALL-E e Leonardo AI."/>
+<meta name="keywords" content="prompts IA, midjourney prompts, dall-e prompts, leonardo ai, prompts inteligencia artificial"/>
+<meta property="og:title" content="GamboPrompts — Biblioteca de Prompts IA"/>
+<meta property="og:description" content="Copia prompts profissionais para Midjourney, DALL-E e Leonardo AI."/>
+<meta property="og:type" content="website"/>
+<meta name="theme-color" content="#06060a"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Montserrat:wght@300;400;500;600;700;900&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet"/>
@@ -24,11 +30,14 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{background:var(--ink);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden;cursor:none}
+body{background:var(--ink);color:var(--text);font-family:var(--sans);min-height:100vh;overflow-x:hidden}
 
-/* CUSTOM CURSOR */
-.cursor{position:fixed;width:8px;height:8px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;mix-blend-mode:difference}
-.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(184,150,90,0.5);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:transform .1s ease,width .3s,height .3s,opacity .3s}
+/* CUSTOM CURSOR - só desktop */
+@media(hover:hover){body{cursor:none}}
+.cursor{position:fixed;width:8px;height:8px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;mix-blend-mode:difference;display:none}
+@media(hover:hover){.cursor{display:block}}
+.cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(184,150,90,0.5);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:transform .1s ease,width .3s,height .3s,opacity .3s;display:none}
+@media(hover:hover){.cursor-ring{display:block}}
 .cursor.hover{width:16px;height:16px}
 .cursor-ring.hover{width:56px;height:56px;opacity:.6}
 
@@ -38,7 +47,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* ===========================
    SITE PÚBLICO
    =========================== */
-#siteView{position:relative;z-index:1}
+#siteView{position:relative;z-index:1;padding-top:0}
 
 /* HEADER */
 .header{position:fixed;top:0;left:0;right:0;z-index:200;padding:0 48px;height:72px;display:flex;align-items:center;gap:32px;background:linear-gradient(to bottom,rgba(6,6,10,.98) 0%,rgba(6,6,10,.0) 100%);transition:background .3s}
@@ -50,7 +59,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .logo-name b{font-weight:700;font-style:normal;color:var(--gold)}
 .header-center{flex:1;display:flex;justify-content:center}
 .search-wrap{position:relative;width:360px}
-.search-wrap input{width:100%;background:rgba(255,255,255,.04);border:none;border-bottom:1px solid var(--border2);padding:10px 16px 10px 36px;color:var(--text);font-family:var(--mono);font-size:.78rem;outline:none;transition:border-color .2s;letter-spacing:.04em;background:transparent}
+.search-wrap input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--border2);padding:10px 16px 10px 36px;color:var(--text);font-family:var(--mono);font-size:.78rem;outline:none;transition:border-color .2s;letter-spacing:.04em}
 .search-wrap input:focus{border-bottom-color:var(--gold)}
 .search-wrap input::placeholder{color:var(--text3)}
 .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:.7rem;font-family:var(--mono)}
@@ -60,7 +69,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 .header-num{font-family:var(--mono);font-size:.65rem;color:var(--text3);letter-spacing:.08em}
 
 /* HERO STRIP */
-.hero-strip{height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 48px 64px;position:relative;overflow:hidden}
+.hero-strip{height:100vh;height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:72px 48px 64px;position:relative;overflow:hidden}
 .hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,var(--ink) 0%,var(--ink2) 40%,var(--ink3) 100%)}
 .hero-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 30%,rgba(184,150,90,.06) 0%,transparent 60%)}
 .hero-lines{position:absolute;inset:0;overflow:hidden;opacity:.15}
@@ -145,7 +154,7 @@ body::after{content:'';position:fixed;inset:0;background-image:url("data:image/s
 /* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(6,6,10,.94);backdrop-filter:blur(16px);z-index:600;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .35s}
 .modal-overlay.open{opacity:1;pointer-events:all}
-.modal{background:var(--ink2);border:1px solid var(--border2);max-width:880px;width:100%;max-height:92vh;overflow-y:auto;display:grid;grid-template-columns:420px 1fr;transform:scale(.96) translateY(10px);transition:transform .35s cubic-bezier(.22,.68,0,1.1);scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.modal{background:var(--ink2);border:1px solid var(--border2);max-width:880px;width:100%;max-height:92vh;overflow-y:auto;display:grid;grid-template-columns:420px 1fr;transform:scale(.96) translateY(10px);transition:transform .35s cubic-bezier(.22,.68,0,1.1);scrollbar-width:thin;scrollbar-color:var(--border) transparent;position:relative}
 .modal-overlay.open .modal{transform:scale(1) translateY(0)}
 .modal-img-wrap{position:relative;overflow:hidden;background:var(--ink3)}
 .modal-img{width:100%;height:100%;object-fit:cover;display:block;filter:brightness(.9) contrast(1.05) saturate(.9)}
@@ -809,17 +818,27 @@ const SB_URL = "https://emfupbaljvmurelhcoly.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtZnVwYmFsanZtdXJlbGhjb2x5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc4MzU1OTEsImV4cCI6MjA5MzQxMTU5MX0.xX5P8pDUvX19U6GbJzK8gNrHehkeFS2NPiInxmNH0Yg";
 
 async function sbFetch(path, opts={}){
-  const res = await fetch(`${SB_URL}/rest/v1/${path}`, {
-    headers: {
-      "apikey": SB_KEY,
-      "Authorization": `Bearer ${SB_KEY}`,
-      "Content-Type": "application/json",
-      "Prefer": opts.prefer || "return=representation",
-      ...opts.headers
-    },
-    ...opts
-  });
-  if(!res.ok){ const e=await res.text(); throw new Error(e); }
+  const method = opts.method || "GET";
+  const headers = {
+    "apikey": SB_KEY,
+    "Authorization": `Bearer ${SB_KEY}`,
+    "Content-Type": "application/json"
+  };
+  // Prefer header apenas para operações que retornam dados
+  if(method === "POST" || method === "PATCH"){
+    headers["Prefer"] = "return=representation";
+  }
+  // Override headers se fornecidos
+  if(opts.headers) Object.assign(headers, opts.headers);
+  
+  const fetchOpts = {...opts, headers};
+  delete fetchOpts.prefer; // remove campo custom
+  
+  const res = await fetch(`${SB_URL}/rest/v1/${path}`, fetchOpts);
+  if(!res.ok){
+    const e = await res.text();
+    throw new Error(`Supabase ${method} ${path}: ${e}`);
+  }
   const txt = await res.text();
   return txt ? JSON.parse(txt) : [];
 }
@@ -861,6 +880,9 @@ async function loadData(){
 
 async function seedDefaultPrompts(){
   try {
+    // Verifica se já existem prompts antes de fazer seed
+    const existing = await sbFetch("prompts?select=id&limit=1");
+    if(existing && existing.length > 0) return; // já tem dados
     const rows = DEFAULT_PROMPTS.map(p=>({
       title:p.title, category:p.category, image:p.image,
       prompt:p.prompt, instructions:p.instructions||"", premium:p.premium||false
@@ -1048,10 +1070,22 @@ function goPage(n){currentPage=n;renderGrid();document.getElementById("mainConte
 
 function renderSite(){renderCatBtns();renderGrid();}
 
+function copyToClipboard(text){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(text);
+  }
+  // Fallback para browsers antigos
+  const ta=document.createElement("textarea");
+  ta.value=text;ta.style.cssText="position:fixed;left:-9999px;top:-9999px";
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand("copy");}catch(e){}
+  document.body.removeChild(ta);
+  return Promise.resolve();
+}
 function copyPrompt(e,id){
   e.stopPropagation();
   const p=sitePrompts.find(x=>x.id===id);if(!p)return;
-  navigator.clipboard.writeText(p.prompt).then(()=>{
+  copyToClipboard(p.prompt).then(()=>{
     const btn=e.currentTarget;const orig=btn.textContent;btn.textContent="Copiado";btn.classList.add("copied");
     setTimeout(()=>{btn.textContent=orig;btn.classList.remove("copied");},2000);
     const t=document.getElementById("toastSite");t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);
@@ -1078,7 +1112,7 @@ document.getElementById("modalOverlay").addEventListener("click",e=>{if(e.target
 document.getElementById("modalCopyBtn").addEventListener("click",()=>{
   const id=parseInt(document.getElementById("modalCopyBtn").dataset.id);
   const p=sitePrompts.find(x=>x.id===id);if(!p)return;
-  navigator.clipboard.writeText(p.prompt).then(()=>{
+  copyToClipboard(p.prompt).then(()=>{
     document.getElementById("modalCopyBtn").textContent="Copiado";
     setTimeout(()=>document.getElementById("modalCopyBtn").textContent="Copiar Prompt",2000);
     const t=document.getElementById("toastSite");t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200);
@@ -1186,8 +1220,14 @@ document.getElementById("fI").addEventListener("input",e=>{
 document.getElementById("fIFile").addEventListener("change",e=>{
   const file=e.target.files[0];if(!file)return;
   document.getElementById("fIFileName").textContent=file.name;
-  new FileReader().onload=ev=>{imgData=ev.target.result;document.getElementById("fI").value="";const el=document.getElementById("fIPrev");el.src=imgData;el.className="img-prev vis";};
-  const fr=new FileReader();fr.onload=ev=>{imgData=ev.target.result;document.getElementById("fI").value="";const el=document.getElementById("fIPrev");el.src=imgData;el.className="img-prev vis";};fr.readAsDataURL(file);
+  const fr=new FileReader();
+  fr.onload=ev=>{
+    imgData=ev.target.result;
+    document.getElementById("fI").value="";
+    const el=document.getElementById("fIPrev");
+    el.src=imgData;el.className="img-prev vis";
+  };
+  fr.readAsDataURL(file);
 });
 
 document.getElementById("pFormSave").addEventListener("click", async ()=>{
@@ -1334,7 +1374,20 @@ document.getElementById("btnEC").addEventListener("click",()=>{const rows=admDat
 document.getElementById("btnES").addEventListener("click",()=>{dl("script.js",`const prompts=${JSON.stringify(admData,null,2)};\n`,"text/javascript");admToast("script.js gerado!");});
 document.getElementById("importFileInput").addEventListener("change",e=>{
   const f=e.target.files[0];if(!f)return;
-  const r=new FileReader();r.onload=ev=>{try{const imp=JSON.parse(ev.target.result);if(!Array.isArray(imp))throw 0;if(!confirm(`Importar ${imp.length} prompts?`))return;admData=imp;saveData();renderAdmAll();renderPTable();renderDash();admToast(`${imp.length} prompts importados!`);}catch{admToast("Ficheiro invalido!",true);}};r.readAsText(f);e.target.value="";
+  const r=new FileReader();r.onload=async ev=>{
+    try{
+      const imp=JSON.parse(ev.target.result);
+      if(!Array.isArray(imp))throw 0;
+      if(!confirm(`Importar ${imp.length} prompts? Isto substitui os dados actuais.`))return;
+      admToast("A importar...");
+      // Apaga tudo e insere os novos
+      await fetch(`${SB_URL}/rest/v1/prompts?id=gt.0`,{method:"DELETE",headers:{"apikey":SB_KEY,"Authorization":`Bearer ${SB_KEY}`}});
+      const rows=imp.map(p=>({title:p.title,category:p.category,image:p.image||"",prompt:p.prompt,instructions:p.instructions||"",premium:p.premium||false}));
+      await sbFetch("prompts",{method:"POST",body:JSON.stringify(rows)});
+      await loadData();renderAdmAll();renderPTable();renderDash();
+      admToast(`${imp.length} prompts importados!`);
+    }catch(e){admToast("Ficheiro invalido ou erro!",true);}
+  };r.readAsText(f);e.target.value="";
 });
 function dl(name,content,type){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([content],{type}));a.download=name;a.click();}
 
