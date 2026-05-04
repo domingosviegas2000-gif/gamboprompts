@@ -828,6 +828,7 @@ async function sbFetch(path, opts={}){
 async function loadData(){
   try {
     showLoading(true);
+    // Sempre busca do Supabase — sem cache para garantir consistência
     const rows = await sbFetch("prompts?order=id.asc&limit=10000");
     if(rows && rows.length > 0){
       admData = rows.map(r=>({
@@ -836,13 +837,22 @@ async function loadData(){
         premium: r.premium||false
       }));
     } else {
-      // primeira vez: insere os prompts default no Supabase
       admData = [...DEFAULT_PROMPTS];
       await seedDefaultPrompts();
+      // Recarrega após seed
+      const seeded = await sbFetch("prompts?order=id.asc&limit=10000");
+      if(seeded && seeded.length > 0){
+        admData = seeded.map(r=>({
+          id:r.id,title:r.title,category:r.category,
+          image:r.image||"",prompt:r.prompt,instructions:r.instructions||"",
+          premium:r.premium||false
+        }));
+      }
     }
   } catch(e) {
     console.error("Supabase erro:", e);
-    admData = JSON.parse(localStorage.getItem("gp_prompts")||"null") || [...DEFAULT_PROMPTS];
+    // Fallback: usa defaults (sem localStorage para evitar inconsistências)
+    admData = [...DEFAULT_PROMPTS];
   }
   try{admCats=JSON.parse(localStorage.getItem("gp_cats"))||[...DEFAULT_CATS];}catch{admCats=[...DEFAULT_CATS];}
   sitePrompts=[...admData]; siteCats=[...admCats];
@@ -878,7 +888,17 @@ async function dbUpdatePrompt(id, p){
 }
 
 async function dbDeletePrompt(id){
-  await sbFetch(`prompts?id=eq.${id}`, {method:"DELETE", prefer:"", headers:{"Prefer":""}});
+  // FIX: usar Prefer correcto para delete
+  const res = await fetch(`${SB_URL}/rest/v1/prompts?id=eq.${id}`, {
+    method: "DELETE",
+    headers: {
+      "apikey": SB_KEY,
+      "Authorization": `Bearer ${SB_KEY}`,
+      "Content-Type": "application/json"
+    }
+  });
+  if(!res.ok){ const e=await res.text(); throw new Error(e); }
+  return true;
 }
 
 function showLoading(show){
@@ -1080,10 +1100,13 @@ document.getElementById("loginInput").addEventListener("keydown",e=>{if(e.key===
 async function tryLogin(){
   if(document.getElementById("loginInput").value===ADMIN_PASS){
     document.getElementById("adminLogin").classList.remove("open");
-    document.getElementById("adminPanel").classList.add("open");
     document.getElementById("loginInput").value="";
     document.getElementById("loginErr").textContent="";
-    await loadData();renderAdmAll();showPage("dashboard");
+    showLoading(true);
+    await loadData();
+    showLoading(false);
+    document.getElementById("adminPanel").classList.add("open");
+    renderAdmAll();showPage("dashboard");
   } else {
     document.getElementById("loginErr").textContent="Password incorrecta.";
     document.getElementById("loginInput").value="";
@@ -1365,12 +1388,34 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Escape"){closeModal();[pFormOv,prevOv,cfmOv,catEdOv].forEach(o=>o.classList.remove("open"));}
 });
 
-// INIT
+// INIT — mostra site imediatamente, carrega Supabase em background
 (async()=>{
-  showLoading(true);
-  await loadData();
+  // 1. Mostra site imediatamente com dados default (rápido)
+  admData = [...DEFAULT_PROMPTS];
+  try{admCats=JSON.parse(localStorage.getItem("gp_cats"))||[...DEFAULT_CATS];}catch{admCats=[...DEFAULT_CATS];}
+  sitePrompts=[...admData]; siteCats=[...admCats];
   loadSettings();
   renderSite();
+
+  // 2. Carrega Supabase em background (sem bloquear)
+  try {
+    const rows = await sbFetch("prompts?order=id.asc&limit=10000");
+    if(rows && rows.length > 0){
+      admData = rows.map(r=>({
+        id:r.id,title:r.title,category:r.category,
+        image:r.image||"",prompt:r.prompt,instructions:r.instructions||"",
+        premium:r.premium||false
+      }));
+      sitePrompts=[...admData];
+      renderSite(); // actualiza silenciosamente
+    } else {
+      // primeira vez — seed os defaults
+      await seedDefaultPrompts();
+    }
+  } catch(e){
+    console.error("Supabase erro (background):", e);
+    // Site continua a funcionar com os defaults
+  }
 })();
 </script>
 </body>
