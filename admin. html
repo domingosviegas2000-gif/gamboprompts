@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GamboPrompts Admin PRO</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+    margin:0;
+    padding:20px;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+}
+
+.card{
+    background:#1e293b;
+    padding:20px;
+    border-radius:15px;
+    margin-bottom:20px;
+}
+
+input, textarea, select{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    background:#334155;
+    color:white;
+}
+
+button{
+    background:#3b82f6;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:10px;
+    cursor:pointer;
+    margin-top:10px;
+    font-weight:bold;
+}
+
+button:hover{
+    background:#2563eb;
+}
+
+.prompt{
+    background:#334155;
+    padding:15px;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+.delete{
+    background:#ef4444;
+}
+
+.delete:hover{
+    background:#dc2626;
+}
+
+.premium{
+    color:gold;
+    font-weight:bold;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:20px;
+}
+
+.stat{
+    background:#1e293b;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+}
+
+.login{
+    max-width:400px;
+    margin:100px auto;
+}
+
+.hidden{
+    display:none;
+}
+</style>
+</head>
+
+<body>
+
+<div id="loginPage" class="login">
+    <div class="card">
+        <h2>Login Admin</h2>
+
+        <input type="password" id="password" placeholder="Senha">
+
+        <button onclick="login()">Entrar</button>
+    </div>
+</div>
+
+<div id="adminPanel" class="hidden">
+
+<div class="container">
+
+<h1>🔥 GamboPrompts Admin PRO</h1>
+
+<div class="stats">
+    <div class="stat">
+        <h2 id="totalPrompts">0</h2>
+        <p>Total Prompts</p>
+    </div>
+
+    <div class="stat">
+        <h2>PRO</h2>
+        <p>Plano</p>
+    </div>
+
+    <div class="stat">
+        <h2>Adsense</h2>
+        <p>Monetização</p>
+    </div>
+</div>
+
+<div class="card">
+<h2>Adicionar Prompt</h2>
+
+<input type="text" id="title" placeholder="Título">
+
+<textarea id="content" placeholder="Conteúdo do prompt"></textarea>
+
+<input type="text" id="category" placeholder="Categoria">
+
+<select id="premium">
+<option value="false">Grátis</option>
+<option value="true">Premium</option>
+</select>
+
+<button onclick="addPrompt()">Adicionar Prompt</button>
+</div>
+
+<div class="card">
+<h2>Monetização Afiliada</h2>
+
+<input type="text" id="affiliate" placeholder="Link afiliado">
+
+<button onclick="saveAffiliate()">Salvar Afiliado</button>
+
+<p id="affiliateSaved"></p>
+</div>
+
+<div class="card">
+<h2>Google Adsense</h2>
+
+<textarea id="adsense" placeholder="Código Adsense"></textarea>
+
+<button onclick="saveAdsense()">Salvar Adsense</button>
+
+<p id="adsenseSaved"></p>
+</div>
+
+<div class="card">
+<h2>Configurações do Site</h2>
+
+<input type="text" id="siteName" placeholder="Nome do Site">
+
+<input type="text" id="logo" placeholder="Logo URL">
+
+<button onclick="saveSettings()">Salvar Configurações</button>
+
+<p id="settingsSaved"></p>
+</div>
+
+<div class="card">
+<h2>Lista de Prompts</h2>
+
+<div id="promptList"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+
+const ADMIN_PASSWORD = "gambo123";
+
+function login(){
+    const password = document.getElementById("password").value;
+
+    if(password === ADMIN_PASSWORD){
+        document.getElementById("loginPage").classList.add("hidden");
+        document.getElementById("adminPanel").classList.remove("hidden");
+        loadPrompts();
+    }else{
+        alert("Senha incorreta");
+    }
+}
+
+function addPrompt(){
+
+    const title = document.getElementById("title").value;
+    const content = document.getElementById("content").value;
+    const category = document.getElementById("category").value;
+    const premium = document.getElementById("premium").value;
+
+    const prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+
+    prompts.push({
+        title,
+        content,
+        category,
+        premium
+    });
+
+    localStorage.setItem("prompts", JSON.stringify(prompts));
+
+    loadPrompts();
+
+    document.getElementById("title").value = "";
+    document.getElementById("content").value = "";
+    document.getElementById("category").value = "";
+}
+
+function loadPrompts(){
+
+    const promptList = document.getElementById("promptList");
+
+    promptList.innerHTML = "";
+
+    const prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+
+    document.getElementById("totalPrompts").innerText = prompts.length;
+
+    prompts.forEach((prompt,index)=>{
+
+        promptList.innerHTML += `
+        <div class="prompt">
+            <h3>${prompt.title}</h3>
+
+            <p>${prompt.content}</p>
+
+            <small>${prompt.category}</small>
+
+            <br><br>
+
+            ${prompt.premium === "true"
+            ? "<span class='premium'>PREMIUM</span>"
+            : "<span>GRÁTIS</span>"}
+
+            <br><br>
+
+            <button class="delete" onclick="deletePrompt(${index})">
+                Apagar
+            </button>
+        </div>
+        `;
+    });
+}
+
+function deletePrompt(index){
+
+    const prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+
+    prompts.splice(index,1);
+
+    localStorage.setItem("prompts", JSON.stringify(prompts));
+
+    loadPrompts();
+}
+
+function saveAffiliate(){
+
+    const affiliate = document.getElementById("affiliate").value;
+
+    localStorage.setItem("affiliate", affiliate);
+
+    document.getElementById("affiliateSaved").innerText =
+    "Afiliado salvo com sucesso";
+}
+
+function saveAdsense(){
+
+    const adsense = document.getElementById("adsense").value;
+
+    localStorage.setItem("adsense", adsense);
+
+    document.getElementById("adsenseSaved").innerText =
+    "Adsense salvo com sucesso";
+}
+
+function saveSettings(){
+
+    const siteName = document.getElementById("siteName").value;
+    const logo = document.getElementById("logo").value;
+
+    localStorage.setItem("siteName", siteName);
+    localStorage.setItem("logo", logo);
+
+    document.getElementById("settingsSaved").innerText =
+    "Configurações salvas";
+}
+
+</script>
+
+</body>
+</html>
