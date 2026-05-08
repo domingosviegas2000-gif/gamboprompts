@@ -3,20 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GamboPrompts Admin PRO</title>
+
+<title>GamboPrompts Admin PRO 2.0</title>
 
 <style>
+
 body{
-    font-family: Arial, sans-serif;
+    margin:0;
+    font-family:Arial;
     background:#0f172a;
     color:white;
-    margin:0;
+}
+
+.container{
+    max-width:1400px;
+    margin:auto;
     padding:20px;
 }
 
-.container
-    max-width:1200px;
-    margin:auto;
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
 }
 
 .card{
@@ -26,7 +34,7 @@ body{
     margin-bottom:20px;
 }
 
-input, textarea, select{
+input,textarea,select{
     width:100%;
     padding:12px;
     margin-top:10px;
@@ -34,6 +42,7 @@ input, textarea, select{
     border-radius:10px;
     background:#334155;
     color:white;
+    box-sizing:border-box;
 }
 
 button{
@@ -51,19 +60,12 @@ button:hover{
     background:#2563eb;
 }
 
-.prompt{
-    background:#334155;
-    padding:15px;
-    border-radius:10px;
-    margin-top:10px;
-}
-
 .delete{
     background:#ef4444;
 }
 
-.delete:hover{
-    background:#dc2626;
+.edit{
+    background:#f59e0b;
 }
 
 .premium{
@@ -71,242 +73,445 @@ button:hover{
     font-weight:bold;
 }
 
-.stats{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:20px;
+.prompt-card{
+    background:#334155;
+    padding:15px;
+    border-radius:15px;
+    margin-top:15px;
 }
 
-.stat{
+img{
+    width:100%;
+    border-radius:10px;
+    margin-top:10px;
+}
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.stats{
     background:#1e293b;
     padding:20px;
     border-radius:15px;
     text-align:center;
 }
 
-.login{
-    max-width:400px;
-    margin:100px auto;
-}
-
 .hidden{
     display:none;
 }
+
 </style>
+
 </head>
 
 <body>
 
-<div id="loginPage" class="login">
-    <div class="card">
-        <h2>Login Admin</h2>
-
-        <input type="password" id="password" placeholder="Senha">
-
-        <button onclick="login()">Entrar</button>
-    </div>
-</div>
-
-<div id="adminPanel" class="hidden">
-
 <div class="container">
 
-<h1>🔥 GamboPrompts Admin PRO</h1>
+<div class="topbar">
+<h1>🔥 GamboPrompts Admin PRO 2.0</h1>
+
+<button onclick="exportPrompts()">
+Exportar JSON
+</button>
+</div>
+
+<div class="grid">
 
 <div class="stats">
-    <div class="stat">
-        <h2 id="totalPrompts">0</h2>
-        <p>Total Prompts</p>
-    </div>
+<h2 id="totalPrompts">0</h2>
+<p>Prompts</p>
+</div>
 
-    <div class="stat">
-        <h2>PRO</h2>
-        <p>Plano</p>
-    </div>
+<div class="stats">
+<h2 id="premiumCount">0</h2>
+<p>Premium</p>
+</div>
 
-    <div class="stat">
-        <h2>Adsense</h2>
-        <p>Monetização</p>
-    </div>
+<div class="stats">
+<h2>Adsense</h2>
+<p>Ativo</p>
+</div>
+
+<div class="stats">
+<h2>PRO</h2>
+<p>Painel</p>
+</div>
+
 </div>
 
 <div class="card">
-<h2>Adicionar Prompt</h2>
 
-<input type="text" id="title" placeholder="Título">
+<h2>Adicionar / Editar Prompt</h2>
 
-<textarea id="content" placeholder="Conteúdo do prompt"></textarea>
+<input type="hidden" id="editIndex">
 
-<input type="text" id="category" placeholder="Categoria">
+<input type="text" id="title"
+placeholder="Título do Prompt">
 
-<select id="premium">
-<option value="false">Grátis</option>
-<option value="true">Premium</option>
+<textarea id="prompt"
+placeholder="Conteúdo do Prompt"></textarea>
+
+<textarea id="instructions"
+placeholder="Como usar este prompt"></textarea>
+
+<input type="text" id="image"
+placeholder="URL da imagem">
+
+<select id="category">
+
+<option>ChatGPT</option>
+<option>Midjourney</option>
+<option>Marketing</option>
+<option>Trading</option>
+<option>Negócios</option>
+<option>TikTok</option>
+<option>Automação</option>
+
 </select>
 
-<button onclick="addPrompt()">Adicionar Prompt</button>
+<select id="premium">
+
+<option value="false">Grátis</option>
+<option value="true">Premium</option>
+
+</select>
+
+<input type="text" id="tags"
+placeholder="Tags separadas por vírgula">
+
+<button onclick="savePrompt()">
+Salvar Prompt
+</button>
+
 </div>
 
 <div class="card">
-<h2>Monetização Afiliada</h2>
 
-<input type="text" id="affiliate" placeholder="Link afiliado">
+<h2>Monetização</h2>
 
-<button onclick="saveAffiliate()">Salvar Afiliado</button>
+<input type="text" id="gumroad"
+placeholder="Link Gumroad">
 
-<p id="affiliateSaved"></p>
+<input type="text" id="kofi"
+placeholder="Link Ko-fi">
+
+<input type="text" id="affiliate"
+placeholder="Link Afiliado">
+
+<textarea id="adsense"
+placeholder="Código Adsense"></textarea>
+
+<button onclick="saveMonetization()">
+Salvar Monetização
+</button>
+
 </div>
 
 <div class="card">
-<h2>Google Adsense</h2>
 
-<textarea id="adsense" placeholder="Código Adsense"></textarea>
+<h2>Newsletter Premium</h2>
 
-<button onclick="saveAdsense()">Salvar Adsense</button>
+<input type="text"
+placeholder="Link Beehiiv">
 
-<p id="adsenseSaved"></p>
+<input type="text"
+placeholder="Link ConvertKit">
+
+<button>
+Salvar Newsletter
+</button>
+
 </div>
 
 <div class="card">
+
 <h2>Configurações do Site</h2>
 
-<input type="text" id="siteName" placeholder="Nome do Site">
+<input type="text"
+placeholder="Nome do site">
 
-<input type="text" id="logo" placeholder="Logo URL">
+<input type="text"
+placeholder="Logo URL">
 
-<button onclick="saveSettings()">Salvar Configurações</button>
+<input type="text"
+placeholder="Cor principal">
 
-<p id="settingsSaved"></p>
+<button>
+Salvar Configurações
+</button>
+
 </div>
 
 <div class="card">
+
 <h2>Lista de Prompts</h2>
 
 <div id="promptList"></div>
-</div>
 
 </div>
+
 </div>
 
 <script>
 
-const ADMIN_PASSWORD = "gambo123";
+let prompts =
+JSON.parse(localStorage.getItem("prompts")) || [];
 
-function login(){
-    const password = document.getElementById("password").value;
+function updateDashboard(){
 
-    if(password === ADMIN_PASSWORD){
-        document.getElementById("loginPage").classList.add("hidden");
-        document.getElementById("adminPanel").classList.remove("hidden");
-        loadPrompts();
-    }else{
-        alert("Senha incorreta");
-    }
+document.getElementById("totalPrompts")
+.innerText = prompts.length;
+
+const premium =
+prompts.filter(p=>p.premium==="true");
+
+document.getElementById("premiumCount")
+.innerText = premium.length;
+
 }
 
-function addPrompt(){
+function savePrompt(){
 
-    const title = document.getElementById("title").value;
-    const content = document.getElementById("content").value;
-    const category = document.getElementById("category").value;
-    const premium = document.getElementById("premium").value;
+const title =
+document.getElementById("title").value;
 
-    const prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+const prompt =
+document.getElementById("prompt").value;
 
-    prompts.push({
-        title,
-        content,
-        category,
-        premium
-    });
+const instructions =
+document.getElementById("instructions").value;
 
-    localStorage.setItem("prompts", JSON.stringify(prompts));
+const image =
+document.getElementById("image").value;
 
-    loadPrompts();
+const category =
+document.getElementById("category").value;
 
-    document.getElementById("title").value = "";
-    document.getElementById("content").value = "";
-    document.getElementById("category").value = "";
+const premium =
+document.getElementById("premium").value;
+
+const tags =
+document.getElementById("tags").value;
+
+const editIndex =
+document.getElementById("editIndex").value;
+
+const data = {
+
+title,
+prompt,
+instructions,
+image,
+category,
+premium,
+tags
+
+};
+
+if(editIndex===""){
+
+prompts.push(data);
+
+}else{
+
+prompts[editIndex] = data;
+
 }
 
-function loadPrompts(){
+localStorage.setItem(
+"prompts",
+JSON.stringify(prompts)
+);
 
-    const promptList = document.getElementById("promptList");
+clearForm();
 
-    promptList.innerHTML = "";
+renderPrompts();
 
-    const prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+}
 
-    document.getElementById("totalPrompts").innerText = prompts.length;
+function renderPrompts(){
 
-    prompts.forEach((prompt,index)=>{
+const list =
+document.getElementById("promptList");
 
-        promptList.innerHTML += `
-        <div class="prompt">
-            <h3>${prompt.title}</h3>
+list.innerHTML = "";
 
-            <p>${prompt.content}</p>
+prompts.forEach((p,index)=>{
 
-            <small>${prompt.category}</small>
+list.innerHTML += `
 
-            <br><br>
+<div class="prompt-card">
 
-            ${prompt.premium === "true"
-            ? "<span class='premium'>PREMIUM</span>"
-            : "<span>GRÁTIS</span>"}
+<h2>${p.title}</h2>
 
-            <br><br>
+<p>${p.prompt}</p>
 
-            <button class="delete" onclick="deletePrompt(${index})">
-                Apagar
-            </button>
-        </div>
-        `;
-    });
+<h4>Como usar:</h4>
+
+<p>${p.instructions}</p>
+
+<img src="${p.image}">
+
+<p><b>Categoria:</b> ${p.category}</p>
+
+<p><b>Tags:</b> ${p.tags}</p>
+
+${
+p.premium==="true"
+? "<p class='premium'>PREMIUM</p>"
+: "<p>GRÁTIS</p>"
+}
+
+<button class="edit"
+onclick="editPrompt(${index})">
+Editar
+</button>
+
+<button class="delete"
+onclick="deletePrompt(${index})">
+Apagar
+</button>
+
+</div>
+
+`;
+
+});
+
+updateDashboard();
+
+}
+
+function editPrompt(index){
+
+const p = prompts[index];
+
+document.getElementById("editIndex")
+.value = index;
+
+document.getElementById("title")
+.value = p.title;
+
+document.getElementById("prompt")
+.value = p.prompt;
+
+document.getElementById("instructions")
+.value = p.instructions;
+
+document.getElementById("image")
+.value = p.image;
+
+document.getElementById("category")
+.value = p.category;
+
+document.getElementById("premium")
+.value = p.premium;
+
+document.getElementById("tags")
+.value = p.tags;
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
 }
 
 function deletePrompt(index){
 
-    const prompts = JSON.parse(localStorage.getItem("prompts")) || [];
+if(confirm("Apagar prompt?")){
 
-    prompts.splice(index,1);
+prompts.splice(index,1);
 
-    localStorage.setItem("prompts", JSON.stringify(prompts));
+localStorage.setItem(
+"prompts",
+JSON.stringify(prompts)
+);
 
-    loadPrompts();
+renderPrompts();
+
 }
 
-function saveAffiliate(){
-
-    const affiliate = document.getElementById("affiliate").value;
-
-    localStorage.setItem("affiliate", affiliate);
-
-    document.getElementById("affiliateSaved").innerText =
-    "Afiliado salvo com sucesso";
 }
 
-function saveAdsense(){
+function clearForm(){
 
-    const adsense = document.getElementById("adsense").value;
+document.getElementById("editIndex")
+.value = "";
 
-    localStorage.setItem("adsense", adsense);
+document.getElementById("title")
+.value = "";
 
-    document.getElementById("adsenseSaved").innerText =
-    "Adsense salvo com sucesso";
+document.getElementById("prompt")
+.value = "";
+
+document.getElementById("instructions")
+.value = "";
+
+document.getElementById("image")
+.value = "";
+
+document.getElementById("tags")
+.value = "";
+
 }
 
-function saveSettings(){
+function exportPrompts(){
 
-    const siteName = document.getElementById("siteName").value;
-    const logo = document.getElementById("logo").value;
+const dataStr =
+JSON.stringify(prompts,null,2);
 
-    localStorage.setItem("siteName", siteName);
-    localStorage.setItem("logo", logo);
+const blob =
+new Blob([dataStr],
+{type:"application/json"});
 
-    document.getElementById("settingsSaved").innerText =
-    "Configurações salvas";
+const url =
+URL.createObjectURL(blob);
+
+const a =
+document.createElement("a");
+
+a.href = url;
+
+a.download = "prompts.json";
+
+a.click();
+
 }
+
+function saveMonetization(){
+
+const monetization = {
+
+gumroad:
+document.getElementById("gumroad").value,
+
+kofi:
+document.getElementById("kofi").value,
+
+affiliate:
+document.getElementById("affiliate").value,
+
+adsense:
+document.getElementById("adsense").value
+
+};
+
+localStorage.setItem(
+"monetization",
+JSON.stringify(monetization)
+);
+
+alert("Monetização salva");
+
+}
+
+renderPrompts();
 
 </script>
 
