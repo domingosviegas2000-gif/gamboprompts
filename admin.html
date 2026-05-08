@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>GamboPrompts Admin PRO 2.0</title>
+<title>GamboPrompts Admin PRO 3.0</title>
 
 <style>
 
@@ -21,6 +21,15 @@ body{
     padding:20px;
 }
 
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
 .grid{
     display:grid;
     grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
@@ -32,6 +41,13 @@ body{
     padding:20px;
     border-radius:15px;
     margin-bottom:20px;
+}
+
+.stats{
+    background:#1e293b;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
 }
 
 input,textarea,select{
@@ -84,24 +100,17 @@ img{
     width:100%;
     border-radius:10px;
     margin-top:10px;
+    max-height:300px;
+    object-fit:cover;
 }
 
-.topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:30px;
-}
-
-.stats{
-    background:#1e293b;
+.dropzone{
+    border:2px dashed #64748b;
     padding:20px;
-    border-radius:15px;
+    border-radius:10px;
     text-align:center;
-}
-
-.hidden{
-    display:none;
+    margin-top:10px;
+    cursor:pointer;
 }
 
 </style>
@@ -113,11 +122,23 @@ img{
 <div class="container">
 
 <div class="topbar">
-<h1>🔥 GamboPrompts Admin PRO 2.0</h1>
+
+<h1>🔥 GamboPrompts Admin PRO 3.0</h1>
+
+<div>
+
+<input type="file" id="importFile">
+
+<button onclick="importPrompts()">
+Importar JSON
+</button>
 
 <button onclick="exportPrompts()">
 Exportar JSON
 </button>
+
+</div>
+
 </div>
 
 <div class="grid">
@@ -150,17 +171,32 @@ Exportar JSON
 
 <input type="hidden" id="editIndex">
 
-<input type="text" id="title"
+<input type="text"
+id="title"
 placeholder="Título do Prompt">
 
-<textarea id="prompt"
+<textarea
+id="prompt"
 placeholder="Conteúdo do Prompt"></textarea>
 
-<textarea id="instructions"
+<textarea
+id="instructions"
 placeholder="Como usar este prompt"></textarea>
 
-<input type="text" id="image"
-placeholder="URL da imagem">
+<div class="dropzone"
+onclick="document.getElementById('imageFile').click()">
+
+📁 Arrastar ou selecionar imagem
+
+<input type="file"
+id="imageFile"
+accept="image/*"
+style="display:none">
+
+</div>
+
+<img id="previewImage"
+style="display:none">
 
 <select id="category">
 
@@ -174,6 +210,14 @@ placeholder="URL da imagem">
 
 </select>
 
+<input type="text"
+id="newCategory"
+placeholder="Nova categoria">
+
+<button onclick="addCategory()">
+Adicionar Categoria
+</button>
+
 <select id="premium">
 
 <option value="false">Grátis</option>
@@ -181,7 +225,8 @@ placeholder="URL da imagem">
 
 </select>
 
-<input type="text" id="tags"
+<input type="text"
+id="tags"
 placeholder="Tags separadas por vírgula">
 
 <button onclick="savePrompt()">
@@ -194,16 +239,20 @@ Salvar Prompt
 
 <h2>Monetização</h2>
 
-<input type="text" id="gumroad"
+<input type="text"
+id="gumroad"
 placeholder="Link Gumroad">
 
-<input type="text" id="kofi"
+<input type="text"
+id="kofi"
 placeholder="Link Ko-fi">
 
-<input type="text" id="affiliate"
+<input type="text"
+id="affiliate"
 placeholder="Link Afiliado">
 
-<textarea id="adsense"
+<textarea
+id="adsense"
 placeholder="Código Adsense"></textarea>
 
 <button onclick="saveMonetization()">
@@ -262,6 +311,27 @@ Salvar Configurações
 let prompts =
 JSON.parse(localStorage.getItem("prompts")) || [];
 
+const imageFile =
+document.getElementById("imageFile");
+
+const previewImage =
+document.getElementById("previewImage");
+
+imageFile.addEventListener("change",()=>{
+
+const file = imageFile.files[0];
+
+if(file){
+
+previewImage.src =
+URL.createObjectURL(file);
+
+previewImage.style.display = "block";
+
+}
+
+});
+
 function updateDashboard(){
 
 document.getElementById("totalPrompts")
@@ -286,9 +356,6 @@ document.getElementById("prompt").value;
 const instructions =
 document.getElementById("instructions").value;
 
-const image =
-document.getElementById("image").value;
-
 const category =
 document.getElementById("category").value;
 
@@ -300,6 +367,21 @@ document.getElementById("tags").value;
 
 const editIndex =
 document.getElementById("editIndex").value;
+
+const file =
+imageFile.files[0];
+
+let image = "";
+
+if(file){
+
+image = URL.createObjectURL(file);
+
+}else if(editIndex !== ""){
+
+image = prompts[editIndex].image;
+
+}
 
 const data = {
 
@@ -343,6 +425,14 @@ list.innerHTML = "";
 
 prompts.forEach((p,index)=>{
 
+p.title = p.title || "";
+p.prompt = p.prompt || "";
+p.instructions = p.instructions || "";
+p.image = p.image || "";
+p.category = p.category || "";
+p.tags = p.tags || "";
+p.premium = p.premium || "false";
+
 list.innerHTML += `
 
 <div class="prompt-card">
@@ -355,7 +445,9 @@ list.innerHTML += `
 
 <p>${p.instructions}</p>
 
-<img src="${p.image}">
+${p.image
+? `<img src="${p.image}">`
+: ""}
 
 <p><b>Categoria:</b> ${p.category}</p>
 
@@ -403,9 +495,6 @@ document.getElementById("prompt")
 document.getElementById("instructions")
 .value = p.instructions;
 
-document.getElementById("image")
-.value = p.image;
-
 document.getElementById("category")
 .value = p.category;
 
@@ -414,6 +503,14 @@ document.getElementById("premium")
 
 document.getElementById("tags")
 .value = p.tags;
+
+if(p.image){
+
+previewImage.src = p.image;
+
+previewImage.style.display = "block";
+
+}
 
 window.scrollTo({
 top:0,
@@ -453,11 +550,10 @@ document.getElementById("prompt")
 document.getElementById("instructions")
 .value = "";
 
-document.getElementById("image")
-.value = "";
-
 document.getElementById("tags")
 .value = "";
+
+previewImage.style.display = "none";
 
 }
 
@@ -481,6 +577,64 @@ a.href = url;
 a.download = "prompts.json";
 
 a.click();
+
+}
+
+function importPrompts(){
+
+const file =
+document.getElementById("importFile")
+.files[0];
+
+if(!file) return;
+
+const reader =
+new FileReader();
+
+reader.onload = function(e){
+
+const imported =
+JSON.parse(e.target.result);
+
+prompts = imported;
+
+localStorage.setItem(
+"prompts",
+JSON.stringify(prompts)
+);
+
+renderPrompts();
+
+alert("Prompts importados");
+
+};
+
+reader.readAsText(file);
+
+}
+
+function addCategory(){
+
+const category =
+document.getElementById("newCategory")
+.value;
+
+if(!category) return;
+
+const select =
+document.getElementById("category");
+
+const option =
+document.createElement("option");
+
+option.text = category;
+
+select.add(option);
+
+document.getElementById("newCategory")
+.value = "";
+
+alert("Categoria adicionada");
 
 }
 
