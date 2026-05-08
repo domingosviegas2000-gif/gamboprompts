@@ -1,321 +1,49 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="module">
 
-<title>GamboPrompts Admin PRO 3.0</title>
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-<style>
-
-body{
-    margin:0;
-    font-family:Arial;
-    background:#0f172a;
-    color:white;
+import {
+getFirestore,
+collection,
+addDoc,
+getDocs,
+deleteDoc,
+doc,
+updateDoc
 }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-.container{
-    max-width:1400px;
-    margin:auto;
-    padding:20px;
-}
+const firebaseConfig = {
 
-.topbar{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:30px;
-    flex-wrap:wrap;
-    gap:10px;
-}
+apiKey: "AIzaSyBX3X9rq_-JALXfUhZscA97ef50DJLXa2w",
 
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-    gap:20px;
-}
+authDomain: "gamboprompts.firebaseapp.com",
 
-.card{
-    background:#1e293b;
-    padding:20px;
-    border-radius:15px;
-    margin-bottom:20px;
-}
+projectId: "gamboprompts",
 
-.stats{
-    background:#1e293b;
-    padding:20px;
-    border-radius:15px;
-    text-align:center;
-}
+storageBucket: "gamboprompts.firebasestorage.app",
 
-input,textarea,select{
-    width:100%;
-    padding:12px;
-    margin-top:10px;
-    border:none;
-    border-radius:10px;
-    background:#334155;
-    color:white;
-    box-sizing:border-box;
-}
+messagingSenderId: "582015637499",
 
-button{
-    background:#3b82f6;
-    color:white;
-    border:none;
-    padding:12px 20px;
-    border-radius:10px;
-    cursor:pointer;
-    margin-top:10px;
-    font-weight:bold;
-}
+appId: "1:582015637499:web:5342fb4c0e01b6b8c9dd5e",
 
-button:hover{
-    background:#2563eb;
-}
+measurementId: "G-0WE20EK5TY"
 
-.delete{
-    background:#ef4444;
-}
+};
 
-.edit{
-    background:#f59e0b;
-}
+const app = initializeApp(firebaseConfig);
 
-.premium{
-    color:gold;
-    font-weight:bold;
-}
-
-.prompt-card{
-    background:#334155;
-    padding:15px;
-    border-radius:15px;
-    margin-top:15px;
-}
-
-img{
-    width:100%;
-    border-radius:10px;
-    margin-top:10px;
-    max-height:300px;
-    object-fit:cover;
-}
-
-.dropzone{
-    border:2px dashed #64748b;
-    padding:20px;
-    border-radius:10px;
-    text-align:center;
-    margin-top:10px;
-    cursor:pointer;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="container">
-
-<div class="topbar">
-
-<h1>🔥 GamboPrompts Admin PRO 3.0</h1>
-
-<div>
-
-<input type="file" id="importFile">
-
-<button onclick="importPrompts()">
-Importar JSON
-</button>
-
-<button onclick="exportPrompts()">
-Exportar JSON
-</button>
-
-</div>
-
-</div>
-
-<div class="grid">
-
-<div class="stats">
-<h2 id="totalPrompts">0</h2>
-<p>Prompts</p>
-</div>
-
-<div class="stats">
-<h2 id="premiumCount">0</h2>
-<p>Premium</p>
-</div>
-
-<div class="stats">
-<h2>Adsense</h2>
-<p>Ativo</p>
-</div>
-
-<div class="stats">
-<h2>PRO</h2>
-<p>Painel</p>
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>Adicionar / Editar Prompt</h2>
-
-<input type="hidden" id="editIndex">
-
-<input type="text"
-id="title"
-placeholder="Título do Prompt">
-
-<textarea
-id="prompt"
-placeholder="Conteúdo do Prompt"></textarea>
-
-<textarea
-id="instructions"
-placeholder="Como usar este prompt"></textarea>
-
-<div class="dropzone"
-onclick="document.getElementById('imageFile').click()">
-
-📁 Arrastar ou selecionar imagem
-
-<input type="file"
-id="imageFile"
-accept="image/*"
-style="display:none">
-
-</div>
-
-<img id="previewImage"
-style="display:none">
-
-<select id="category">
-
-<option>ChatGPT</option>
-<option>Midjourney</option>
-<option>Marketing</option>
-<option>Trading</option>
-<option>Negócios</option>
-<option>TikTok</option>
-<option>Automação</option>
-
-</select>
-
-<input type="text"
-id="newCategory"
-placeholder="Nova categoria">
-
-<button onclick="addCategory()">
-Adicionar Categoria
-</button>
-
-<select id="premium">
-
-<option value="false">Grátis</option>
-<option value="true">Premium</option>
-
-</select>
-
-<input type="text"
-id="tags"
-placeholder="Tags separadas por vírgula">
-
-<button onclick="savePrompt()">
-Salvar Prompt
-</button>
-
-</div>
-
-<div class="card">
-
-<h2>Monetização</h2>
-
-<input type="text"
-id="gumroad"
-placeholder="Link Gumroad">
-
-<input type="text"
-id="kofi"
-placeholder="Link Ko-fi">
-
-<input type="text"
-id="affiliate"
-placeholder="Link Afiliado">
-
-<textarea
-id="adsense"
-placeholder="Código Adsense"></textarea>
-
-<button onclick="saveMonetization()">
-Salvar Monetização
-</button>
-
-</div>
-
-<div class="card">
-
-<h2>Newsletter Premium</h2>
-
-<input type="text"
-placeholder="Link Beehiiv">
-
-<input type="text"
-placeholder="Link ConvertKit">
-
-<button>
-Salvar Newsletter
-</button>
-
-</div>
-
-<div class="card">
-
-<h2>Configurações do Site</h2>
-
-<input type="text"
-placeholder="Nome do site">
-
-<input type="text"
-placeholder="Logo URL">
-
-<input type="text"
-placeholder="Cor principal">
-
-<button>
-Salvar Configurações
-</button>
-
-</div>
-
-<div class="card">
-
-<h2>Lista de Prompts</h2>
-
-<div id="promptList"></div>
-
-</div>
-
-</div>
-
-<script>
-
-let prompts =
-JSON.parse(localStorage.getItem("prompts")) || [];
+const db = getFirestore(app);
 
 const imageFile =
 document.getElementById("imageFile");
 
 const previewImage =
 document.getElementById("previewImage");
+
+const promptList =
+document.getElementById("promptList");
 
 imageFile.addEventListener("change",()=>{
 
@@ -332,29 +60,16 @@ previewImage.style.display = "block";
 
 });
 
-function updateDashboard(){
-
-document.getElementById("totalPrompts")
-.innerText = prompts.length;
-
-const premium =
-prompts.filter(p=>p.premium==="true");
-
-document.getElementById("premiumCount")
-.innerText = premium.length;
-
-}
-
-function savePrompt(){
+window.savePrompt = async function(){
 
 const title =
-document.getElementById("title").value;
+document.getElementById("title").value.trim();
 
 const prompt =
-document.getElementById("prompt").value;
+document.getElementById("prompt").value.trim();
 
 const instructions =
-document.getElementById("instructions").value;
+document.getElementById("instructions").value.trim();
 
 const category =
 document.getElementById("category").value;
@@ -363,23 +78,18 @@ const premium =
 document.getElementById("premium").value;
 
 const tags =
-document.getElementById("tags").value;
+document.getElementById("tags")
+.value.trim();
 
-const editIndex =
-document.getElementById("editIndex").value;
-
-const file =
-imageFile.files[0];
+const editId =
+document.getElementById("editIndex")
+.value;
 
 let image = "";
 
-if(file){
+if(previewImage.src){
 
-image = URL.createObjectURL(file);
-
-}else if(editIndex !== ""){
-
-image = prompts[editIndex].image;
+image = previewImage.src;
 
 }
 
@@ -391,81 +101,139 @@ instructions,
 image,
 category,
 premium,
-tags
+tags,
+createdAt: Date.now()
 
 };
 
-if(editIndex===""){
+if(!title || !prompt){
 
-prompts.push(data);
+alert("Preencha título e prompt");
+
+return;
+
+}
+
+try{
+
+if(editId){
+
+await updateDoc(
+doc(db,"gambo_prompts",editId),
+data
+);
+
+alert("Prompt atualizado");
 
 }else{
 
-prompts[editIndex] = data;
+await addDoc(
+collection(db,"gambo_prompts"),
+data
+);
+
+alert("Prompt salvo online");
 
 }
-
-localStorage.setItem(
-"prompts",
-JSON.stringify(prompts)
-);
 
 clearForm();
 
-renderPrompts();
+loadPrompts();
+
+}catch(error){
+
+console.error(error);
+
+alert("Erro ao salvar");
 
 }
 
-function renderPrompts(){
+};
 
-const list =
-document.getElementById("promptList");
+window.loadPrompts = async function(){
 
-list.innerHTML = "";
+promptList.innerHTML = `
+<p>A carregar prompts...</p>
+`;
 
-prompts.forEach((p,index)=>{
+try{
 
-p.title = p.title || "";
-p.prompt = p.prompt || "";
-p.instructions = p.instructions || "";
-p.image = p.image || "";
-p.category = p.category || "";
-p.tags = p.tags || "";
-p.premium = p.premium || "false";
+const querySnapshot =
+await getDocs(
+collection(db,"gambo_prompts")
+);
 
-list.innerHTML += `
+promptList.innerHTML = "";
+
+let total = 0;
+let premiumCount = 0;
+
+querySnapshot.forEach((docItem)=>{
+
+const p = docItem.data();
+
+const id = docItem.id;
+
+total++;
+
+if(p.premium === "true"){
+
+premiumCount++;
+
+}
+
+promptList.innerHTML += `
 
 <div class="prompt-card">
 
-<h2>${p.title}</h2>
+<h2>${p.title || ""}</h2>
 
-<p>${p.prompt}</p>
+<p>${p.prompt || ""}</p>
 
 <h4>Como usar:</h4>
 
-<p>${p.instructions}</p>
-
-${p.image
-? `<img src="${p.image}">`
-: ""}
-
-<p><b>Categoria:</b> ${p.category}</p>
-
-<p><b>Tags:</b> ${p.tags}</p>
+<p>${p.instructions || ""}</p>
 
 ${
-p.premium==="true"
+p.image
+? `<img src="${p.image}">`
+: ""
+}
+
+<p>
+<b>Categoria:</b>
+${p.category || ""}
+</p>
+
+<p>
+<b>Tags:</b>
+${p.tags || ""}
+</p>
+
+${
+p.premium === "true"
 ? "<p class='premium'>PREMIUM</p>"
 : "<p>GRÁTIS</p>"
 }
 
-<button class="edit"
-onclick="editPrompt(${index})">
+<button
+class="edit"
+onclick="editPrompt(
+'${id}',
+\`${p.title || ""}\`,
+\`${p.prompt || ""}\`,
+\`${p.instructions || ""}\`,
+\`${p.category || ""}\`,
+\`${p.premium || "false"}\`,
+\`${p.tags || ""}\`,
+\`${p.image || ""}\`
+)">
 Editar
 </button>
 
-<button class="delete"
-onclick="deletePrompt(${index})">
+<button
+class="delete"
+onclick="deletePrompt('${id}')">
 Apagar
 </button>
 
@@ -475,68 +243,99 @@ Apagar
 
 });
 
-updateDashboard();
+document.getElementById("totalPrompts")
+.innerText = total;
+
+document.getElementById("premiumCount")
+.innerText = premiumCount;
+
+}catch(error){
+
+console.error(error);
+
+promptList.innerHTML = `
+<p>Erro ao carregar prompts</p>
+`;
 
 }
 
-function editPrompt(index){
+};
 
-const p = prompts[index];
+window.editPrompt = function(
+id,
+title,
+prompt,
+instructions,
+category,
+premium,
+tags,
+image
+){
 
 document.getElementById("editIndex")
-.value = index;
+.value = id;
 
 document.getElementById("title")
-.value = p.title;
+.value = title;
 
 document.getElementById("prompt")
-.value = p.prompt;
+.value = prompt;
 
 document.getElementById("instructions")
-.value = p.instructions;
+.value = instructions;
 
 document.getElementById("category")
-.value = p.category;
+.value = category;
 
 document.getElementById("premium")
-.value = p.premium;
+.value = premium;
 
 document.getElementById("tags")
-.value = p.tags;
+.value = tags;
 
-if(p.image){
+if(image){
 
-previewImage.src = p.image;
+previewImage.src = image;
 
 previewImage.style.display = "block";
 
 }
 
 window.scrollTo({
+
 top:0,
 behavior:"smooth"
+
 });
 
-}
+};
 
-function deletePrompt(index){
+window.deletePrompt = async function(id){
 
-if(confirm("Apagar prompt?")){
+const confirmDelete =
+confirm("Apagar prompt?");
 
-prompts.splice(index,1);
+if(!confirmDelete) return;
 
-localStorage.setItem(
-"prompts",
-JSON.stringify(prompts)
+try{
+
+await deleteDoc(
+doc(db,"gambo_prompts",id)
 );
 
-renderPrompts();
+loadPrompts();
+
+}catch(error){
+
+console.error(error);
+
+alert("Erro ao apagar");
 
 }
 
-}
+};
 
-function clearForm(){
+window.clearForm = function(){
 
 document.getElementById("editIndex")
 .value = "";
@@ -555,71 +354,21 @@ document.getElementById("tags")
 
 previewImage.style.display = "none";
 
-}
-
-function exportPrompts(){
-
-const dataStr =
-JSON.stringify(prompts,null,2);
-
-const blob =
-new Blob([dataStr],
-{type:"application/json"});
-
-const url =
-URL.createObjectURL(blob);
-
-const a =
-document.createElement("a");
-
-a.href = url;
-
-a.download = "prompts.json";
-
-a.click();
-
-}
-
-function importPrompts(){
-
-const file =
-document.getElementById("importFile")
-.files[0];
-
-if(!file) return;
-
-const reader =
-new FileReader();
-
-reader.onload = function(e){
-
-const imported =
-JSON.parse(e.target.result);
-
-prompts = imported;
-
-localStorage.setItem(
-"prompts",
-JSON.stringify(prompts)
-);
-
-renderPrompts();
-
-alert("Prompts importados");
-
 };
 
-reader.readAsText(file);
-
-}
-
-function addCategory(){
+window.addCategory = function(){
 
 const category =
 document.getElementById("newCategory")
-.value;
+.value.trim();
 
-if(!category) return;
+if(!category){
+
+alert("Digite categoria");
+
+return;
+
+}
 
 const select =
 document.getElementById("category");
@@ -636,23 +385,111 @@ document.getElementById("newCategory")
 
 alert("Categoria adicionada");
 
+};
+
+window.exportPrompts = async function(){
+
+const querySnapshot =
+await getDocs(
+collection(db,"gambo_prompts")
+);
+
+const prompts = [];
+
+querySnapshot.forEach((docItem)=>{
+
+prompts.push({
+
+id: docItem.id,
+...docItem.data()
+
+});
+
+});
+
+const dataStr =
+JSON.stringify(prompts,null,2);
+
+const blob =
+new Blob(
+[dataStr],
+{type:"application/json"}
+);
+
+const url =
+URL.createObjectURL(blob);
+
+const a =
+document.createElement("a");
+
+a.href = url;
+
+a.download = "gamboprompts.json";
+
+a.click();
+
+};
+
+window.importPrompts = function(){
+
+const file =
+document.getElementById("importFile")
+.files[0];
+
+if(!file){
+
+alert("Escolha um ficheiro");
+
+return;
+
 }
 
-function saveMonetization(){
+const reader =
+new FileReader();
+
+reader.onload = async function(e){
+
+const imported =
+JSON.parse(e.target.result);
+
+for(const item of imported){
+
+await addDoc(
+collection(db,"gambo_prompts"),
+item
+);
+
+}
+
+alert("Prompts importados");
+
+loadPrompts();
+
+};
+
+reader.readAsText(file);
+
+};
+
+window.saveMonetization = function(){
 
 const monetization = {
 
 gumroad:
-document.getElementById("gumroad").value,
+document.getElementById("gumroad")
+.value,
 
 kofi:
-document.getElementById("kofi").value,
+document.getElementById("kofi")
+.value,
 
 affiliate:
-document.getElementById("affiliate").value,
+document.getElementById("affiliate")
+.value,
 
 adsense:
-document.getElementById("adsense").value
+document.getElementById("adsense")
+.value
 
 };
 
@@ -663,11 +500,8 @@ JSON.stringify(monetization)
 
 alert("Monetização salva");
 
-}
+};
 
-renderPrompts();
+loadPrompts();
 
 </script>
-
-</body>
-</html>
