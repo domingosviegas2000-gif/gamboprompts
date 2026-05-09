@@ -1,3 +1,322 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GamboPrompts Admin PRO 4.0</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+background:#0f172a;
+font-family:Arial, sans-serif;
+color:white;
+padding:20px;
+}
+
+.container{
+max-width:1400px;
+margin:auto;
+}
+
+h1,h2,h3,h4{
+margin-bottom:10px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+margin-bottom:20px;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:16px;
+margin-bottom:20px;
+box-shadow:0 0 10px rgba(0,0,0,0.3);
+}
+
+.stats{
+background:#1e293b;
+padding:20px;
+border-radius:16px;
+text-align:center;
+}
+
+.stats h2{
+font-size:32px;
+margin-bottom:5px;
+}
+
+input,
+textarea,
+select{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:10px;
+background:#334155;
+color:white;
+font-size:15px;
+}
+
+textarea{
+min-height:120px;
+resize:vertical;
+}
+
+button{
+padding:12px 18px;
+border:none;
+border-radius:10px;
+background:#3b82f6;
+color:white;
+font-weight:bold;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#2563eb;
+}
+
+.delete{
+background:#ef4444;
+}
+
+.edit{
+background:#f59e0b;
+}
+
+.premium{
+color:gold;
+font-weight:bold;
+margin-top:10px;
+}
+
+.prompt-card{
+background:#334155;
+padding:20px;
+border-radius:14px;
+margin-top:15px;
+}
+
+.prompt-card img{
+width:100%;
+border-radius:10px;
+margin-top:10px;
+max-height:300px;
+object-fit:cover;
+}
+
+.dropzone{
+border:2px dashed #64748b;
+padding:25px;
+border-radius:12px;
+text-align:center;
+margin-top:10px;
+cursor:pointer;
+}
+
+.top-buttons{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:10px;
+}
+
+#previewImage{
+width:100%;
+margin-top:10px;
+border-radius:10px;
+display:none;
+max-height:300px;
+object-fit:cover;
+}
+
+small{
+color:#94a3b8;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🔥 GamboPrompts Admin PRO 4.0</h1>
+
+<div class="top-buttons">
+
+<input type="file" id="importFile">
+
+<button onclick="importPrompts()">
+Importar JSON
+</button>
+
+<button onclick="exportPrompts()">
+Exportar JSON
+</button>
+
+</div>
+
+<br>
+
+<div class="grid">
+
+<div class="stats">
+<h2 id="totalPrompts">0</h2>
+<p>Total Prompts</p>
+</div>
+
+<div class="stats">
+<h2 id="premiumCount">0</h2>
+<p>Premium</p>
+</div>
+
+<div class="stats">
+<h2>Adsense</h2>
+<p>Ativo</p>
+</div>
+
+<div class="stats">
+<h2>PRO</h2>
+<p>Painel</p>
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Adicionar / Editar Prompt</h2>
+
+<input type="hidden" id="editIndex">
+
+<input
+type="text"
+id="title"
+placeholder="Título do Prompt">
+
+<textarea
+id="prompt"
+placeholder="Conteúdo do Prompt"></textarea>
+
+<textarea
+id="instructions"
+placeholder="Como usar este prompt"></textarea>
+
+<div
+class="dropzone"
+onclick="document.getElementById('imageFile').click()">
+
+📁 Selecionar imagem
+
+<input
+type="file"
+id="imageFile"
+accept="image/*"
+style="display:none">
+
+</div>
+
+<img id="previewImage">
+
+<select id="category">
+
+<option>ChatGPT</option>
+<option>Midjourney</option>
+<option>Marketing</option>
+<option>Trading</option>
+<option>Negócios</option>
+<option>TikTok</option>
+<option>Automação</option>
+
+</select>
+
+<input
+type="text"
+id="newCategory"
+placeholder="Nova categoria">
+
+<button onclick="addCategory()">
+Adicionar Categoria
+</button>
+
+<select id="premium">
+
+<option value="false">
+Grátis
+</option>
+
+<option value="true">
+Premium
+</option>
+
+</select>
+
+<input
+type="text"
+id="tags"
+placeholder="Tags separadas por vírgula">
+
+<button onclick="savePrompt()">
+Salvar Prompt
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Monetização</h2>
+
+<input
+type="text"
+id="gumroad"
+placeholder="Link Gumroad">
+
+<input
+type="text"
+id="kofi"
+placeholder="Link Ko-fi">
+
+<input
+type="text"
+id="affiliate"
+placeholder="Link Afiliado">
+
+<textarea
+id="adsense"
+placeholder="Código Adsense"></textarea>
+
+<button onclick="saveMonetization()">
+Salvar Monetização
+</button>
+
+</div>
+
+<div class="card">
+
+<h2>Lista de Prompts</h2>
+
+<div id="promptList"></div>
+
+</div>
+
+</div>
+
 <script type="module">
 
 import { initializeApp }
@@ -78,18 +397,24 @@ const premium =
 document.getElementById("premium").value;
 
 const tags =
-document.getElementById("tags")
-.value.trim();
+document.getElementById("tags").value.trim();
 
 const editId =
-document.getElementById("editIndex")
-.value;
+document.getElementById("editIndex").value;
 
 let image = "";
 
 if(previewImage.src){
 
 image = previewImage.src;
+
+}
+
+if(!title || !prompt){
+
+alert("Preencha título e prompt");
+
+return;
 
 }
 
@@ -105,14 +430,6 @@ tags,
 createdAt: Date.now()
 
 };
-
-if(!title || !prompt){
-
-alert("Preencha título e prompt");
-
-return;
-
-}
 
 try{
 
@@ -152,9 +469,8 @@ alert("Erro ao salvar");
 
 window.loadPrompts = async function(){
 
-promptList.innerHTML = `
-<p>A carregar prompts...</p>
-`;
+promptList.innerHTML =
+"<p>A carregar prompts...</p>";
 
 try{
 
@@ -216,6 +532,8 @@ p.premium === "true"
 : "<p>GRÁTIS</p>"
 }
 
+<div class="top-buttons">
+
 <button
 class="edit"
 onclick="editPrompt(
@@ -239,6 +557,8 @@ Apagar
 
 </div>
 
+</div>
+
 `;
 
 });
@@ -253,9 +573,8 @@ document.getElementById("premiumCount")
 
 console.error(error);
 
-promptList.innerHTML = `
-<p>Erro ao carregar prompts</p>
-`;
+promptList.innerHTML =
+"<p>Erro ao carregar prompts</p>";
 
 }
 
@@ -505,3 +824,6 @@ alert("Monetização salva");
 loadPrompts();
 
 </script>
+
+</body>
+</html>
