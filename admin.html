@@ -1,1 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt">
 
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>GamboPrompts Admin</title>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+</head>
+
+<body>
+
+<div class="admin">
+
+<h1>🔥 GamboPrompts Admin</h1>
+
+<input id="title" placeholder="Título">
+
+<input id="category" placeholder="Categoria">
+
+<input id="image" placeholder="Link da imagem">
+
+<textarea id="prompt" placeholder="Prompt completo"></textarea>
+
+<textarea id="instructions" placeholder="Instruções"></textarea>
+
+<label>
+<input type="checkbox" id="premium">
+Premium
+</label>
+
+<button id="saveBtn">
+Salvar Prompt
+</button>
+
+<hr>
+
+<div id="promptList"></div>
+
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+
+</html>
