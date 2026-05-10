@@ -1,320 +1,6 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>GamboPrompts Admin PRO 4.1</title>
-
-<style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-body{
-background:#0f172a;
-font-family:Arial,sans-serif;
-color:white;
-padding:20px;
-}
-
-.container{
-max-width:1400px;
-margin:auto;
-}
-
-h1,h2,h3,h4{
-margin-bottom:10px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-margin-bottom:20px;
-}
-
-.stats{
-background:#1e293b;
-padding:20px;
-border-radius:16px;
-text-align:center;
-}
-
-.stats h2{
-font-size:32px;
-}
-
-.card{
-background:#1e293b;
-padding:20px;
-border-radius:16px;
-margin-bottom:20px;
-}
-
-input,
-textarea,
-select{
-width:100%;
-padding:12px;
-margin-top:10px;
-border:none;
-border-radius:10px;
-background:#334155;
-color:white;
-font-size:15px;
-}
-
-textarea{
-min-height:120px;
-resize:vertical;
-}
-
-button{
-background:#3b82f6;
-color:white;
-border:none;
-padding:12px 18px;
-border-radius:10px;
-cursor:pointer;
-font-weight:bold;
-margin-top:10px;
-}
-
-button:hover{
-background:#2563eb;
-}
-
-.edit{
-background:#f59e0b;
-}
-
-.delete{
-background:#ef4444;
-}
-
-.prompt-card{
-background:#334155;
-padding:20px;
-border-radius:14px;
-margin-top:15px;
-}
-
-.prompt-card img{
-width:100%;
-max-height:300px;
-object-fit:cover;
-border-radius:10px;
-margin-top:10px;
-}
-
-.premium{
-color:gold;
-font-weight:bold;
-margin-top:10px;
-}
-
-.dropzone{
-border:2px dashed #64748b;
-padding:25px;
-border-radius:12px;
-text-align:center;
-margin-top:10px;
-cursor:pointer;
-}
-
-#previewImage{
-width:100%;
-max-height:300px;
-object-fit:cover;
-border-radius:10px;
-margin-top:10px;
-display:none;
-}
-
-.top-buttons{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:10px;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<div class="container">
-
-<h1>🔥 GamboPrompts Admin PRO 4.1</h1>
-
-<div class="top-buttons">
-
-<input type="file" id="importFile">
-
-<button onclick="importPrompts()">
-Importar JSON
-</button>
-
-<button onclick="exportPrompts()">
-Exportar JSON
-</button>
-
-</div>
-
-<br>
-
-<div class="grid">
-
-<div class="stats">
-<h2 id="totalPrompts">0</h2>
-<p>Total Prompts</p>
-</div>
-
-<div class="stats">
-<h2 id="premiumCount">0</h2>
-<p>Premium</p>
-</div>
-
-<div class="stats">
-<h2>Adsense</h2>
-<p>Ativo</p>
-</div>
-
-<div class="stats">
-<h2>PRO</h2>
-<p>Painel</p>
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>Adicionar / Editar Prompt</h2>
-
-<input type="hidden" id="editIndex">
-
-<input
-type="text"
-id="title"
-placeholder="Título do Prompt">
-
-<textarea
-id="prompt"
-placeholder="Conteúdo do Prompt"></textarea>
-
-<textarea
-id="instructions"
-placeholder="Como usar este prompt"></textarea>
-
-<div
-class="dropzone"
-onclick="document.getElementById('imageFile').click()">
-
-📁 Selecionar imagem
-
-<input
-type="file"
-id="imageFile"
-accept="image/*"
-style="display:none">
-
-</div>
-
-<img id="previewImage">
-
-<select id="category">
-
-<option>ChatGPT</option>
-<option>Midjourney</option>
-<option>Marketing</option>
-<option>Trading</option>
-<option>Negócios</option>
-<option>TikTok</option>
-<option>Automação</option>
-
-</select>
-
-<input
-type="text"
-id="newCategory"
-placeholder="Nova categoria">
-
-<button onclick="addCategory()">
-Adicionar Categoria
-</button>
-
-<select id="premium">
-
-<option value="false">
-Grátis
-</option>
-
-<option value="true">
-Premium
-</option>
-
-</select>
-
-<input
-type="text"
-id="tags"
-placeholder="Tags separadas por vírgula">
-
-<button onclick="savePrompt()">
-Salvar Prompt
-</button>
-
-</div>
-
-<div class="card">
-
-<h2>Monetização</h2>
-
-<input
-type="text"
-id="gumroad"
-placeholder="Link Gumroad">
-
-<input
-type="text"
-id="kofi"
-placeholder="Link Ko-fi">
-
-<input
-type="text"
-id="affiliate"
-placeholder="Link Afiliado">
-
-<textarea
-id="adsense"
-placeholder="Código Adsense"></textarea>
-
-<button onclick="saveMonetization()">
-Salvar Monetização
-</button>
-
-</div>
-
-<div class="card">
-
-<h2>Lista de Prompts</h2>
-
-<div id="promptList"></div>
-
-</div>
-
-</div>
-
 <script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
 getFirestore,
@@ -324,64 +10,374 @@ getDocs,
 deleteDoc,
 doc,
 updateDoc
-}
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-
 apiKey: "AIzaSyBX3X9rq_-JALXfUhZscA97ef50DJLXa2w",
-
 authDomain: "gamboprompts.firebaseapp.com",
-
 projectId: "gamboprompts",
-
 storageBucket: "gamboprompts.firebasestorage.app",
-
 messagingSenderId: "582015637499",
-
 appId: "1:582015637499:web:5342fb4c0e01b6b8c9dd5e",
-
 measurementId: "G-0WE20EK5TY"
-
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 
-const imageFile =
-document.getElementById("imageFile");
+const imageFile = document.getElementById("imageFile");
+const previewImage = document.getElementById("previewImage");
+const promptList = document.getElementById("promptList");
 
-const previewImage =
-document.getElementById("previewImage");
-
-const promptList =
-document.getElementById("promptList");
-
-imageFile.addEventListener("change",()=>{
+imageFile.addEventListener("change", () => {
 
 const file = imageFile.files[0];
 
 if(file){
-
-previewImage.src =
-URL.createObjectURL(file);
-
+previewImage.src = URL.createObjectURL(file);
 previewImage.style.display = "block";
-
 }
 
 });
 
 window.savePrompt = async function(){
 
-const title =
-document.getElementById("title").value.trim();
+const title = document.getElementById("title").value.trim();
+const prompt = document.getElementById("prompt").value.trim();
+const instructions = document.getElementById("instructions").value.trim();
+const category = document.getElementById("category").value;
+const premium = document.getElementById("premium").value;
+const tags = document.getElementById("tags").value.trim();
+const editId = document.getElementById("editIndex").value;
 
-const prompt =
-document.getElementById("prompt").value.trim();
+if(!title || !prompt){
+alert("Preencha título e prompt");
+return;
+}
 
-const instructions =
-document.getElementById("instructions").value.trim();
+let image = "";
 
-const
+if(previewImage.src){
+image = previewImage.src;
+}
+
+const data = {
+title,
+prompt,
+instructions,
+image,
+category,
+premium,
+tags,
+createdAt: Date.now()
+};
+
+try{
+
+if(editId){
+
+await updateDoc(
+doc(db,"gambo_prompts",editId),
+data
+);
+
+alert("Prompt atualizado");
+
+}else{
+
+await addDoc(
+collection(db,"gambo_prompts"),
+data
+);
+
+alert("Prompt salvo online");
+
+}
+
+clearForm();
+await loadPrompts();
+
+}catch(error){
+console.error(error);
+alert("Erro ao salvar prompt");
+}
+
+};
+
+window.loadPrompts = async function(){
+
+promptList.innerHTML = "<p>A carregar prompts...</p>";
+
+try{
+
+const querySnapshot = await getDocs(
+collection(db,"gambo_prompts")
+);
+
+promptList.innerHTML = "";
+
+let total = 0;
+let premiumCount = 0;
+
+querySnapshot.forEach((docItem)=>{
+
+const p = docItem.data();
+const id = docItem.id;
+
+if(p.premium === "true"){
+premiumCount++;
+}
+
+total++;
+
+promptList.innerHTML += `
+
+<div class="prompt-card">
+
+<h2>${p.title || ""}</h2>
+
+<p>${p.prompt || ""}</p>
+
+<h4>Como usar:</h4>
+
+<p>${p.instructions || ""}</p>
+
+${
+p.image
+? `<img src="${p.image}">`
+: ""
+}
+
+<p><b>Categoria:</b> ${p.category || ""}</p>
+
+<p><b>Tags:</b> ${p.tags || ""}</p>
+
+${
+p.premium === "true"
+? "<p class='premium'>PREMIUM</p>"
+: "<p>GRÁTIS</p>"
+}
+
+<button class="edit" onclick="editPrompt('${id}')">
+Editar
+</button>
+
+<button class="delete" onclick="deletePrompt('${id}')">
+Apagar
+</button>
+
+</div>
+
+`;
+
+window[`prompt_${id}`] = p;
+
+});
+
+document.getElementById("totalPrompts").innerText = total;
+document.getElementById("premiumCount").innerText = premiumCount;
+
+}catch(error){
+console.error(error);
+promptList.innerHTML = "<p>Erro ao carregar prompts</p>";
+}
+
+};
+
+window.editPrompt = function(id){
+
+const p = window[`prompt_${id}`];
+
+if(!p) return;
+
+document.getElementById("editIndex").value = id;
+document.getElementById("title").value = p.title || "";
+document.getElementById("prompt").value = p.prompt || "";
+document.getElementById("instructions").value = p.instructions || "";
+document.getElementById("category").value = p.category || "ChatGPT";
+document.getElementById("premium").value = p.premium || "false";
+document.getElementById("tags").value = p.tags || "";
+
+if(p.image){
+previewImage.src = p.image;
+previewImage.style.display = "block";
+}
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+};
+
+window.deletePrompt = async function(id){
+
+const confirmDelete = confirm("Apagar prompt?");
+
+if(!confirmDelete) return;
+
+try{
+
+await deleteDoc(
+doc(db,"gambo_prompts",id)
+);
+
+await loadPrompts();
+
+}catch(error){
+console.error(error);
+alert("Erro ao apagar");
+}
+
+};
+
+window.clearForm = function(){
+
+document.getElementById("editIndex").value = "";
+document.getElementById("title").value = "";
+document.getElementById("prompt").value = "";
+document.getElementById("instructions").value = "";
+document.getElementById("tags").value = "";
+
+previewImage.style.display = "none";
+previewImage.src = "";
+
+};
+
+window.addCategory = function(){
+
+const category = document.getElementById("newCategory").value.trim();
+
+if(!category){
+alert("Digite uma categoria");
+return;
+}
+
+const select = document.getElementById("category");
+const option = document.createElement("option");
+
+option.value = category;
+option.textContent = category;
+
+select.appendChild(option);
+
+select.value = category;
+
+document.getElementById("newCategory").value = "";
+
+alert("Categoria adicionada");
+
+};
+
+window.exportPrompts = async function(){
+
+try{
+
+const querySnapshot = await getDocs(
+collection(db,"gambo_prompts")
+);
+
+const prompts = [];
+
+querySnapshot.forEach((docItem)=>{
+
+prompts.push({
+id: docItem.id,
+...docItem.data()
+});
+
+});
+
+const dataStr = JSON.stringify(prompts,null,2);
+
+const blob = new Blob(
+[dataStr],
+{type:"application/json"}
+);
+
+const url = URL.createObjectURL(blob);
+
+const a = document.createElement("a");
+
+a.href = url;
+a.download = "gamboprompts.json";
+a.click();
+
+}catch(error){
+console.error(error);
+alert("Erro ao exportar");
+}
+
+};
+
+window.importPrompts = async function(){
+
+const file = document.getElementById("importFile").files[0];
+
+if(!file){
+alert("Escolha um ficheiro JSON");
+return;
+}
+
+const reader = new FileReader();
+
+reader.onload = async function(e){
+
+try{
+
+const imported = JSON.parse(e.target.result);
+
+for(const item of imported){
+
+await addDoc(
+collection(db,"gambo_prompts"),
+item
+);
+
+}
+
+alert("Prompts importados");
+
+await loadPrompts();
+
+}catch(error){
+console.error(error);
+alert("Erro ao importar prompts");
+}
+
+};
+
+reader.readAsText(file);
+
+};
+
+window.saveMonetization = function(){
+
+const monetization = {
+
+gumroad:
+document.getElementById("gumroad").value,
+
+kofi:
+document.getElementById("kofi").value,
+
+affiliate:
+document.getElementById("affiliate").value,
+
+adsense:
+document.getElementById("adsense").value
+
+};
+
+localStorage.setItem(
+"monetization",
+JSON.stringify(monetization)
+);
+
+alert("Monetização salva");
+
+};
+
+loadPrompts();
+
+</script>
