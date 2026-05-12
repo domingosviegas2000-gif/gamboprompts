@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Painel Administrativo - GamboPrompts</title>
+  <title>Painel Administrativo</title>
 
   <style>
     *{
@@ -16,17 +16,19 @@
     body{
       background:#0f172a;
       color:white;
+      display:flex;
     }
 
+    /* MENU LATERAL */
+
     .sidebar{
-      position:fixed;
-      left:0;
-      top:0;
-      width:240px;
+      width:250px;
       height:100vh;
       background:#111827;
       padding:20px;
-      overflow:auto;
+      position:fixed;
+      left:0;
+      top:0;
     }
 
     .sidebar h2{
@@ -34,35 +36,50 @@
       color:#38bdf8;
     }
 
-    .sidebar ul{
-      list-style:none;
-    }
-
-    .sidebar ul li{
-      padding:15px;
+    .sidebar a{
+      display:block;
+      color:#fff;
+      text-decoration:none;
+      padding:14px;
       margin-bottom:10px;
-      background:#1e293b;
-      border-radius:10px;
-      cursor:pointer;
+      border-radius:8px;
       transition:0.3s;
+      background:#1f2937;
     }
 
-    .sidebar ul li:hover{
+    .sidebar a:hover{
       background:#38bdf8;
-      color:black;
     }
+
+    /* CONTEÚDO */
 
     .main{
-      margin-left:260px;
-      padding:20px;
+      margin-left:250px;
+      width:100%;
+      padding:30px;
     }
 
     .topbar{
-      background:#111827;
-      padding:20px;
-      border-radius:15px;
-      margin-bottom:20px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:30px;
     }
+
+    .topbar h1{
+      font-size:28px;
+    }
+
+    .logout{
+      background:red;
+      color:white;
+      border:none;
+      padding:10px 20px;
+      border-radius:8px;
+      cursor:pointer;
+    }
+
+    /* CARDS */
 
     .cards{
       display:grid;
@@ -75,6 +92,7 @@
       background:#1e293b;
       padding:25px;
       border-radius:15px;
+      box-shadow:0 0 10px rgba(0,0,0,0.3);
     }
 
     .card h3{
@@ -82,16 +100,18 @@
       color:#38bdf8;
     }
 
-    .section{
-      background:#111827;
-      padding:20px;
-      border-radius:15px;
-      margin-bottom:20px;
+    .card p{
+      font-size:28px;
+      font-weight:bold;
     }
 
-    .section h2{
-      margin-bottom:20px;
-      color:#38bdf8;
+    /* TABELA */
+
+    .table-box{
+      background:#1e293b;
+      padding:20px;
+      border-radius:15px;
+      overflow:auto;
     }
 
     table{
@@ -101,76 +121,64 @@
 
     table th,
     table td{
-      border:1px solid #334155;
-      padding:12px;
+      padding:15px;
       text-align:left;
+      border-bottom:1px solid #334155;
     }
 
     table th{
-      background:#1e293b;
+      color:#38bdf8;
     }
 
-    input,
-    textarea,
-    select{
-      width:100%;
-      padding:12px;
-      margin-top:10px;
-      margin-bottom:15px;
+    /* BOTÕES */
+
+    .btn{
+      padding:8px 14px;
       border:none;
-      border-radius:10px;
-      background:#1e293b;
+      border-radius:6px;
+      cursor:pointer;
       color:white;
     }
 
-    button{
-      background:#38bdf8;
-      color:black;
-      border:none;
-      padding:12px 20px;
-      border-radius:10px;
-      cursor:pointer;
-      font-weight:bold;
+    .edit{
+      background:#22c55e;
     }
 
-    button:hover{
-      opacity:0.9;
-    }
-
-    .status{
-      color:#22c55e;
-      font-weight:bold;
+    .delete{
+      background:#ef4444;
     }
 
   </style>
 </head>
+
 <body>
 
-  <div class="sidebar">
-    <h2>Gambo Admin</h2>
+  <!-- MENU -->
 
-    <ul>
-      <li>Dashboard</li>
-      <li>Prompts</li>
-      <li>Categorias</li>
-      <li>Mensagens</li>
-      <li>Comentários</li>
-      <li>Relatórios</li>
-      <li>Análises</li>
-      <li>Publicidade</li>
-      <li>Configurações</li>
-      <li>Segurança</li>
-      <li>Backup</li>
-      <li>Sair</li>
-    </ul>
+  <div class="sidebar">
+    <h2>ADMIN</h2>
+
+    <a href="#">Dashboard</a>
+    <a href="#">Prompts</a>
+    <a href="#">Categorias</a>
+    <a href="#">Uploads</a>
+    <a href="#">Mensagens</a>
+    <a href="#">Configurações</a>
   </div>
+
+  <!-- CONTEÚDO -->
 
   <div class="main">
 
     <div class="topbar">
       <h1>Painel Administrativo</h1>
-      <p>Controle completo do site GamboPrompts</p>
+
+      <button class="logout">
+        Sair
+      </button>
     </div>
+
+    <!-- CARDS -->
 
     <div class="cards">
 
@@ -180,84 +188,206 @@
       </div>
 
       <div class="card">
+        <h3>Categorias</h3>
+        <p>15</p>
+      </div>
+
+      <div class="card">
+        <h3>Uploads</h3>
+        <p>84</p>
+      </div>
+
+      <div class="card">
         <h3>Mensagens</h3>
-        <p>34</p>
-      </div>
-
-      <div class="card">
-        <h3>Comentários</h3>
-        <p>87</p>
-      </div>
-
-      <div class="card">
-        <h3>Status do Site</h3>
-        <p class="status">Online</p>
+        <p>32</p>
       </div>
 
     </div>
 
-    <div class="section">
-      <h2>Adicionar Novo Prompt</h2>
+    <!-- TABELA -->
 
-      <input type="text" placeholder="Título do Prompt">
-
-      <select>
-        <option>Escolher Categoria</option>
-        <option>Design</option>
-        <option>Marketing</option>
-        <option>Programação</option>
-        <option>Imagens IA</option>
-      </select>
-
-      <textarea rows="6" placeholder="Escreva o prompt aqui"></textarea>
-
-      <button>Publicar Prompt</button>
-    </div>
-
-    <div class="section">
-      <h2>Últimos Prompts</h2>
+    <div class="table-box">
 
       <table>
-        <tr>
-          <th>Título</th>
-          <th>Categoria</th>
-          <th>Status</th>
-        </tr>
 
-        <tr>
-          <td>Prompt Cinematográfico</td>
-          <td>Imagens IA</td>
-          <td>Publicado</td>
-        </tr>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Título</th>
+            <th>Categoria</th>
+            <th>Data</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
 
-        <tr>
-          <td>Prompt de Marketing</td>
-          <td>Marketing</td>
-          <td>Publicado</td>
-        </tr>
+        <tbody>
 
-        <tr>
-          <td>Prompt para Logos</td>
-          <td>Design</td>
-          <td>Pendente</td>
-        </tr>
+          <tr>
+            <td>1</td>
+            <td>Prompt Ultra Realista</td>
+            <td>Imagem IA</td>
+            <td>12/05/2026</td>
+
+            <td>
+              <button class="btn edit">
+                Editar
+              </button>
+
+              <button class="btn delete">
+                Apagar
+              </button>
+            </td>
+          </tr>
+
+          <tr>
+            <td>2</td>
+            <td>Prompt Cinematográfico</td>
+            <td>Vídeo IA</td>
+            <td>12/05/2026</td>
+
+            <td>
+              <button class="btn edit">
+                Editar
+              </button>
+
+              <button class="btn delete">
+                Apagar
+              </button>
+            </td>
+          </tr>
+
+        </tbody>
 
       </table>
-    </div>
 
-    <div class="section">
-      <h2>Configurações do Site</h2>
-
-      <input type="text" placeholder="Nome do Site">
-
-      <input type="text" placeholder="Slogan do Site">
-
-      <textarea rows="4" placeholder="Descrição do Site"></textarea>
-
-      <button>Salvar Configurações</button>
     </div>
 
   </div>
+<!-- ADICIONAR PROMPT -->
 
+<div class="table-box" style="margin-top:30px;">
+
+<h2 style="margin-bottom:20px; color:#38bdf8;">
+Adicionar Novo Prompt
+</h2>
+
+<input type="text" placeholder="Título do Prompt" style="
+width:100%;
+padding:15px;
+margin-bottom:20px;
+border:none;
+border-radius:10px;
+background:#0f172a;
+color:white;
+font-size:16px;
+">
+
+<select style="
+width:100%;
+padding:15px;
+margin-bottom:20px;
+border:none;
+border-radius:10px;
+background:#0f172a;
+color:white;
+font-size:16px;
+">
+
+<option>Escolher Categoria</option>
+<option>Design</option>
+<option>Marketing</option>
+<option>Programação</option>
+<option>Imagens IA</option>
+<option>Vídeos IA</option>
+<option>Negócios</option>
+
+</select>
+
+<textarea placeholder="Escreva o prompt completo aqui..." style="
+width:100%;
+height:250px;
+padding:15px;
+margin-bottom:20px;
+border:none;
+border-radius:10px;
+background:#0f172a;
+color:white;
+font-size:16px;
+"></textarea>
+
+<!-- UPLOAD -->
+
+<div style="
+background:#0f172a;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+">
+
+<h3 style="margin-bottom:15px;">
+Upload de Imagem
+</h3>
+
+<input type="file">
+
+</div>
+
+<!-- MONETIZAÇÃO -->
+
+<div style="
+background:#0f172a;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+">
+
+<h3 style="margin-bottom:15px;">
+Monetização
+</h3>
+
+<input type="number" placeholder="Preço do Prompt" style="
+width:100%;
+padding:15px;
+margin-bottom:15px;
+border:none;
+border-radius:10px;
+background:#1e293b;
+color:white;
+">
+
+<select style="
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#1e293b;
+color:white;
+">
+
+<option>Grátis</option>
+<option>Pago</option>
+<option>Premium</option>
+
+</select>
+
+</div>
+
+<button style="
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#38bdf8;
+color:black;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+">
+
+Publicar Prompt
+
+</button>
+
+</div>
 </body>
 </html>
