@@ -16,21 +16,17 @@
     body{
   background:#0f172a;
   color:white;
-  display:flex;
+  display:block;
   overflow-x:hidden;
 }
 
     /* MENU LATERAL */
 
-    .sidebar{
-      width:250px;
-      height:100vh;
-      background:#111827;
-      padding:20px;
-      position:fixed;
-      left:0;
-      top:0;
-    }
+    ..sidebar{
+  width:100%;
+  background:#111827;
+  padding:20px;
+}
 
     .sidebar h2{
       margin-bottom:30px;
@@ -54,11 +50,9 @@
 
     /* CONTEÚDO */
 
-    ..main{
-  margin-left:250px;
-  width:calc(100% - 250px);
-  padding:30px;
-  overflow-y:auto;
+    ...main{
+  width:100%;
+  padding:20px;
 }
 
     .topbar{
@@ -317,6 +311,62 @@ font-size:16px;
 </select>
 
 <textarea placeholder="Escreva o prompt completo aqui..." style="
+  <!-- INSTRUÇÕES -->
+
+<textarea placeholder="Como usar este prompt..." style="
+width:100%;
+height:180px;
+padding:15px;
+margin-bottom:20px;
+border:none;
+border-radius:10px;
+background:#0f172a;
+color:white;
+font-size:16px;
+"></textarea>
+
+<!-- LINK AFILIADO -->
+
+<input type="text" placeholder="Link de afiliado" style="
+width:100%;
+padding:15px;
+margin-bottom:20px;
+border:none;
+border-radius:10px;
+background:#0f172a;
+color:white;
+font-size:16px;
+">
+
+<!-- DOAÇÕES -->
+
+<input type="text" placeholder="Link para doações (PayPal, Binance, etc)" style="
+width:100%;
+padding:15px;
+margin-bottom:20px;
+border:none;
+border-radius:10px;
+background:#0f172a;
+color:white;
+font-size:16px;
+">
+
+<!-- PACK -->
+
+<div style="
+background:#0f172a;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+">
+
+<h3 style="margin-bottom:15px;">
+Adicionar Pack de Arquivos
+</h3>
+
+<input type="file" multiple>
+
+</div>
 width:100%;
 height:250px;
 padding:15px;
