@@ -14,10 +14,11 @@
     }
 
     body{
-      background:#0f172a;
-      color:white;
-      display:flex;
-    }
+  background:#0f172a;
+  color:white;
+  display:flex;
+  overflow-x:hidden;
+}
 
     /* MENU LATERAL */
 
@@ -53,11 +54,12 @@
 
     /* CONTEÚDO */
 
-    .main{
-      margin-left:250px;
-      width:100%;
-      padding:30px;
-    }
+    ..main{
+  margin-left:250px;
+  width:calc(100% - 250px);
+  padding:30px;
+  overflow-y:auto;
+}
 
     .topbar{
       display:flex;
@@ -113,7 +115,18 @@
       border-radius:15px;
       overflow:auto;
     }
+    
+    input,
+select,
+textarea{
+  width:100%;
+  max-width:100%;
+}
 
+.table-box{
+  width:100%;
+  overflow-x:auto;
+}
     table{
       width:100%;
       border-collapse:collapse;
