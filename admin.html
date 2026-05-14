@@ -278,7 +278,7 @@ textarea{
 Adicionar Novo Prompt
 </h2>
 
-<input type="text" placeholder="Título do Prompt" style="
+<input type="text" id=" placeholder="Título do Prompt" style="
 width:100%;
 padding:15px;
 margin-bottom:20px;
@@ -289,7 +289,7 @@ color:white;
 font-size:16px;
 ">
 
-<select style="
+<select id="categoria">
 width:100%;
 padding:15px;
 margin-bottom:20px;
@@ -310,7 +310,7 @@ font-size:16px;
 
 </select>
 
-<textarea placeholder="Escreva o prompt completo aqui..." style="
+<textarea id="prompt" placeholder="Escreva o prompt completo aqui...">
 width:100%;
 height:250px;
 padding:15px;
@@ -324,7 +324,7 @@ font-size:16px;
 
 <!-- INSTRUÇÕES -->
 
-<textarea placeholder="Como usar este prompt..." style="
+<textarea id="instrucoes" placeholder="Como usar este prompt..." style="
 width:100%;
 height:180px;
 padding:15px;
@@ -338,7 +338,7 @@ font-size:16px;
 
 <!-- LINK AFILIADO -->
 
-<input type="text" placeholder="Link de afiliado" style="
+<input type="text" id="afiliado" placeholder="Link de afiliado">
 width:100%;
 padding:15px;
 margin-bottom:20px;
@@ -351,7 +351,7 @@ font-size:16px;
 
 <!-- DOAÇÕES -->
 
-<input type="text" placeholder="Link para doações (PayPal, Binance, etc)" style="
+<input type="text" id="doacao" placeholder="Link para doações (PayPal, Binance, etc)"
 width:100%;
 padding:15px;
 margin-bottom:20px;
@@ -409,7 +409,7 @@ margin-bottom:20px;
 Monetização
 </h3>
 
-<input type="number" placeholder="Preço do Prompt" style="
+<input type="number" id="preco" placeholder="Preço do Prompt""
 width:100%;
 padding:15px;
 margin-bottom:15px;
@@ -419,7 +419,7 @@ background:#1e293b;
 color:white;
 ">
 
-<select style="
+<select id="tipo">"
 width:100%;
 padding:15px;
 border:none;
@@ -450,8 +450,70 @@ cursor:pointer;
 
 Publicar Prompt
 
-</button>
+<button id="publicar" style="
 
 </div>
+  <script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+  authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+  projectId: "gamboprompts-8ff6d",
+  storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+  messagingSenderId: "92750073125",
+  appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+document.getElementById("publicar")
+.addEventListener("click", async () => {
+
+const titulo = document.getElementById("titulo").value;
+
+const categoria = document.getElementById("categoria").value;
+
+const prompt = document.getElementById("prompt").value;
+
+const instrucoes = document.getElementById("instrucoes").value;
+
+const afiliado = document.getElementById("afiliado").value;
+
+const doacao = document.getElementById("doacao").value;
+
+const preco = document.getElementById("preco").value;
+
+const tipo = document.getElementById("tipo").value;
+
+await addDoc(collection(db, "prompts"), {
+
+titulo,
+categoria,
+prompt,
+instrucoes,
+afiliado,
+doacao,
+preco,
+tipo,
+descricao: prompt,
+imagem: "https://via.placeholder.com/400"
+
+});
+
+alert("Prompt publicado com sucesso!");
+
+});
+
+</script>
 </body>
 </html>
