@@ -453,9 +453,7 @@ Publicar Prompt
 <button id="publicar" style="
 
 </div>
-  <script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  <script type="module"> import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
 getFirestore,
@@ -464,12 +462,12 @@ addDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
-  authDomain: "gamboprompts-8ff6d.firebaseapp.com",
-  projectId: "gamboprompts-8ff6d",
-  storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
-  messagingSenderId: "92750073125",
-  appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+projectId: "gamboprompts-8ff6d",
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+messagingSenderId: "92750073125",
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 };
 
 const app = initializeApp(firebaseConfig);
