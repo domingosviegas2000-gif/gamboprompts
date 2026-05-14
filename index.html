@@ -10,8 +10,6 @@
 
 <link rel="stylesheet" href="style.css">
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
 </head>
 
 <body>
@@ -26,16 +24,14 @@
 
 <div id="prompts" class="grid"></div>
 
-<script src="app.js"></script>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
-getFirestore,
-collection,
-getDocs
+  getFirestore,
+  collection,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -53,31 +49,39 @@ const db = getFirestore(app);
 
 const promptsContainer = document.getElementById("prompts");
 
-async function carregarPrompts(){
+async function carregarPrompts() {
 
-  const querySnapshot = await getDocs(collection(db, "prompts"));
+  try {
 
-  querySnapshot.forEach((doc) => {
+    const querySnapshot = await getDocs(collection(db, "prompts"));
 
-    const data = doc.data();
+    querySnapshot.forEach((doc) => {
 
-    promptsContainer.innerHTML += `
+      const data = doc.data();
 
-      <div class="card">
+      promptsContainer.innerHTML += `
 
-        <img src="${data.imagem}" />
+        <div class="card">
 
-        <h2>${data.titulo}</h2>
+          <img src="${data.imagem}" style="width:100%; border-radius:10px; margin-bottom:10px;">
 
-        <p>${data.descricao}</p>
+          <h2>${data.titulo}</h2>
 
-        <span>${data.categoria}</span>
+          <p>${data.descricao}</p>
 
-      </div>
+          <span>${data.categoria}</span>
 
-    `;
+        </div>
 
-  });
+      `;
+
+    });
+
+  } catch(error) {
+
+    console.log("ERRO:", error);
+
+  }
 
 }
 
@@ -86,5 +90,5 @@ carregarPrompts();
 </script>
 
 </body>
-</html>
 
+</html>
