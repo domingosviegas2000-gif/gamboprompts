@@ -146,7 +146,7 @@ placeholder="Link para doações">
 
 <!-- MONETIZAÇÃO -->
 
-<div class="box">
+class="box">
 
 <h3>Monetização</h3>
 
@@ -171,7 +171,7 @@ Publicar Prompt
 
 </button>
 
-<script type="module">
+ <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -194,10 +194,12 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-document.getElementById("publicar")
+document
+.getElementById("publicar")
 .addEventListener("click", async () => {
 
-let categoria = document.getElementById("categoria").value;
+let categoria =
+document.getElementById("categoria").value;
 
 const novaCategoria =
 document.getElementById("novaCategoria").value;
@@ -241,7 +243,7 @@ tipo,
 descricao: prompt,
 
 imagem:
-"https://picsum.photos/500/300"
+"https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80"
 
 });
 
