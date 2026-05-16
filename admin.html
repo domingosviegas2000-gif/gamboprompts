@@ -140,8 +140,7 @@ placeholder="Link para doações">
 
 <h3>Upload de Imagem</h3>
 
-<input type="file">
-
+<input type="file" id="imagemInput">
 </div>
 
 <!-- MONETIZAÇÃO -->
@@ -242,8 +241,41 @@ tipo,
 
 descricao: prompt,
 
-imagem:
-"https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80"
+imagem: imagemUrl
+ 
+const imagemInput =
+document.getElementById("imagemInput");
+
+const imagemFile =
+imagemInput.files[0];
+
+let imagemUrl =
+"https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80";
+
+if(imagemFile){
+
+const formData = new FormData();
+
+formData.append("file", imagemFile);
+
+formData.append(
+"upload_preset",
+"gamboprompts"
+);
+
+const resposta = await fetch(
+"https://api.cloudinary.com/v1_1/derwtydzg/image/upload",
+{
+method:"POST",
+body:formData
+}
+);
+
+const dados = await resposta.json();
+
+imagemUrl = dados.secure_url;
+
+}
 
 });
 
