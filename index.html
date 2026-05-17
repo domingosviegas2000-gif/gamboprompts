@@ -21,6 +21,45 @@
 <p>Biblioteca de Prompts IA</p>
 
 </header>
+  <div style="
+display:flex;
+gap:15px;
+padding:20px;
+flex-wrap:wrap;
+">
+
+<input
+type="text"
+id="pesquisa"
+placeholder="Pesquisar prompts..."
+style="
+flex:1;
+padding:15px;
+border:none;
+border-radius:12px;
+background:#1e293b;
+color:white;
+font-size:16px;
+"
+>
+
+<select
+id="filtroCategoria"
+style="
+padding:15px;
+border:none;
+border-radius:12px;
+background:#1e293b;
+color:white;
+font-size:16px;
+"
+>
+
+<option value="">Todas Categorias</option>
+
+</select>
+
+</div>
 
 <div id="prompts" class="grid"></div>
 
@@ -50,6 +89,14 @@ const db = getFirestore(app);
 const promptsContainer =
 document.getElementById("prompts");
 
+const pesquisaInput =
+document.getElementById("pesquisa");
+
+const filtroCategoria =
+document.getElementById("filtroCategoria");
+
+let todosPrompts = [];
+
 async function carregarPrompts() {
 
 try {
@@ -57,14 +104,59 @@ try {
 const querySnapshot =
 await getDocs(collection(db, "prompts"));
 
+todosPrompts = [];
+
 querySnapshot.forEach((doc) => {
 
-const data = doc.data();
+todosPrompts.push({
+id: doc.id,
+...doc.data()
+});
+
+});
+
+criarCategorias();
+
+mostrarPrompts(todosPrompts);
+
+} catch(error) {
+
+console.log("ERRO:", error);
+
+}
+
+}
+
+function criarCategorias(){
+
+const categorias = [
+...new Set(
+todosPrompts.map(p => p.categoria)
+)
+];
+
+categorias.forEach((categoria) => {
+
+filtroCategoria.innerHTML += `
+<option value="${categoria}">
+${categoria}
+</option>
+`;
+
+});
+
+}
+
+function mostrarPrompts(lista){
+
+promptsContainer.innerHTML = "";
+
+lista.forEach((data) => {
 
 promptsContainer.innerHTML += `
 
 <a 
-href="prompt.html?id=${doc.id}" 
+href="prompt.html?id=${data.id}" 
 style="
 text-decoration:none;
 color:white;
@@ -99,18 +191,56 @@ display:block;
 
 });
 
-} catch(error) {
+}
 
-console.log("ERRO:", error);
+function filtrarPrompts(){
+
+const pesquisa =
+pesquisaInput.value.toLowerCase();
+
+const categoria =
+filtroCategoria.value;
+
+const filtrados =
+todosPrompts.filter((prompt) => {
+
+const matchPesquisa =
+
+prompt.titulo.toLowerCase().includes(pesquisa)
+
+||
+
+prompt.descricao.toLowerCase().includes(pesquisa);
+
+const matchCategoria =
+
+categoria === ""
+
+||
+
+prompt.categoria === categoria;
+
+return matchPesquisa && matchCategoria;
+
+});
+
+mostrarPrompts(filtrados);
 
 }
 
-}
+pesquisaInput.addEventListener(
+"input",
+filtrarPrompts
+);
+
+filtroCategoria.addEventListener(
+"change",
+filtrarPrompts
+);
 
 carregarPrompts();
 
 </script>
-
 </body>
 
 </html>
