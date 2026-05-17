@@ -29,59 +29,81 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
-  getFirestore,
-  collection,
-  getDocs
+getFirestore,
+collection,
+getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
-  authDomain: "gamboprompts-8ff6d.firebaseapp.com",
-  projectId: "gamboprompts-8ff6d",
-  storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
-  messagingSenderId: "92750073125",
-  appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+projectId: "gamboprompts-8ff6d",
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+messagingSenderId: "92750073125",
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 };
 
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-const promptsContainer = document.getElementById("prompts");
+const promptsContainer =
+document.getElementById("prompts");
 
 async function carregarPrompts() {
 
-  try {
+try {
 
-    const querySnapshot = await getDocs(collection(db, "prompts"));
+const querySnapshot =
+await getDocs(collection(db, "prompts"));
 
-    querySnapshot.forEach((doc) => {
+querySnapshot.forEach((doc) => {
 
-      const data = doc.data();
+const data = doc.data();
 
-      promptsContainer.innerHTML += `
+promptsContainer.innerHTML += `
 
-        <div class="card">
+<a 
+href="prompt.html?id=${doc.id}" 
+style="
+text-decoration:none;
+color:white;
+"
+>
 
-          <img src="${data.imagem}" style="width:100%; border-radius:10px; margin-bottom:10px;">
+<div class="card">
 
-          <h2>${data.titulo}</h2>
+<img 
+src="${data.imagem}" 
+style="
+width:100%;
+height:220px;
+object-fit:cover;
+border-radius:12px;
+margin-bottom:15px;
+display:block;
+"
+>
 
-          <p>${data.descricao}</p>
+<h2>${data.titulo}</h2>
 
-          <span>${data.categoria}</span>
+<p>${data.descricao}</p>
 
-        </div>
+<span>${data.categoria}</span>
 
-      `;
+</div>
 
-    });
+</a>
 
-  } catch(error) {
+`;
 
-    console.log("ERRO:", error);
+});
 
-  }
+} catch(error) {
+
+console.log("ERRO:", error);
+
+}
 
 }
 
