@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Prompt</title>
+
+<style>
+
+body{
+background:#0f172a;
+color:white;
+font-family:Arial;
+padding:30px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+img{
+width:100%;
+border-radius:15px;
+margin-bottom:20px;
+}
+
+h1{
+margin-bottom:20px;
+font-size:35px;
+}
+
+.categoria{
+background:#38bdf8;
+color:black;
+display:inline-block;
+padding:8px 15px;
+border-radius:30px;
+margin-bottom:20px;
+font-weight:bold;
+}
+
+.box{
+background:#1e293b;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+line-height:1.7;
+}
+
+button{
+width:100%;
+padding:18px;
+border:none;
+border-radius:12px;
+background:#38bdf8;
+color:black;
+font-size:18px;
+font-weight:bold;
+cursor:pointer;
+margin-top:20px;
+}
+
+textarea{
+width:100%;
+height:250px;
+background:#0f172a;
+color:white;
+border:none;
+border-radius:12px;
+padding:15px;
+font-size:16px;
+margin-top:15px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<img id="imagem">
+
+<h1 id="titulo"></h1>
+
+<div class="categoria" id="categoria"></div>
+
+<div class="box">
+
+<h2>Descrição</h2>
+
+<p id="descricao"></p>
+
+</div>
+
+<div class="box">
+
+<h2>Prompt Completo</h2>
+
+<textarea id="prompt" readonly></textarea>
+
+<button onclick="copiarPrompt()">
+
+Copiar Prompt
+
+</button>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+doc,
+getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+projectId: "gamboprompts-8ff6d",
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+messagingSenderId: "92750073125",
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+const params = new URLSearchParams(window.location.search);
+
+const id = params.get("id");
+
+async function carregarPrompt(){
+
+const docRef = doc(db, "prompts", id);
+
+const docSnap = await getDoc(docRef);
+
+if(docSnap.exists()){
+
+const data = docSnap.data();
+
+document.getElementById("imagem").src = data.imagem;
+
+document.getElementById("titulo").innerText = data.titulo;
+
+document.getElementById("categoria").innerText = data.categoria;
+
+document.getElementById("descricao").innerText = data.descricao;
+
+document.getElementById("prompt").value = data.prompt;
+
+}
+
+}
+
+carregarPrompt();
+
+window.copiarPrompt = function(){
+
+const textarea =
+document.getElementById("prompt");
+
+textarea.select();
+
+document.execCommand("copy");
+
+alert("Prompt copiado!");
+
+}
+
+</script>
+
+</body>
+
+</html>
