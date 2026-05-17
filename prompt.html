@@ -102,6 +102,8 @@ margin-top:15px;
 
 <h2>Prompt Completo</h2>
 
+<div id="premiumBox"></div>
+
 <textarea id="prompt" readonly></textarea>
 
 <button onclick="copiarPrompt()">
@@ -159,7 +161,52 @@ document.getElementById("categoria").innerText = data.categoria;
 
 document.getElementById("descricao").innerText = data.descricao;
 
-document.getElementById("prompt").value = data.prompt;
+if(data.tipo === "Premium"){
+
+document.getElementById("premiumBox")
+.innerHTML = `
+
+<div style="
+background:#f59e0b;
+color:black;
+padding:20px;
+border-radius:15px;
+margin-bottom:20px;
+font-weight:bold;
+text-align:center;
+">
+
+🔒 Este prompt é Premium
+
+<br><br>
+
+<button style="
+padding:15px 25px;
+border:none;
+border-radius:10px;
+background:black;
+color:white;
+font-weight:bold;
+cursor:pointer;
+">
+
+Desbloquear Prompt
+
+</button>
+
+</div>
+
+`;
+
+document.getElementById("prompt").value =
+"Conteúdo bloqueado.";
+
+}else{
+
+document.getElementById("prompt").value =
+data.prompt;
+
+}
 
 }
 
