@@ -145,7 +145,7 @@ placeholder="Link para doações">
 
 <!-- MONETIZAÇÃO -->
 
-class="box">
+<div class="box">
 
 <h3>Monetização</h3>
 
@@ -179,6 +179,10 @@ collection,
 addDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+import {
+getAuth,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 const firebaseConfig = {
 apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
 authDomain: "gamboprompts-8ff6d.firebaseapp.com",
@@ -189,6 +193,17 @@ appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 };
 
 const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+onAuthStateChanged(auth, (user) => {
+
+if(!user){
+
+window.location.href = "login.html";
+
+}
+
+});
 const db = getFirestore(app);
 
 document.getElementById("publicar").addEventListener("click", async () => {
