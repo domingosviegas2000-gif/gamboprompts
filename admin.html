@@ -78,6 +78,38 @@ opacity:0.9;
 <body>
 
 <h1>🔥 Painel Administrativo</h1>
+ <div id="dashboard" style="
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+margin-bottom:30px;
+">
+
+<div class="box">
+
+<h3>Total de Prompts</h3>
+
+<h1 id="totalPrompts">0</h1>
+
+</div>
+
+<div class="box">
+
+<h3>Prompts Premium</h3>
+
+<h1 id="totalPremium">0</h1>
+
+</div>
+
+<div class="box">
+
+<h3>Categorias</h3>
+
+<h1 id="totalCategorias">0</h1>
+
+</div>
+
+</div>
 
 <input type="text"
 id="titulo"
@@ -176,7 +208,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import {
 getFirestore,
 collection,
-addDoc
+addDoc,
+getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
@@ -204,8 +237,44 @@ window.location.href = "login.html";
 }
 
 });
-const db = getFirestore(app);
+async function carregarDashboard(){
 
+const snapshot =
+await getDocs(collection(db, "prompts"));
+
+let total = 0;
+let premium = 0;
+
+const categorias = [];
+
+snapshot.forEach((doc) => {
+
+const data = doc.data();
+
+total++;
+
+if(data.tipo === "Premium"){
+premium++;
+}
+
+if(!categorias.includes(data.categoria)){
+categorias.push(data.categoria);
+}
+
+});
+
+document.getElementById("totalPrompts")
+.innerText = total;
+
+document.getElementById("totalPremium")
+.innerText = premium;
+
+document.getElementById("totalCategorias")
+.innerText = categorias.length;
+
+}
+
+carregarDashboard();
 document.getElementById("publicar").addEventListener("click", async () => {
 
 let categoria = document.getElementById("categoria").value;
