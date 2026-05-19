@@ -21,7 +21,10 @@
 <p>Biblioteca de Prompts IA</p>
 
 </header>
-  <div style="
+
+<!-- PESQUISA -->
+
+<div style="
 display:flex;
 gap:15px;
 padding:20px;
@@ -55,38 +58,63 @@ font-size:16px;
 "
 >
 
-<option value="">Todas Categorias</option>
+<option value="">
+Todas Categorias
+</option>
 
 </select>
 
 </div>
 
+<!-- GRID -->
+
 <div id="prompts" class="grid"></div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+/* =========================
+FIREBASE
+========================= */
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
 getFirestore,
 collection,
-getDocs
-  updateDoc,
+getDocs,
+updateDoc,
 doc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* =========================
+CONFIG
+========================= */
 
 const firebaseConfig = {
+
 apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+
 authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+
 projectId: "gamboprompts-8ff6d",
+
 storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+
 messagingSenderId: "92750073125",
+
 appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+
 };
 
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
+
+/* =========================
+ELEMENTOS
+========================= */
 
 const promptsContainer =
 document.getElementById("prompts");
@@ -97,22 +125,32 @@ document.getElementById("pesquisa");
 const filtroCategoria =
 document.getElementById("filtroCategoria");
 
+/* =========================
+VARIÁVEIS
+========================= */
+
 let todosPrompts = [];
 
-async function carregarPrompts() {
+/* =========================
+CARREGAR PROMPTS
+========================= */
 
-try {
+async function carregarPrompts(){
+
+try{
 
 const querySnapshot =
-await getDocs(collection(db, "prompts"));
+await getDocs(collection(db,"prompts"));
 
 todosPrompts = [];
 
-querySnapshot.forEach((doc) => {
+querySnapshot.forEach((docItem) => {
 
 todosPrompts.push({
-id: doc.id,
-...doc.data()
+
+id: docItem.id,
+...docItem.data()
+
 });
 
 });
@@ -121,54 +159,90 @@ criarCategorias();
 
 mostrarPrompts(todosPrompts);
 
-} catch(error) {
+}catch(error){
 
-console.log("ERRO:", error);
+console.log(error);
+
+}
 
 }
 
-}
+/* =========================
+CRIAR CATEGORIAS
+========================= */
 
 function criarCategorias(){
 
 const categorias = [
+
 ...new Set(
 todosPrompts.map(p => p.categoria)
 )
+
 ];
+
+filtroCategoria.innerHTML = `
+<option value="">
+Todas Categorias
+</option>
+`;
 
 categorias.forEach((categoria) => {
 
 filtroCategoria.innerHTML += `
+
 <option value="${categoria}">
 ${categoria}
 </option>
+
 `;
 
 });
 
 }
 
+/* =========================
+MOSTRAR PROMPTS
+========================= */
+
 function mostrarPrompts(lista){
 
 promptsContainer.innerHTML = "";
+
+if(lista.length === 0){
+
+promptsContainer.innerHTML = `
+
+<p style="
+color:white;
+padding:20px;
+font-size:18px;
+">
+Nenhum prompt encontrado.
+</p>
+
+`;
+
+return;
+
+}
 
 lista.forEach((data) => {
 
 promptsContainer.innerHTML += `
 
-<a 
-href="prompt.html?id=${data.id}" 
+<div
+class="card"
+onclick="
+window.location.href='prompt.html?id=${data.id}'
+"
 style="
-text-decoration:none;
-color:white;
+cursor:pointer;
 "
 >
 
-<div class="card">
-
-<img 
-src="${data.imagem}" 
+<img
+src="${data.imagem}"
 style="
 width:100%;
 height:220px;
@@ -220,11 +294,13 @@ align-items:center;
 margin-top:15px;
 ">
 
-<span>${data.categoria}</span>
+<span>
+${data.categoria}
+</span>
 
 <button
 class="like-btn"
-data-id="${doc.id}"
+data-id="${data.id}"
 data-likes="${data.likes || 0}"
 style="
 background:#22c55e;
@@ -233,21 +309,26 @@ border:none;
 padding:10px 14px;
 border-radius:8px;
 cursor:pointer;
-">
+"
+>
+
 ❤️ ${data.likes || 0}
+
 </button>
 
 </div>
 
 </div>
 
-</a>
-
 `;
 
 });
 
 }
+
+/* =========================
+FILTRO
+========================= */
 
 function filtrarPrompts(){
 
@@ -284,6 +365,10 @@ mostrarPrompts(filtrados);
 
 }
 
+/* =========================
+EVENTOS
+========================= */
+
 pesquisaInput.addEventListener(
 "input",
 filtrarPrompts
@@ -294,10 +379,15 @@ filtroCategoria.addEventListener(
 filtrarPrompts
 );
 
-carregarPrompts();
+/* =========================
+LIKES
+========================= */
+
 document.addEventListener("click", async (e) => {
 
 if(e.target.classList.contains("like-btn")){
+
+e.stopPropagation();
 
 const id =
 e.target.dataset.id;
@@ -306,7 +396,7 @@ const likesAtual =
 parseInt(e.target.dataset.likes);
 
 const ref =
-doc(db, "prompts", id);
+doc(db,"prompts",id);
 
 await updateDoc(ref, {
 
@@ -323,7 +413,15 @@ e.target.innerHTML =
 }
 
 });
+
+/* =========================
+START
+========================= */
+
+carregarPrompts();
+
 </script>
+
 </body>
 
 </html>
