@@ -71,6 +71,8 @@ import {
 getFirestore,
 collection,
 getDocs
+  updateDoc,
+doc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -211,7 +213,31 @@ ${data.tipo === "Premium"
 
 </p>
 
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:15px;
+">
+
 <span>${data.categoria}</span>
+
+<button
+class="like-btn"
+data-id="${doc.id}"
+data-likes="${data.likes || 0}"
+style="
+background:#22c55e;
+color:white;
+border:none;
+padding:10px 14px;
+border-radius:8px;
+cursor:pointer;
+">
+❤️ ${data.likes || 0}
+</button>
+
+</div>
 
 </div>
 
@@ -269,7 +295,34 @@ filtrarPrompts
 );
 
 carregarPrompts();
+document.addEventListener("click", async (e) => {
 
+if(e.target.classList.contains("like-btn")){
+
+const id =
+e.target.dataset.id;
+
+const likesAtual =
+parseInt(e.target.dataset.likes);
+
+const ref =
+doc(db, "prompts", id);
+
+await updateDoc(ref, {
+
+likes: likesAtual + 1
+
+});
+
+e.target.dataset.likes =
+likesAtual + 1;
+
+e.target.innerHTML =
+`❤️ ${likesAtual + 1}`;
+
+}
+
+});
 </script>
 </body>
 
