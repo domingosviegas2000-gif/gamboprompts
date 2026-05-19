@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Admin SaaS Completo</title>
+<title>Painel Admin</title>
 
 <style>
 body{
@@ -18,7 +18,6 @@ header{
   padding:15px;
   display:flex;
   justify-content:space-between;
-  align-items:center;
 }
 
 .container{padding:20px;}
@@ -35,11 +34,10 @@ button{
   border:none;
   border-radius:6px;
   cursor:pointer;
-  margin:5px;
 }
 
-.primary{background:#3b82f6;color:white;}
 .danger{background:#ef4444;color:white;}
+.primary{background:#3b82f6;color:white;}
 
 .item{
   background:#1f2937;
@@ -49,56 +47,53 @@ button{
   justify-content:space-between;
   border-radius:8px;
 }
+
+#loading{
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 </style>
 </head>
 
 <body>
 
+<div id="loading">A verificar sessão...</div>
+
+<div id="app" style="display:none;">
+
 <header>
-  <h3>🔥 Admin SaaS</h3>
-  <button class="danger" id="logoutBtn">Sair</button>
+  <h3>🔥 Admin Panel</h3>
+  <button id="logoutBtn" class="danger">Sair</button>
 </header>
 
 <div class="container">
 
-<!-- DASHBOARD -->
 <div class="section">
   <h3>📊 Dashboard</h3>
-  <p>Total Prompts: <span id="totalPrompts">0</span></p>
-  <p>Premium: <span id="totalPremium">0</span></p>
+  <p>Prompts: <span id="totalPrompts">0</span></p>
   <p>Categorias: <span id="totalCategories">0</span></p>
 </div>
 
-<!-- CATEGORIAS -->
 <div class="section">
   <h3>📂 Categorias</h3>
-  <button class="primary" onclick="addCategory()">+ Criar Categoria</button>
+  <button class="primary" onclick="addCategory()">Criar Categoria</button>
   <div id="categories"></div>
 </div>
 
-<!-- PROMPTS -->
 <div class="section">
   <h3>📚 Prompts</h3>
-  <button class="primary" onclick="addPrompt()">+ Criar Prompt</button>
+  <button class="primary" onclick="addPrompt()">Criar Prompt</button>
   <div id="prompts"></div>
 </div>
 
-<!-- MONETIZAÇÃO (BASE FUTURA) -->
-<div class="section">
-  <h3>💰 Monetização</h3>
-  <p>Sistema preparado para:</p>
-  <ul>
-    <li>Grátis</li>
-    <li>Pago</li>
-    <li>Premium (bloqueio futuro)</li>
-  </ul>
 </div>
 
 </div>
 
 <script type="module">
 
-// ================= FIREBASE =================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore,
@@ -111,13 +106,13 @@ import {
 
 import {
   getAuth,
-  signOut,
   onAuthStateChanged,
+  signOut,
   setPersistence,
   browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-// ================= CONFIG =================
+// ================= FIREBASE CONFIG =================
 const firebaseConfig = {
   apiKey: "SUA_API",
   authDomain: "SEU_AUTH",
@@ -131,25 +126,34 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-// persistência login
+// ================= AUTH FIX DEFINITIVO =================
 await setPersistence(auth, browserLocalPersistence);
 
-// ================= AUTH =================
-onAuthStateChanged(auth,(user)=>{
-  if(!user){
-    window.location.href="login.html";
+const loading = document.getElementById("loading");
+const appDiv = document.getElementById("app");
+
+onAuthStateChanged(auth, (user) => {
+
+  if (user) {
+    loading.style.display = "none";
+    appDiv.style.display = "block";
+  } else {
+    window.location.href = "login.html";
   }
+
 });
 
 // logout
-document.getElementById("logoutBtn").addEventListener("click", async ()=>{
+document.getElementById("logoutBtn").addEventListener("click", async () => {
   await signOut(auth);
-  window.location.href="login.html";
+  window.location.href = "login.html";
 });
 
-// ================= CATEGORIAS =================
+// ================= FIRESTORE =================
 const catRef = collection(db,"categories");
+const promptRef = collection(db,"prompts");
 
+// categorias
 onSnapshot(catRef,(snap)=>{
   document.getElementById("totalCategories").innerText = snap.size;
 
@@ -166,29 +170,21 @@ onSnapshot(catRef,(snap)=>{
   document.getElementById("categories").innerHTML = html;
 });
 
-// ================= PROMPTS =================
-const promptRef = collection(db,"prompts");
-
+// prompts
 onSnapshot(promptRef,(snap)=>{
   document.getElementById("totalPrompts").innerText = snap.size;
 
-  let premiumCount = 0;
   let html="";
-
   snap.forEach(d=>{
-    let data = d.data();
-    if(data.type === "premium") premiumCount++;
-
     html += `
       <div class="item">
-        <span>${data.title} (${data.type})</span>
+        <span>${d.data().title} (${d.data().type})</span>
         <button class="danger" onclick="deletePrompt('${d.id}')">Apagar</button>
       </div>
     `;
   });
 
   document.getElementById("prompts").innerHTML = html;
-  document.getElementById("totalPremium").innerText = premiumCount;
 });
 
 // ================= CRUD =================
@@ -209,7 +205,6 @@ window.deleteCategory = async (id)=>{
 window.addPrompt = async ()=>{
   let title = prompt("Título:");
   let type = prompt("Tipo (free/paid/premium):","free");
-  if(!title) return;
 
   await addDoc(collection(db,"prompts"),{
     title,
