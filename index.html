@@ -10,6 +10,10 @@
 
 <style>
 
+/* =========================
+RESET
+========================= */
+
 *{
 margin:0;
 padding:0;
@@ -22,6 +26,10 @@ background:#0f172a;
 color:white;
 padding:20px;
 }
+
+/* =========================
+HEADER
+========================= */
 
 .header{
 text-align:center;
@@ -37,6 +45,10 @@ margin-bottom:10px;
 color:#94a3b8;
 font-size:18px;
 }
+
+/* =========================
+PESQUISA
+========================= */
 
 .top-bar{
 display:flex;
@@ -54,7 +66,12 @@ border-radius:12px;
 background:#1e293b;
 color:white;
 font-size:16px;
+min-width:180px;
 }
+
+/* =========================
+GRID
+========================= */
 
 .grid{
 display:grid;
@@ -63,38 +80,68 @@ gap:25px;
 margin-top:20px;
 }
 
+/* =========================
+CARD
+========================= */
+
 .card{
 background:#1e293b;
 padding:18px;
-border-radius:18px;
+border-radius:20px;
 transition:0.3s;
-text-decoration:none;
-color:white;
-display:block;
+display:flex;
+flex-direction:column;
+height:100%;
 }
 
 .card:hover{
 transform:translateY(-5px);
 }
 
-.card img{
+/* =========================
+IMAGEM SEM CORTES
+========================= */
+
+.imagem-box{
 width:100%;
-height:220px;
-object-fit:cover;
-border-radius:12px;
+background:#0f172a;
+border-radius:15px;
+overflow:hidden;
+display:flex;
+align-items:center;
+justify-content:center;
+padding:10px;
 margin-bottom:15px;
-display:block;
+min-height:220px;
 }
+
+.imagem-box img{
+width:100%;
+height:auto;
+max-height:500px;
+object-fit:contain;
+display:block;
+border-radius:12px;
+background:#0f172a;
+}
+
+/* =========================
+TEXTOS
+========================= */
 
 .card h2{
 margin-bottom:12px;
-font-size:22px;
+font-size:24px;
 }
 
 .card p{
 color:#cbd5e1;
 line-height:1.5;
 }
+
+/* =========================
+PREMIUM
+========================= */
 
 .badge{
 background:#f59e0b;
@@ -108,14 +155,29 @@ margin-top:10px;
 margin-bottom:10px;
 }
 
+/* =========================
+RODAPÉ
+========================= */
+
 .card-footer{
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-top:18px;
+margin-top:20px;
 gap:10px;
 flex-wrap:wrap;
 }
+
+.categoria{
+background:#0f172a;
+padding:8px 12px;
+border-radius:10px;
+font-size:14px;
+}
+
+/* =========================
+LIKE
+========================= */
 
 .like-btn{
 background:#22c55e;
@@ -125,17 +187,72 @@ padding:10px 14px;
 border-radius:10px;
 cursor:pointer;
 font-weight:bold;
+font-size:15px;
 }
 
 .like-btn:hover{
 opacity:0.9;
 }
 
-.categoria{
-background:#0f172a;
-padding:8px 12px;
-border-radius:10px;
-font-size:14px;
+/* =========================
+LINK
+========================= */
+
+.link-card{
+text-decoration:none;
+color:white;
+display:block;
+height:100%;
+}
+
+/* =========================
+RESPONSIVO
+========================= */
+
+@media(max-width:768px){
+
+body{
+padding:15px;
+}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+.imagem-box{
+min-height:260px;
+}
+
+.imagem-box img{
+max-height:420px;
+}
+
+}
+
+@media(max-width:480px){
+
+.imagem-box{
+min-height:220px;
+}
+
+.imagem-box img{
+max-height:350px;
+}
+
+.header h1{
+font-size:32px;
+}
+
+}
+
+/* =========================
+SEGURANÇA IMAGEM
+========================= */
+
+img{
+max-width:100%;
+height:auto;
+display:block;
 }
 
 </style>
@@ -182,12 +299,13 @@ getFirestore,
 collection,
 getDocs,
 updateDoc,
-doc,
-getDoc
+doc
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* FIREBASE */
+/* =========================
+FIREBASE
+========================= */
 
 const firebaseConfig = {
 
@@ -209,7 +327,9 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-/* ELEMENTOS */
+/* =========================
+ELEMENTOS
+========================= */
 
 const promptsContainer =
 document.getElementById("prompts");
@@ -220,11 +340,15 @@ document.getElementById("pesquisa");
 const filtroCategoria =
 document.getElementById("filtroCategoria");
 
-/* VARIÁVEIS */
+/* =========================
+VARIÁVEIS
+========================= */
 
 let todosPrompts = [];
 
-/* CARREGAR PROMPTS */
+/* =========================
+CARREGAR PROMPTS
+========================= */
 
 async function carregarPrompts(){
 
@@ -256,7 +380,9 @@ console.log(error);
 
 }
 
-/* CRIAR CATEGORIAS */
+/* =========================
+CRIAR CATEGORIAS
+========================= */
 
 function criarCategorias(){
 
@@ -267,9 +393,11 @@ todosPrompts.map(p => p.categoria)
 ];
 
 filtroCategoria.innerHTML = `
+
 <option value="">
 Todas Categorias
 </option>
+
 `;
 
 categorias.forEach((categoria) => {
@@ -286,7 +414,9 @@ ${categoria}
 
 }
 
-/* MOSTRAR PROMPTS */
+/* =========================
+MOSTRAR PROMPTS
+========================= */
 
 function mostrarPrompts(lista){
 
@@ -317,15 +447,18 @@ promptsContainer.innerHTML += `
 
 <a
 href="prompt.html?id=${data.id}"
-style="
-text-decoration:none;
-color:white;
-"
+class="link-card"
 >
+
+<div class="imagem-box">
 
 <img
 src="${data.imagem}"
+alt="${data.titulo}"
+loading="lazy"
 >
+
+</div>
 
 <h2>${data.titulo}</h2>
 
@@ -333,9 +466,13 @@ ${data.tipo === "Premium"
 
 ?
 
-`<div class="badge">
+`
+
+<div class="badge">
 PREMIUM
-</div>`
+</div>
+
+`
 
 :
 
@@ -382,7 +519,9 @@ data-likes="${data.likes || 0}">
 
 });
 
-/* EVENTO LIKE */
+/* =========================
+LIKE
+========================= */
 
 document
 .querySelectorAll(".like-btn")
@@ -419,7 +558,9 @@ btn.innerHTML =
 
 }
 
-/* FILTRO */
+/* =========================
+FILTRO
+========================= */
 
 function filtrarPrompts(){
 
@@ -464,7 +605,9 @@ mostrarPrompts(filtrados);
 
 }
 
-/* EVENTOS */
+/* =========================
+EVENTOS
+========================= */
 
 pesquisaInput.addEventListener(
 "input",
@@ -476,7 +619,9 @@ filtroCategoria.addEventListener(
 filtrarPrompts
 );
 
-/* START */
+/* =========================
+START
+========================= */
 
 carregarPrompts();
 
