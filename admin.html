@@ -20,7 +20,7 @@ font-family:Arial,sans-serif;
 body{
 background:#0f172a;
 color:white;
-padding:30px;
+padding:25px;
 }
 
 h1{
@@ -57,12 +57,12 @@ margin-bottom:15px;
 
 button{
 width:100%;
-padding:16px;
+padding:15px;
 border:none;
 border-radius:10px;
 background:#38bdf8;
 color:black;
-font-size:18px;
+font-size:16px;
 font-weight:bold;
 cursor:pointer;
 }
@@ -83,6 +83,42 @@ width:auto;
 padding:12px 20px;
 margin-bottom:30px;
 background:#ef4444;
+color:white;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
+}
+
+.card img{
+width:100%;
+height:220px;
+object-fit:cover;
+border-radius:10px;
+margin-bottom:15px;
+}
+
+.card-buttons{
+display:flex;
+gap:10px;
+margin-top:15px;
+}
+
+.editar-btn{
+background:#f59e0b;
+color:white;
+}
+
+.apagar-btn{
+background:#ef4444;
+color:white;
+}
+
+.like-btn{
+background:#22c55e;
 color:white;
 }
 
@@ -128,7 +164,7 @@ color:white;
 
 </div>
 
-<!-- LISTA DE PROMPTS -->
+<!-- PROMPTS -->
 
 <div class="box">
 
@@ -140,21 +176,17 @@ color:white;
 
 </div>
 
-<!-- TÍTULO -->
+<!-- FORM -->
 
 <input
 type="text"
 id="titulo"
 placeholder="Título do Prompt">
 
-<!-- PROMPT -->
-
 <textarea
 id="prompt"
 placeholder="Escreva o prompt completo aqui..."
 style="height:250px;"></textarea>
-
-<!-- INSTRUÇÕES -->
 
 <textarea
 id="instrucoes"
@@ -163,23 +195,24 @@ style="height:180px;"></textarea>
 
 <!-- CATEGORIA -->
 
-<select id="categoria">
-
-<option>Design</option>
-<option>Marketing</option>
-<option>Programação</option>
-<option>Imagens IA</option>
-<option>Vídeos IA</option>
-<option>Negócios</option>
-
-</select>
+<select id="categoria"></select>
 
 <!-- NOVA CATEGORIA -->
+
+<div class="box">
+
+<h3>Adicionar Categoria</h3>
 
 <input
 type="text"
 id="novaCategoria"
-placeholder="Adicionar nova categoria">
+placeholder="Nova categoria">
+
+<button id="adicionarCategoria">
+➕ Adicionar Categoria
+</button>
+
+</div>
 
 <!-- AFILIADO -->
 
@@ -194,16 +227,6 @@ placeholder="Link de afiliado">
 type="text"
 id="doacao"
 placeholder="Link para doações">
-
-<!-- PACK -->
-
-<div class="box">
-
-<h3>Adicionar Pack de Arquivos</h3>
-
-<input type="file" multiple>
-
-</div>
 
 <!-- IMAGEM -->
 
@@ -236,19 +259,11 @@ placeholder="Preço do Prompt">
 
 </div>
 
-<!-- BOTÃO -->
-
 <button id="publicar">
-
 Publicar Prompt
-
 </button>
 
 <script type="module">
-
-/* =========================
-FIREBASE
-========================= */
 
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -259,7 +274,9 @@ collection,
 addDoc,
 getDocs,
 deleteDoc,
-doc
+doc,
+updateDoc,
+getDoc
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -271,7 +288,7 @@ signOut
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 /* =========================
-CONFIG FIREBASE
+FIREBASE
 ========================= */
 
 const firebaseConfig = {
@@ -292,9 +309,9 @@ appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 
 const app = initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
-
 const db = getFirestore(app);
+
+const auth = getAuth(app);
 
 /* =========================
 PROTEGER ADMIN
@@ -305,6 +322,71 @@ onAuthStateChanged(auth, (user) => {
 if(!user){
 
 window.location.href = "login.html";
+
+}
+
+});
+
+/* =========================
+VARIÁVEIS
+========================= */
+
+let editandoId = null;
+
+let categorias = [
+"Design",
+"Marketing",
+"Programação",
+"Imagens IA",
+"Vídeos IA",
+"Negócios"
+];
+
+/* =========================
+CARREGAR CATEGORIAS
+========================= */
+
+function carregarCategorias(){
+
+const select =
+document.getElementById("categoria");
+
+select.innerHTML = "";
+
+categorias.forEach((cat) => {
+
+select.innerHTML += `
+<option>${cat}</option>
+`;
+
+});
+
+}
+
+carregarCategorias();
+
+/* =========================
+ADICIONAR CATEGORIA
+========================= */
+
+document
+.getElementById("adicionarCategoria")
+.addEventListener("click", () => {
+
+const nova =
+document.getElementById("novaCategoria").value;
+
+if(nova === "") return;
+
+if(!categorias.includes(nova)){
+
+categorias.push(nova);
+
+carregarCategorias();
+
+alert("✅ Categoria adicionada");
+
+document.getElementById("novaCategoria").value = "";
 
 }
 
@@ -323,11 +405,11 @@ let total = 0;
 
 let premium = 0;
 
-const categorias = [];
+const cats = [];
 
-snapshot.forEach((doc) => {
+snapshot.forEach((docItem) => {
 
-const data = doc.data();
+const data = docItem.data();
 
 total++;
 
@@ -337,9 +419,9 @@ premium++;
 
 }
 
-if(!categorias.includes(data.categoria)){
+if(!cats.includes(data.categoria)){
 
-categorias.push(data.categoria);
+cats.push(data.categoria);
 
 }
 
@@ -352,7 +434,7 @@ document.getElementById("totalPremium")
 .innerText = premium;
 
 document.getElementById("totalCategorias")
-.innerText = categorias.length;
+.innerText = cats.length;
 
 }
 
@@ -378,55 +460,41 @@ const data = docItem.data();
 
 lista.innerHTML += `
 
-<div style="
-background:#1e293b;
-padding:20px;
-border-radius:12px;
-margin-bottom:15px;
-">
+<div class="card">
 
-<img
-src="${data.imagem}"
-style="
-width:100%;
-max-height:200px;
-object-fit:cover;
-border-radius:10px;
-margin-bottom:10px;
-">
+<img src="${data.imagem}">
 
-<h3 style="margin-bottom:10px;">
-${data.titulo}
-</h3>
+<h2>${data.titulo}</h2>
 
-<p style="
-opacity:0.8;
-margin-bottom:15px;
-">
+<p style="margin-top:10px;">
 ${data.categoria}
 </p>
 
-<div style="
-display:flex;
-gap:10px;
+<p style="
+margin-top:10px;
+opacity:0.8;
 ">
+❤️ ${data.likes || 0} Likes
+</p>
+
+<div class="card-buttons">
 
 <button
-onclick="editarPrompt('${docItem.id}')"
-style="
-background:#f59e0b;
-color:white;
-">
+class="editar-btn"
+onclick="editarPrompt('${docItem.id}')">
 ✏️ Editar
 </button>
 
 <button
-onclick="apagarPrompt('${docItem.id}')"
-style="
-background:#ef4444;
-color:white;
-">
+class="apagar-btn"
+onclick="apagarPrompt('${docItem.id}')">
 🗑️ Apagar
+</button>
+
+<button
+class="like-btn"
+onclick="likePrompt('${docItem.id}', ${data.likes || 0})">
+❤️ Like
 </button>
 
 </div>
@@ -442,7 +510,7 @@ color:white;
 listarPrompts();
 
 /* =========================
-PUBLICAR PROMPT
+PUBLICAR / EDITAR
 ========================= */
 
 document
@@ -450,18 +518,6 @@ document
 .addEventListener("click", async () => {
 
 try{
-
-let categoria =
-document.getElementById("categoria").value;
-
-const novaCategoria =
-document.getElementById("novaCategoria").value;
-
-if(novaCategoria !== ""){
-
-categoria = novaCategoria;
-
-}
 
 const titulo =
 document.getElementById("titulo").value;
@@ -471,6 +527,9 @@ document.getElementById("prompt").value;
 
 const instrucoes =
 document.getElementById("instrucoes").value;
+
+const categoria =
+document.getElementById("categoria").value;
 
 const afiliado =
 document.getElementById("afiliado").value;
@@ -483,10 +542,6 @@ document.getElementById("preco").value;
 
 const tipo =
 document.getElementById("tipo").value;
-
-/* =========================
-UPLOAD CLOUDINARY
-========================= */
 
 const imagemInput =
 document.getElementById("imagemInput");
@@ -524,48 +579,141 @@ dados.secure_url;
 
 }
 
-/* =========================
-SALVAR FIREBASE
-========================= */
+if(editandoId){
+
+const promptRef =
+doc(db, "prompts", editandoId);
+
+const novosDados = {
+
+titulo,
+prompt,
+instrucoes,
+categoria,
+afiliado,
+doacao,
+preco,
+tipo,
+descricao: prompt
+
+};
+
+if(imagemFile){
+
+novosDados.imagem = imagemUrl;
+
+}
+
+await updateDoc(promptRef, novosDados);
+
+alert("✅ Prompt atualizado!");
+
+editandoId = null;
+
+document.getElementById("publicar")
+.innerText = "Publicar Prompt";
+
+}else{
 
 await addDoc(
 collection(db, "prompts"),
 {
 
 titulo,
-categoria,
 prompt,
+descricao: prompt,
 instrucoes,
+categoria,
 afiliado,
 doacao,
 preco,
 tipo,
-
-descricao: prompt,
-
-imagem: imagemUrl
+imagem: imagemUrl,
+likes:0
 
 }
 );
 
-alert("✅ Prompt publicado com sucesso!");
+alert("✅ Prompt publicado!");
 
-carregarDashboard();
+}
+
+document.getElementById("titulo").value = "";
+document.getElementById("prompt").value = "";
+document.getElementById("instrucoes").value = "";
+document.getElementById("afiliado").value = "";
+document.getElementById("doacao").value = "";
+document.getElementById("preco").value = "";
+document.getElementById("imagemInput").value = "";
 
 listarPrompts();
+
+carregarDashboard();
 
 }catch(error){
 
 console.log(error);
 
-alert("❌ Erro ao publicar");
+alert("❌ Erro");
 
 }
 
 });
 
 /* =========================
-APAGAR PROMPT
+EDITAR
+========================= */
+
+window.editarPrompt =
+async function(id){
+
+const ref =
+doc(db, "prompts", id);
+
+const snap =
+await getDoc(ref);
+
+const data =
+snap.data();
+
+editandoId = id;
+
+document.getElementById("titulo").value =
+data.titulo || "";
+
+document.getElementById("prompt").value =
+data.prompt || "";
+
+document.getElementById("instrucoes").value =
+data.instrucoes || "";
+
+document.getElementById("categoria").value =
+data.categoria || "";
+
+document.getElementById("afiliado").value =
+data.afiliado || "";
+
+document.getElementById("doacao").value =
+data.doacao || "";
+
+document.getElementById("preco").value =
+data.preco || "";
+
+document.getElementById("tipo").value =
+data.tipo || "Grátis";
+
+document.getElementById("publicar")
+.innerText = "Atualizar Prompt";
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
+/* =========================
+APAGAR
 ========================= */
 
 window.apagarPrompt =
@@ -587,15 +735,22 @@ carregarDashboard();
 }
 
 /* =========================
-EDITAR PROMPT
+LIKE
 ========================= */
 
-window.editarPrompt =
-function(id){
+window.likePrompt =
+async function(id, likesAtual){
 
-alert(
-"🚧 Sistema de edição será criado no próximo passo.\n\nID: " + id
-);
+const ref =
+doc(db, "prompts", id);
+
+await updateDoc(ref, {
+
+likes: likesAtual + 1
+
+});
+
+listarPrompts();
 
 }
 
