@@ -24,17 +24,18 @@ padding:20px;
 }
 
 .container{
-max-width:1000px;
+max-width:1100px;
 margin:auto;
 }
 
 .banner{
 width:100%;
-max-height:500px;
+max-height:600px;
 object-fit:contain;
 border-radius:20px;
 margin-bottom:25px;
 background:#111827;
+padding:10px;
 }
 
 h1{
@@ -95,12 +96,6 @@ color:black;
 width:100%;
 }
 
-.like-btn{
-background:#22c55e;
-color:white;
-width:100%;
-}
-
 .afiliado-btn{
 background:#8b5cf6;
 color:white;
@@ -125,6 +120,11 @@ padding:15px;
 border-radius:15px;
 text-decoration:none;
 color:white;
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
 }
 
 .card img{
@@ -173,10 +173,11 @@ getFirestore,
 doc,
 getDoc,
 collection,
-getDocs,
-updateDoc
+getDocs
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* FIREBASE */
 
 const firebaseConfig = {
 
@@ -198,6 +199,8 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
+/* PEGAR ID */
+
 const params =
 new URLSearchParams(window.location.search);
 
@@ -205,6 +208,8 @@ const id = params.get("id");
 
 const conteudo =
 document.getElementById("conteudo");
+
+/* CARREGAR PROMPT */
 
 async function carregarPrompt(){
 
@@ -248,20 +253,6 @@ ${data.tipo}
 <h2>📂 Categoria</h2>
 
 <p>${data.categoria}</p>
-
-</div>
-
-<div class="box">
-
-<h2>❤️ Likes</h2>
-
-<p id="likes">${data.likes || 0} Likes</p>
-
-<button
-class="like-btn"
-id="curtir">
-❤️ Curtir
-</button>
 
 </div>
 
@@ -385,30 +376,11 @@ copiar.innerText = "✅ Copiado";
 
 }
 
-/* LIKE */
-
-document
-.getElementById("curtir")
-.addEventListener("click", async () => {
-
-const likesAtual =
-data.likes || 0;
-
-await updateDoc(ref, {
-
-likes: likesAtual + 1
-
-});
-
-document.getElementById("likes")
-.innerText =
-`${likesAtual + 1} Likes`;
-
-});
-
 carregarRelacionados(data.categoria);
 
 }
+
+/* RELACIONADOS */
 
 async function carregarRelacionados(categoriaAtual){
 
@@ -442,7 +414,7 @@ class="card"
 <h3>${data.titulo}</h3>
 
 <p style="margin-top:10px;">
-❤️ ${data.likes || 0}
+📂 ${data.categoria}
 </p>
 
 </a>
@@ -454,6 +426,8 @@ class="card"
 });
 
 }
+
+/* START */
 
 carregarPrompt();
 
