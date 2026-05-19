@@ -56,12 +56,9 @@ margin-bottom:15px;
 }
 
 button{
-width:100%;
 padding:15px;
 border:none;
 border-radius:10px;
-background:#38bdf8;
-color:black;
 font-size:16px;
 font-weight:bold;
 cursor:pointer;
@@ -71,19 +68,23 @@ button:hover{
 opacity:0.9;
 }
 
+#publicar{
+width:100%;
+background:#38bdf8;
+color:black;
+}
+
+.logout-btn{
+background:#ef4444;
+color:white;
+margin-bottom:25px;
+}
+
 #dashboard{
 display:grid;
 grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
 gap:20px;
 margin-bottom:30px;
-}
-
-.logout-btn{
-width:auto;
-padding:12px 20px;
-margin-bottom:30px;
-background:#ef4444;
-color:white;
 }
 
 .card{
@@ -110,16 +111,19 @@ margin-top:15px;
 .editar-btn{
 background:#f59e0b;
 color:white;
+flex:1;
 }
 
 .apagar-btn{
 background:#ef4444;
 color:white;
+flex:1;
 }
 
 .like-btn{
 background:#22c55e;
 color:white;
+flex:1;
 }
 
 </style>
@@ -139,32 +143,23 @@ color:white;
 <div id="dashboard">
 
 <div class="box">
-
 <h3>Total de Prompts</h3>
-
 <h1 id="totalPrompts">0</h1>
-
 </div>
 
 <div class="box">
-
 <h3>Prompts Premium</h3>
-
 <h1 id="totalPremium">0</h1>
-
 </div>
 
 <div class="box">
-
 <h3>Categorias</h3>
-
 <h1 id="totalCategorias">0</h1>
-
 </div>
 
 </div>
 
-<!-- PROMPTS -->
+<!-- LISTA -->
 
 <div class="box">
 
@@ -185,19 +180,15 @@ placeholder="Título do Prompt">
 
 <textarea
 id="prompt"
-placeholder="Escreva o prompt completo aqui..."
+placeholder="Escreva o prompt..."
 style="height:250px;"></textarea>
 
 <textarea
 id="instrucoes"
-placeholder="Como usar este prompt..."
+placeholder="Como usar..."
 style="height:180px;"></textarea>
 
-<!-- CATEGORIA -->
-
 <select id="categoria"></select>
-
-<!-- NOVA CATEGORIA -->
 
 <div class="box">
 
@@ -214,31 +205,23 @@ placeholder="Nova categoria">
 
 </div>
 
-<!-- AFILIADO -->
-
 <input
 type="text"
 id="afiliado"
-placeholder="Link de afiliado">
-
-<!-- DOAÇÃO -->
+placeholder="Link afiliado">
 
 <input
 type="text"
 id="doacao"
-placeholder="Link para doações">
-
-<!-- IMAGEM -->
+placeholder="Link doação">
 
 <div class="box">
 
-<h3>Upload de Imagem</h3>
+<h3>Upload Imagem</h3>
 
 <input type="file" id="imagemInput">
 
 </div>
-
-<!-- MONETIZAÇÃO -->
 
 <div class="box">
 
@@ -247,7 +230,7 @@ placeholder="Link para doações">
 <input
 type="number"
 id="preco"
-placeholder="Preço do Prompt">
+placeholder="Preço">
 
 <select id="tipo">
 
@@ -264,6 +247,10 @@ Publicar Prompt
 </button>
 
 <script type="module">
+
+/* =========================
+IMPORTS
+========================= */
 
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -294,15 +281,10 @@ FIREBASE
 const firebaseConfig = {
 
 apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
-
 authDomain: "gamboprompts-8ff6d.firebaseapp.com",
-
 projectId: "gamboprompts-8ff6d",
-
 storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
-
 messagingSenderId: "92750073125",
-
 appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 
 };
@@ -314,7 +296,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 /* =========================
-PROTEGER ADMIN
+AUTH
 ========================= */
 
 onAuthStateChanged(auth, (user) => {
@@ -343,7 +325,7 @@ let categorias = [
 ];
 
 /* =========================
-CARREGAR CATEGORIAS
+CATEGORIAS
 ========================= */
 
 function carregarCategorias(){
@@ -356,7 +338,9 @@ select.innerHTML = "";
 categorias.forEach((cat) => {
 
 select.innerHTML += `
-<option>${cat}</option>
+<option value="${cat}">
+${cat}
+</option>
 `;
 
 });
@@ -365,16 +349,12 @@ select.innerHTML += `
 
 carregarCategorias();
 
-/* =========================
-ADICIONAR CATEGORIA
-========================= */
-
 document
 .getElementById("adicionarCategoria")
 .addEventListener("click", () => {
 
 const nova =
-document.getElementById("novaCategoria").value;
+document.getElementById("novaCategoria").value.trim();
 
 if(nova === "") return;
 
@@ -384,11 +364,13 @@ categorias.push(nova);
 
 carregarCategorias();
 
+document.getElementById("categoria").value = nova;
+
 alert("✅ Categoria adicionada");
 
-document.getElementById("novaCategoria").value = "";
-
 }
+
+document.getElementById("novaCategoria").value = "";
 
 });
 
@@ -402,7 +384,6 @@ const snapshot =
 await getDocs(collection(db, "prompts"));
 
 let total = 0;
-
 let premium = 0;
 
 const cats = [];
@@ -438,10 +419,8 @@ document.getElementById("totalCategorias")
 
 }
 
-carregarDashboard();
-
 /* =========================
-LISTAR PROMPTS
+LISTAR
 ========================= */
 
 async function listarPrompts(){
@@ -467,13 +446,10 @@ lista.innerHTML += `
 <h2>${data.titulo}</h2>
 
 <p style="margin-top:10px;">
-${data.categoria}
+📂 ${data.categoria}
 </p>
 
-<p style="
-margin-top:10px;
-opacity:0.8;
-">
+<p style="margin-top:10px;">
 ❤️ ${data.likes || 0} Likes
 </p>
 
@@ -481,19 +457,20 @@ opacity:0.8;
 
 <button
 class="editar-btn"
-onclick="editarPrompt('${docItem.id}')">
+data-id="${docItem.id}">
 ✏️ Editar
 </button>
 
 <button
 class="apagar-btn"
-onclick="apagarPrompt('${docItem.id}')">
+data-id="${docItem.id}">
 🗑️ Apagar
 </button>
 
 <button
 class="like-btn"
-onclick="likePrompt('${docItem.id}', ${data.likes || 0})">
+data-id="${docItem.id}"
+data-likes="${data.likes || 0}">
 ❤️ Like
 </button>
 
@@ -505,17 +482,64 @@ onclick="likePrompt('${docItem.id}', ${data.likes || 0})">
 
 });
 
+/* =========================
+BOTÕES
+========================= */
+
+document.querySelectorAll(".editar-btn")
+.forEach((btn) => {
+
+btn.addEventListener("click", () => {
+
+editarPrompt(btn.dataset.id);
+
+});
+
+});
+
+document.querySelectorAll(".apagar-btn")
+.forEach((btn) => {
+
+btn.addEventListener("click", () => {
+
+apagarPrompt(btn.dataset.id);
+
+});
+
+});
+
+document.querySelectorAll(".like-btn")
+.forEach((btn) => {
+
+btn.addEventListener("click", () => {
+
+likePrompt(
+btn.dataset.id,
+parseInt(btn.dataset.likes)
+);
+
+});
+
+});
+
 }
 
+/* =========================
+CARREGAR INICIAL
+========================= */
+
 listarPrompts();
+carregarDashboard();
 
 /* =========================
-PUBLICAR / EDITAR
+PUBLICAR
 ========================= */
 
 document
 .getElementById("publicar")
-.addEventListener("click", async () => {
+.addEventListener("click", salvarPrompt);
+
+async function salvarPrompt(){
 
 try{
 
@@ -549,8 +573,11 @@ document.getElementById("imagemInput");
 const imagemFile =
 imagemInput.files[0];
 
-let imagemUrl =
-"https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80";
+let imagemUrl = null;
+
+/* =========================
+UPLOAD CLOUDINARY
+========================= */
 
 if(imagemFile){
 
@@ -579,32 +606,38 @@ dados.secure_url;
 
 }
 
+/* =========================
+EDITAR
+========================= */
+
 if(editandoId){
 
-const promptRef =
+const ref =
 doc(db, "prompts", editandoId);
+
+const snap =
+await getDoc(ref);
+
+const atual =
+snap.data();
 
 const novosDados = {
 
 titulo,
 prompt,
+descricao: prompt,
 instrucoes,
 categoria,
 afiliado,
 doacao,
 preco,
 tipo,
-descricao: prompt
+likes: atual.likes || 0,
+imagem: imagemUrl || atual.imagem
 
 };
 
-if(imagemFile){
-
-novosDados.imagem = imagemUrl;
-
-}
-
-await updateDoc(promptRef, novosDados);
+await updateDoc(ref, novosDados);
 
 alert("✅ Prompt atualizado!");
 
@@ -614,6 +647,10 @@ document.getElementById("publicar")
 .innerText = "Publicar Prompt";
 
 }else{
+
+/* =========================
+CRIAR
+========================= */
 
 await addDoc(
 collection(db, "prompts"),
@@ -628,8 +665,8 @@ afiliado,
 doacao,
 preco,
 tipo,
-imagem: imagemUrl,
-likes:0
+likes:0,
+imagem: imagemUrl || "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&q=80"
 
 }
 );
@@ -637,6 +674,10 @@ likes:0
 alert("✅ Prompt publicado!");
 
 }
+
+/* =========================
+RESET
+========================= */
 
 document.getElementById("titulo").value = "";
 document.getElementById("prompt").value = "";
@@ -647,25 +688,23 @@ document.getElementById("preco").value = "";
 document.getElementById("imagemInput").value = "";
 
 listarPrompts();
-
 carregarDashboard();
 
 }catch(error){
 
 console.log(error);
 
-alert("❌ Erro");
+alert("❌ Erro ao salvar");
 
 }
 
-});
+}
 
 /* =========================
 EDITAR
 ========================= */
 
-window.editarPrompt =
-async function(id){
+async function editarPrompt(id){
 
 const ref =
 doc(db, "prompts", id);
@@ -706,8 +745,10 @@ document.getElementById("publicar")
 .innerText = "Atualizar Prompt";
 
 window.scrollTo({
+
 top:0,
 behavior:"smooth"
+
 });
 
 }
@@ -716,11 +757,10 @@ behavior:"smooth"
 APAGAR
 ========================= */
 
-window.apagarPrompt =
-async function(id){
+async function apagarPrompt(id){
 
 const confirmar =
-confirm("Deseja apagar este prompt?");
+confirm("Deseja apagar?");
 
 if(!confirmar) return;
 
@@ -729,7 +769,6 @@ await deleteDoc(doc(db, "prompts", id));
 alert("✅ Prompt apagado!");
 
 listarPrompts();
-
 carregarDashboard();
 
 }
@@ -738,8 +777,7 @@ carregarDashboard();
 LIKE
 ========================= */
 
-window.likePrompt =
-async function(id, likesAtual){
+async function likePrompt(id, likesAtual){
 
 const ref =
 doc(db, "prompts", id);
