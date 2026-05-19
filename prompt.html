@@ -28,17 +28,17 @@ max-width:1000px;
 margin:auto;
 }
 
-img{
+.banner{
 width:100%;
 height:350px;
 object-fit:cover;
-border-radius:16px;
+border-radius:20px;
 margin-bottom:25px;
 }
 
 h1{
 font-size:35px;
-margin-bottom:15px;
+margin-bottom:20px;
 }
 
 .badge{
@@ -55,84 +55,91 @@ background:#f59e0b;
 color:black;
 }
 
-.free{
+.gratis{
 background:#22c55e;
-color:black;
-}
-
-.meta{
-display:flex;
-gap:20px;
-flex-wrap:wrap;
-margin-bottom:25px;
-color:#cbd5e1;
+color:white;
 }
 
 .box{
 background:#111827;
 padding:25px;
-border-radius:16px;
+border-radius:20px;
 margin-bottom:25px;
 }
 
-h2{
-margin-bottom:15px;
+.box h2{
+margin-bottom:20px;
 }
 
 .prompt-text{
 white-space:pre-wrap;
 line-height:1.7;
+font-size:16px;
 color:#e2e8f0;
 }
 
-.buttons{
-display:flex;
-gap:15px;
-flex-wrap:wrap;
-margin-top:25px;
-}
-
-button,
-a{
-padding:14px 20px;
+button{
+padding:15px 20px;
 border:none;
-border-radius:10px;
-font-size:15px;
-font-weight:bold;
+border-radius:12px;
 cursor:pointer;
-text-decoration:none;
-display:inline-block;
+font-size:16px;
+font-weight:bold;
+margin-top:15px;
 }
 
 .copy-btn{
 background:#38bdf8;
 color:black;
+width:100%;
+}
+
+.like-btn{
+background:#22c55e;
+color:white;
+width:100%;
 }
 
 .afiliado-btn{
-background:#22c55e;
+background:#8b5cf6;
 color:white;
+width:100%;
 }
 
 .doacao-btn{
-background:#f43f5e;
+background:#ef4444;
+color:white;
+width:100%;
+}
+
+.relacionados{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+}
+
+.card{
+background:#1e293b;
+padding:15px;
+border-radius:15px;
+text-decoration:none;
 color:white;
 }
 
-.back{
-display:inline-block;
-margin-bottom:25px;
-color:white;
-text-decoration:none;
+.card img{
+width:100%;
+height:180px;
+object-fit:cover;
+border-radius:10px;
+margin-bottom:10px;
 }
 
 .lock{
-background:#1e293b;
-padding:40px;
-border-radius:16px;
+background:#ef4444;
+padding:20px;
+border-radius:15px;
 text-align:center;
-font-size:20px;
-line-height:1.8;
+margin-top:20px;
 }
 
 </style>
@@ -143,5 +150,314 @@ line-height:1.8;
 
 <div class="container">
 
-<a href="index.html" class="back">
-⬅
+<div id="conteudo"></div>
+
+<div class="box">
+
+<h2>🔥 Prompts Relacionados</h2>
+
+<div id="relacionados" class="relacionados"></div>
+
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+collection,
+getDocs,
+updateDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+
+authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+
+projectId: "gamboprompts-8ff6d",
+
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+
+messagingSenderId: "92750073125",
+
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+const params =
+new URLSearchParams(window.location.search);
+
+const id = params.get("id");
+
+const conteudo =
+document.getElementById("conteudo");
+
+async function carregarPrompt(){
+
+const ref =
+doc(db,"prompts",id);
+
+const snap =
+await getDoc(ref);
+
+if(!snap.exists()){
+
+conteudo.innerHTML = `
+<h1>Prompt não encontrado</h1>
+`;
+
+return;
+
+}
+
+const data = snap.data();
+
+document.title = data.titulo;
+
+conteudo.innerHTML = `
+
+<img
+src="${data.imagem}"
+class="banner"
+>
+
+<h1>${data.titulo}</h1>
+
+<div class="badge ${data.tipo === "Premium" ? "premium" : "gratis"}">
+
+${data.tipo}
+
+</div>
+
+<div class="box">
+
+<h2>📂 Categoria</h2>
+
+<p>${data.categoria}</p>
+
+</div>
+
+<div class="box">
+
+<h2>❤️ Likes</h2>
+
+<p id="likes">${data.likes || 0} Likes</p>
+
+<button
+class="like-btn"
+id="curtir">
+❤️ Curtir
+</button>
+
+</div>
+
+<div class="box">
+
+<h2>📖 Instruções</h2>
+
+<p class="prompt-text">
+
+${data.instrucoes || "Sem instruções"}
+
+</p>
+
+</div>
+
+<div class="box">
+
+<h2>🧠 Prompt</h2>
+
+${
+data.tipo === "Premium"
+
+? `
+
+<div class="lock">
+
+<h2>🔒 Conteúdo Premium</h2>
+
+<p>
+Este prompt é premium.
+</p>
+
+</div>
+
+`
+
+:
+
+`
+
+<p class="prompt-text" id="textoPrompt">
+
+${data.prompt}
+
+</p>
+
+<button
+class="copy-btn"
+id="copiar">
+📋 Copiar Prompt
+</button>
+
+`
+
+}
+
+</div>
+
+${
+data.afiliado
+
+?
+
+`
+
+<button
+class="afiliado-btn"
+onclick="window.open('${data.afiliado}')">
+🚀 Acessar Oferta
+</button>
+
+`
+
+:
+
+""
+
+}
+
+${
+data.doacao
+
+?
+
+`
+
+<button
+class="doacao-btn"
+onclick="window.open('${data.doacao}')">
+💖 Apoiar Projeto
+</button>
+
+`
+
+:
+
+""
+
+}
+
+`;
+
+/* COPIAR */
+
+const copiar =
+document.getElementById("copiar");
+
+if(copiar){
+
+copiar.addEventListener("click", () => {
+
+const texto =
+document.getElementById("textoPrompt")
+.innerText;
+
+navigator.clipboard.writeText(texto);
+
+copiar.innerText = "✅ Copiado";
+
+});
+
+}
+
+/* LIKE */
+
+document
+.getElementById("curtir")
+.addEventListener("click", async () => {
+
+const likesAtual =
+data.likes || 0;
+
+await updateDoc(ref, {
+
+likes: likesAtual + 1
+
+});
+
+document.getElementById("likes")
+.innerText =
+`${likesAtual + 1} Likes`;
+
+});
+
+carregarRelacionados(data.categoria);
+
+}
+
+async function carregarRelacionados(categoriaAtual){
+
+const snapshot =
+await getDocs(collection(db,"prompts"));
+
+const relacionados =
+document.getElementById("relacionados");
+
+relacionados.innerHTML = "";
+
+snapshot.forEach((docItem) => {
+
+const data = docItem.data();
+
+if(
+data.categoria === categoriaAtual
+&&
+docItem.id !== id
+){
+
+relacionados.innerHTML += `
+
+<a
+href="prompt.html?id=${docItem.id}"
+class="card"
+>
+
+<img src="${data.imagem}">
+
+<h3>${data.titulo}</h3>
+
+<p style="margin-top:10px;">
+❤️ ${data.likes || 0}
+</p>
+
+</a>
+
+`;
+
+}
+
+});
+
+}
+
+carregarPrompt();
+
+</script>
+
+</body>
+
+</html>
