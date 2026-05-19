@@ -10,70 +10,129 @@
 
 <style>
 
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
 body{
 background:#0f172a;
 color:white;
-font-family:Arial;
-padding:30px;
+padding:20px;
 }
 
 .container{
-max-width:900px;
+max-width:1000px;
 margin:auto;
 }
 
 img{
 width:100%;
-border-radius:15px;
-margin-bottom:20px;
+height:350px;
+object-fit:cover;
+border-radius:16px;
+margin-bottom:25px;
 }
 
 h1{
-margin-bottom:20px;
 font-size:35px;
+margin-bottom:15px;
 }
 
-.categoria{
-background:#38bdf8;
-color:black;
+.badge{
 display:inline-block;
 padding:8px 15px;
 border-radius:30px;
-margin-bottom:20px;
+font-size:14px;
 font-weight:bold;
+margin-bottom:20px;
+}
+
+.premium{
+background:#f59e0b;
+color:black;
+}
+
+.free{
+background:#22c55e;
+color:black;
+}
+
+.meta{
+display:flex;
+gap:20px;
+flex-wrap:wrap;
+margin-bottom:25px;
+color:#cbd5e1;
 }
 
 .box{
-background:#1e293b;
-padding:20px;
-border-radius:15px;
-margin-top:20px;
-line-height:1.7;
+background:#111827;
+padding:25px;
+border-radius:16px;
+margin-bottom:25px;
 }
 
-button{
-width:100%;
-padding:18px;
+h2{
+margin-bottom:15px;
+}
+
+.prompt-text{
+white-space:pre-wrap;
+line-height:1.7;
+color:#e2e8f0;
+}
+
+.buttons{
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+margin-top:25px;
+}
+
+button,
+a{
+padding:14px 20px;
 border:none;
-border-radius:12px;
-background:#38bdf8;
-color:black;
-font-size:18px;
+border-radius:10px;
+font-size:15px;
 font-weight:bold;
 cursor:pointer;
-margin-top:20px;
+text-decoration:none;
+display:inline-block;
 }
 
-textarea{
-width:100%;
-height:250px;
-background:#0f172a;
+.copy-btn{
+background:#38bdf8;
+color:black;
+}
+
+.afiliado-btn{
+background:#22c55e;
 color:white;
-border:none;
-border-radius:12px;
-padding:15px;
-font-size:16px;
-margin-top:15px;
+}
+
+.doacao-btn{
+background:#f43f5e;
+color:white;
+}
+
+.back{
+display:inline-block;
+margin-bottom:25px;
+color:white;
+text-decoration:none;
+}
+
+.lock{
+background:#1e293b;
+padding:40px;
+border-radius:16px;
+text-align:center;
+font-size:20px;
+line-height:1.8;
 }
 
 </style>
@@ -84,151 +143,5 @@ margin-top:15px;
 
 <div class="container">
 
-<img id="imagem">
-
-<h1 id="titulo"></h1>
-
-<div class="categoria" id="categoria"></div>
-
-<div class="box">
-
-<h2>Descrição</h2>
-
-<p id="descricao"></p>
-
-</div>
-
-<div class="box">
-
-<h2>Prompt Completo</h2>
-
-<div id="premiumBox"></div>
-
-<textarea id="prompt" readonly></textarea>
-
-<button onclick="copiarPrompt()">
-
-Copiar Prompt
-
-</button>
-
-</div>
-
-</div>
-
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getFirestore,
-doc,
-getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-const firebaseConfig = {
-apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
-authDomain: "gamboprompts-8ff6d.firebaseapp.com",
-projectId: "gamboprompts-8ff6d",
-storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
-messagingSenderId: "92750073125",
-appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
-};
-
-const app = initializeApp(firebaseConfig);
-
-const db = getFirestore(app);
-
-const params = new URLSearchParams(window.location.search);
-
-const id = params.get("id");
-
-async function carregarPrompt(){
-
-const docRef = doc(db, "prompts", id);
-
-const docSnap = await getDoc(docRef);
-
-if(docSnap.exists()){
-
-const data = docSnap.data();
-
-document.getElementById("imagem").src = data.imagem;
-
-document.getElementById("titulo").innerText = data.titulo;
-
-document.getElementById("categoria").innerText = data.categoria;
-
-document.getElementById("descricao").innerText = data.descricao;
-
-if(data.tipo === "Premium"){
-
-document.getElementById("premiumBox")
-.innerHTML = `
-
-<div style="
-background:#f59e0b;
-color:black;
-padding:20px;
-border-radius:15px;
-margin-bottom:20px;
-font-weight:bold;
-text-align:center;
-">
-
-🔒 Este prompt é Premium
-
-<br><br>
-
-<button style="
-padding:15px 25px;
-border:none;
-border-radius:10px;
-background:black;
-color:white;
-font-weight:bold;
-cursor:pointer;
-">
-
-Desbloquear Prompt
-
-</button>
-
-</div>
-
-`;
-
-document.getElementById("prompt").value =
-"Conteúdo bloqueado.";
-
-}else{
-
-document.getElementById("prompt").value =
-data.prompt;
-
-}
-
-}
-
-}
-
-carregarPrompt();
-
-window.copiarPrompt = function(){
-
-const textarea =
-document.getElementById("prompt");
-
-textarea.select();
-
-document.execCommand("copy");
-
-alert("Prompt copiado!");
-
-}
-
-</script>
-
-</body>
-
-</html>
+<a href="index.html" class="back">
+⬅
