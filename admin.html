@@ -318,12 +318,17 @@ FIREBASE
 
 const firebaseConfig = {
 
-apiKey: "SUA_API",
-authDomain: "SEU_AUTH",
-projectId: "SEU_PROJECT",
-storageBucket: "SEU_STORAGE",
-messagingSenderId: "SEU_ID",
-appId: "SEU_APP"
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+
+authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+
+projectId: "gamboprompts-8ff6d",
+
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+
+messagingSenderId: "92750073125",
+
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 
 };
 
@@ -334,14 +339,26 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 /* =========================
-LOGIN
+PROTEGER ADMIN
 ========================= */
 
 onAuthStateChanged(auth, (user) => {
 
-if(!user){
+if(user){
+
+console.log("ADMIN LOGADO");
+
+}else{
+
+setTimeout(() => {
+
+if(!auth.currentUser){
 
 window.location.href = "login.html";
+
+}
+
+}, 1000);
 
 }
 
@@ -363,7 +380,7 @@ let categorias = [
 ];
 
 /* =========================
-SELECT CATEGORIAS
+CARREGAR CATEGORIAS
 ========================= */
 
 function carregarCategorias(){
@@ -428,8 +445,6 @@ data-index="${index}">
 
 });
 
-/* EDITAR */
-
 document
 .querySelectorAll(".editar-cat")
 .forEach((btn) => {
@@ -441,8 +456,6 @@ editarCategoria(btn.dataset.index);
 });
 
 });
-
-/* APAGAR */
 
 document
 .querySelectorAll(".apagar-cat")
@@ -494,8 +507,6 @@ document.getElementById("novaCategoria").value = "";
 
 carregarCategorias();
 
-alert("✅ Categoria adicionada");
-
 });
 
 /* =========================
@@ -515,8 +526,6 @@ categorias[index] = novoNome;
 
 carregarCategorias();
 
-alert("✅ Categoria atualizada");
-
 }
 
 /* =========================
@@ -534,8 +543,6 @@ categorias.splice(index,1);
 
 carregarCategorias();
 
-alert("✅ Categoria apagada");
-
 }
 
 /* =========================
@@ -548,6 +555,7 @@ const snapshot =
 await getDocs(collection(db, "prompts"));
 
 let total = 0;
+
 let premium = 0;
 
 const cats = [];
@@ -646,8 +654,6 @@ data-likes="${data.likes || 0}">
 
 });
 
-/* EVENTOS */
-
 document.querySelectorAll(".editar-btn")
 .forEach((btn) => {
 
@@ -687,7 +693,7 @@ parseInt(btn.dataset.likes)
 }
 
 /* =========================
-PUBLICAR
+SALVAR PROMPT
 ========================= */
 
 document
@@ -701,7 +707,7 @@ try{
 const titulo =
 document.getElementById("titulo").value;
 
-const prompt =
+const promptText =
 document.getElementById("prompt").value;
 
 const instrucoes =
@@ -775,8 +781,8 @@ snap.data();
 await updateDoc(ref, {
 
 titulo,
-prompt,
-descricao: prompt,
+prompt: promptText,
+descricao: promptText,
 instrucoes,
 categoria,
 afiliado,
@@ -797,15 +803,15 @@ document.getElementById("publicar")
 
 }else{
 
-/* CRIAR */
+/* NOVO */
 
 await addDoc(
 collection(db, "prompts"),
 {
 
 titulo,
-prompt,
-descricao: prompt,
+prompt: promptText,
+descricao: promptText,
 instrucoes,
 categoria,
 afiliado,
@@ -822,143 +828,4 @@ alert("✅ Publicado!");
 
 }
 
-/* RESET */
-
-document.getElementById("titulo").value = "";
-document.getElementById("prompt").value = "";
-document.getElementById("instrucoes").value = "";
-document.getElementById("afiliado").value = "";
-document.getElementById("doacao").value = "";
-document.getElementById("preco").value = "";
-document.getElementById("imagemInput").value = "";
-
-listarPrompts();
-carregarDashboard();
-
-}catch(error){
-
-console.log(error);
-
-alert("❌ Erro");
-
-}
-
-}
-
-/* =========================
-EDITAR PROMPT
-========================= */
-
-async function editarPrompt(id){
-
-const ref =
-doc(db, "prompts", id);
-
-const snap =
-await getDoc(ref);
-
-const data =
-snap.data();
-
-editandoId = id;
-
-document.getElementById("titulo").value =
-data.titulo || "";
-
-document.getElementById("prompt").value =
-data.prompt || "";
-
-document.getElementById("instrucoes").value =
-data.instrucoes || "";
-
-document.getElementById("categoria").value =
-data.categoria || "";
-
-document.getElementById("afiliado").value =
-data.afiliado || "";
-
-document.getElementById("doacao").value =
-data.doacao || "";
-
-document.getElementById("preco").value =
-data.preco || "";
-
-document.getElementById("tipo").value =
-data.tipo || "Grátis";
-
-document.getElementById("publicar")
-.innerText = "Atualizar Prompt";
-
-window.scrollTo({
-top:0,
-behavior:"smooth"
-});
-
-}
-
-/* =========================
-APAGAR PROMPT
-========================= */
-
-async function apagarPrompt(id){
-
-const confirmar =
-confirm("Deseja apagar?");
-
-if(!confirmar) return;
-
-await deleteDoc(doc(db, "prompts", id));
-
-alert("✅ Apagado!");
-
-listarPrompts();
-carregarDashboard();
-
-}
-
-/* =========================
-LIKE
-========================= */
-
-async function likePrompt(id, likesAtual){
-
-const ref =
-doc(db, "prompts", id);
-
-await updateDoc(ref, {
-
-likes: likesAtual + 1
-
-});
-
-listarPrompts();
-
-}
-
-/* =========================
-LOGOUT
-========================= */
-
-document
-.getElementById("logout")
-.addEventListener("click", async () => {
-
-await signOut(auth);
-
-window.location.href = "login.html";
-
-});
-
-/* =========================
-INICIAR
-========================= */
-
-carregarCategorias();
-listarPrompts();
-carregarDashboard();
-
-</script>
-
-</body>
-
-</html>
+/* LIM
