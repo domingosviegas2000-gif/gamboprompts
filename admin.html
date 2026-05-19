@@ -56,10 +56,10 @@ margin-bottom:15px;
 }
 
 button{
-padding:15px;
+padding:14px;
 border:none;
 border-radius:10px;
-font-size:16px;
+font-size:15px;
 font-weight:bold;
 cursor:pointer;
 }
@@ -105,6 +105,7 @@ margin-bottom:15px;
 .card-buttons{
 display:flex;
 gap:10px;
+flex-wrap:wrap;
 margin-top:15px;
 }
 
@@ -124,6 +125,39 @@ flex:1;
 background:#22c55e;
 color:white;
 flex:1;
+}
+
+.categoria-item{
+background:#1e293b;
+padding:15px;
+border-radius:10px;
+margin-bottom:10px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+}
+
+.categoria-buttons{
+display:flex;
+gap:10px;
+}
+
+.editar-cat{
+background:#f59e0b;
+color:white;
+}
+
+.apagar-cat{
+background:#ef4444;
+color:white;
+}
+
+.add-cat{
+width:100%;
+background:#22c55e;
+color:white;
+margin-bottom:20px;
 }
 
 </style>
@@ -159,19 +193,38 @@ flex:1;
 
 </div>
 
-<!-- LISTA -->
+<!-- GERENCIAR CATEGORIAS -->
 
 <div class="box">
 
-<h2 style="margin-bottom:20px;">
-📚 Prompts Publicados
-</h2>
+<h3>📂 Gerenciar Categorias</h3>
+
+<input
+type="text"
+id="novaCategoria"
+placeholder="Nova categoria">
+
+<button
+id="adicionarCategoria"
+class="add-cat">
+➕ Adicionar Categoria
+</button>
+
+<div id="listaCategorias"></div>
+
+</div>
+
+<!-- LISTA PROMPTS -->
+
+<div class="box">
+
+<h3>📚 Prompts Publicados</h3>
 
 <div id="listaPrompts"></div>
 
 </div>
 
-<!-- FORM -->
+<!-- FORMULÁRIO -->
 
 <input
 type="text"
@@ -190,21 +243,6 @@ style="height:180px;"></textarea>
 
 <select id="categoria"></select>
 
-<div class="box">
-
-<h3>Adicionar Categoria</h3>
-
-<input
-type="text"
-id="novaCategoria"
-placeholder="Nova categoria">
-
-<button id="adicionarCategoria">
-➕ Adicionar Categoria
-</button>
-
-</div>
-
 <input
 type="text"
 id="afiliado"
@@ -217,7 +255,7 @@ placeholder="Link doação">
 
 <div class="box">
 
-<h3>Upload Imagem</h3>
+<h3>🖼 Upload Imagem</h3>
 
 <input type="file" id="imagemInput">
 
@@ -225,7 +263,7 @@ placeholder="Link doação">
 
 <div class="box">
 
-<h3>Monetização</h3>
+<h3>💰 Monetização</h3>
 
 <input
 type="number"
@@ -280,12 +318,12 @@ FIREBASE
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
-authDomain: "gamboprompts-8ff6d.firebaseapp.com",
-projectId: "gamboprompts-8ff6d",
-storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
-messagingSenderId: "92750073125",
-appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+apiKey: "SUA_API",
+authDomain: "SEU_AUTH",
+projectId: "SEU_PROJECT",
+storageBucket: "SEU_STORAGE",
+messagingSenderId: "SEU_ID",
+appId: "SEU_APP"
 
 };
 
@@ -296,7 +334,7 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 /* =========================
-AUTH
+LOGIN
 ========================= */
 
 onAuthStateChanged(auth, (user) => {
@@ -325,7 +363,7 @@ let categorias = [
 ];
 
 /* =========================
-CATEGORIAS
+SELECT CATEGORIAS
 ========================= */
 
 function carregarCategorias(){
@@ -345,34 +383,160 @@ ${cat}
 
 });
 
+listarCategorias();
+
 }
 
-carregarCategorias();
+/* =========================
+LISTAR CATEGORIAS
+========================= */
+
+function listarCategorias(){
+
+const lista =
+document.getElementById("listaCategorias");
+
+lista.innerHTML = "";
+
+categorias.forEach((cat,index) => {
+
+lista.innerHTML += `
+
+<div class="categoria-item">
+
+<span>${cat}</span>
+
+<div class="categoria-buttons">
+
+<button
+class="editar-cat"
+data-index="${index}">
+✏️
+</button>
+
+<button
+class="apagar-cat"
+data-index="${index}">
+🗑️
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+/* EDITAR */
+
+document
+.querySelectorAll(".editar-cat")
+.forEach((btn) => {
+
+btn.addEventListener("click", () => {
+
+editarCategoria(btn.dataset.index);
+
+});
+
+});
+
+/* APAGAR */
+
+document
+.querySelectorAll(".apagar-cat")
+.forEach((btn) => {
+
+btn.addEventListener("click", () => {
+
+apagarCategoria(btn.dataset.index);
+
+});
+
+});
+
+}
+
+/* =========================
+ADICIONAR CATEGORIA
+========================= */
 
 document
 .getElementById("adicionarCategoria")
 .addEventListener("click", () => {
 
 const nova =
-document.getElementById("novaCategoria").value.trim();
+document
+.getElementById("novaCategoria")
+.value
+.trim();
 
-if(nova === "") return;
+if(nova === ""){
 
-if(!categorias.includes(nova)){
+alert("Digite categoria");
 
-categorias.push(nova);
-
-carregarCategorias();
-
-document.getElementById("categoria").value = nova;
-
-alert("✅ Categoria adicionada");
+return;
 
 }
 
+if(categorias.includes(nova)){
+
+alert("Categoria já existe");
+
+return;
+
+}
+
+categorias.push(nova);
+
 document.getElementById("novaCategoria").value = "";
 
+carregarCategorias();
+
+alert("✅ Categoria adicionada");
+
 });
+
+/* =========================
+EDITAR CATEGORIA
+========================= */
+
+function editarCategoria(index){
+
+const atual = categorias[index];
+
+const novoNome =
+prompt("Editar categoria:", atual);
+
+if(!novoNome) return;
+
+categorias[index] = novoNome;
+
+carregarCategorias();
+
+alert("✅ Categoria atualizada");
+
+}
+
+/* =========================
+APAGAR CATEGORIA
+========================= */
+
+function apagarCategoria(index){
+
+const confirmar =
+confirm("Deseja apagar categoria?");
+
+if(!confirmar) return;
+
+categorias.splice(index,1);
+
+carregarCategorias();
+
+alert("✅ Categoria apagada");
+
+}
 
 /* =========================
 DASHBOARD
@@ -420,7 +584,7 @@ document.getElementById("totalCategorias")
 }
 
 /* =========================
-LISTAR
+LISTAR PROMPTS
 ========================= */
 
 async function listarPrompts(){
@@ -482,9 +646,7 @@ data-likes="${data.likes || 0}">
 
 });
 
-/* =========================
-BOTÕES
-========================= */
+/* EVENTOS */
 
 document.querySelectorAll(".editar-btn")
 .forEach((btn) => {
@@ -523,13 +685,6 @@ parseInt(btn.dataset.likes)
 });
 
 }
-
-/* =========================
-CARREGAR INICIAL
-========================= */
-
-listarPrompts();
-carregarDashboard();
 
 /* =========================
 PUBLICAR
@@ -575,9 +730,7 @@ imagemInput.files[0];
 
 let imagemUrl = null;
 
-/* =========================
-UPLOAD CLOUDINARY
-========================= */
+/* CLOUDINARY */
 
 if(imagemFile){
 
@@ -606,9 +759,7 @@ dados.secure_url;
 
 }
 
-/* =========================
-EDITAR
-========================= */
+/* EDITAR */
 
 if(editandoId){
 
@@ -621,7 +772,7 @@ await getDoc(ref);
 const atual =
 snap.data();
 
-const novosDados = {
+await updateDoc(ref, {
 
 titulo,
 prompt,
@@ -635,11 +786,9 @@ tipo,
 likes: atual.likes || 0,
 imagem: imagemUrl || atual.imagem
 
-};
+});
 
-await updateDoc(ref, novosDados);
-
-alert("✅ Prompt atualizado!");
+alert("✅ Atualizado!");
 
 editandoId = null;
 
@@ -648,9 +797,7 @@ document.getElementById("publicar")
 
 }else{
 
-/* =========================
-CRIAR
-========================= */
+/* CRIAR */
 
 await addDoc(
 collection(db, "prompts"),
@@ -671,13 +818,11 @@ imagem: imagemUrl || "https://images.unsplash.com/photo-1518770660439-4636190af4
 }
 );
 
-alert("✅ Prompt publicado!");
+alert("✅ Publicado!");
 
 }
 
-/* =========================
-RESET
-========================= */
+/* RESET */
 
 document.getElementById("titulo").value = "";
 document.getElementById("prompt").value = "";
@@ -694,14 +839,14 @@ carregarDashboard();
 
 console.log(error);
 
-alert("❌ Erro ao salvar");
+alert("❌ Erro");
 
 }
 
 }
 
 /* =========================
-EDITAR
+EDITAR PROMPT
 ========================= */
 
 async function editarPrompt(id){
@@ -745,16 +890,14 @@ document.getElementById("publicar")
 .innerText = "Atualizar Prompt";
 
 window.scrollTo({
-
 top:0,
 behavior:"smooth"
-
 });
 
 }
 
 /* =========================
-APAGAR
+APAGAR PROMPT
 ========================= */
 
 async function apagarPrompt(id){
@@ -766,7 +909,7 @@ if(!confirmar) return;
 
 await deleteDoc(doc(db, "prompts", id));
 
-alert("✅ Prompt apagado!");
+alert("✅ Apagado!");
 
 listarPrompts();
 carregarDashboard();
@@ -805,6 +948,14 @@ await signOut(auth);
 window.location.href = "login.html";
 
 });
+
+/* =========================
+INICIAR
+========================= */
+
+carregarCategorias();
+listarPrompts();
+carregarDashboard();
 
 </script>
 
