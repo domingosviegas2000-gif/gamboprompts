@@ -6,91 +6,178 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>GamboPrompts</title>
+<title>Prompt</title>
 
-<link rel="stylesheet" href="style.css">
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+}
+
+.banner{
+width:100%;
+max-height:600px;
+object-fit:contain;
+border-radius:20px;
+margin-bottom:25px;
+background:#111827;
+padding:10px;
+}
+
+h1{
+font-size:35px;
+margin-bottom:20px;
+}
+
+.badge{
+display:inline-block;
+padding:8px 15px;
+border-radius:30px;
+font-size:14px;
+font-weight:bold;
+margin-bottom:20px;
+}
+
+.premium{
+background:#f59e0b;
+color:black;
+}
+
+.gratis{
+background:#22c55e;
+color:white;
+}
+
+.box{
+background:#111827;
+padding:25px;
+border-radius:20px;
+margin-bottom:25px;
+}
+
+.box h2{
+margin-bottom:20px;
+}
+
+.prompt-text{
+white-space:pre-wrap;
+line-height:1.7;
+font-size:16px;
+color:#e2e8f0;
+}
+
+button{
+padding:15px 20px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-size:16px;
+font-weight:bold;
+margin-top:15px;
+}
+
+.copy-btn{
+background:#38bdf8;
+color:black;
+width:100%;
+}
+
+.afiliado-btn{
+background:#8b5cf6;
+color:white;
+width:100%;
+}
+
+.doacao-btn{
+background:#ef4444;
+color:white;
+width:100%;
+}
+
+.relacionados{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+}
+
+.card{
+background:#1e293b;
+padding:15px;
+border-radius:15px;
+text-decoration:none;
+color:white;
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.card img{
+width:100%;
+height:180px;
+object-fit:cover;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+.lock{
+background:#ef4444;
+padding:20px;
+border-radius:15px;
+text-align:center;
+margin-top:20px;
+}
+
+</style>
 
 </head>
 
 <body>
 
-<header class="header">
+<div class="container">
 
-<h1>🔥 GamboPrompts</h1>
+<div id="conteudo"></div>
 
-<p>Biblioteca de Prompts IA</p>
+<div class="box">
 
-</header>
+<h2>🔥 Prompts Relacionados</h2>
 
-<!-- PESQUISA -->
-
-<div style="
-display:flex;
-gap:15px;
-padding:20px;
-flex-wrap:wrap;
-">
-
-<input
-type="text"
-id="pesquisa"
-placeholder="Pesquisar prompts..."
-style="
-flex:1;
-padding:15px;
-border:none;
-border-radius:12px;
-background:#1e293b;
-color:white;
-font-size:16px;
-"
->
-
-<select
-id="filtroCategoria"
-style="
-padding:15px;
-border:none;
-border-radius:12px;
-background:#1e293b;
-color:white;
-font-size:16px;
-"
->
-
-<option value="">
-Todas Categorias
-</option>
-
-</select>
+<div id="relacionados" class="relacionados"></div>
 
 </div>
 
-<!-- GRID -->
-
-<div id="prompts" class="grid"></div>
+</div>
 
 <script type="module">
-
-/* =========================
-FIREBASE
-========================= */
 
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
 getFirestore,
+doc,
+getDoc,
 collection,
-getDocs,
-updateDoc,
-doc
+getDocs
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-/* =========================
-CONFIG
-========================= */
+/* FIREBASE */
 
 const firebaseConfig = {
 
@@ -112,313 +199,237 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-/* =========================
-ELEMENTOS
-========================= */
+/* PEGAR ID */
 
-const promptsContainer =
-document.getElementById("prompts");
+const params =
+new URLSearchParams(window.location.search);
 
-const pesquisaInput =
-document.getElementById("pesquisa");
+const id = params.get("id");
 
-const filtroCategoria =
-document.getElementById("filtroCategoria");
+const conteudo =
+document.getElementById("conteudo");
 
-/* =========================
-VARIÁVEIS
-========================= */
+/* CARREGAR PROMPT */
 
-let todosPrompts = [];
+async function carregarPrompt(){
 
-/* =========================
-CARREGAR PROMPTS
-========================= */
+const ref =
+doc(db,"prompts",id);
 
-async function carregarPrompts(){
+const snap =
+await getDoc(ref);
 
-try{
+if(!snap.exists()){
 
-const querySnapshot =
-await getDocs(collection(db,"prompts"));
-
-todosPrompts = [];
-
-querySnapshot.forEach((docItem) => {
-
-todosPrompts.push({
-
-id: docItem.id,
-...docItem.data()
-
-});
-
-});
-
-criarCategorias();
-
-mostrarPrompts(todosPrompts);
-
-}catch(error){
-
-console.log(error);
-
-}
-
-}
-
-/* =========================
-CRIAR CATEGORIAS
-========================= */
-
-function criarCategorias(){
-
-const categorias = [
-
-...new Set(
-todosPrompts.map(p => p.categoria)
-)
-
-];
-
-filtroCategoria.innerHTML = `
-<option value="">
-Todas Categorias
-</option>
-`;
-
-categorias.forEach((categoria) => {
-
-filtroCategoria.innerHTML += `
-
-<option value="${categoria}">
-${categoria}
-</option>
-
-`;
-
-});
-
-}
-
-/* =========================
-MOSTRAR PROMPTS
-========================= */
-
-function mostrarPrompts(lista){
-
-promptsContainer.innerHTML = "";
-
-if(lista.length === 0){
-
-promptsContainer.innerHTML = `
-
-<p style="
-color:white;
-padding:20px;
-font-size:18px;
-">
-Nenhum prompt encontrado.
-</p>
-
+conteudo.innerHTML = `
+<h1>Prompt não encontrado</h1>
 `;
 
 return;
 
 }
 
-lista.forEach((data) => {
+const data = snap.data();
 
-promptsContainer.innerHTML += `
+document.title = data.titulo;
 
-<div
-class="card"
-onclick="
-window.location.href='prompt.html?id=${data.id}'
-"
-style="
-cursor:pointer;
-"
->
+conteudo.innerHTML = `
 
 <img
 src="${data.imagem}"
-style="
-width:100%;
-height:220px;
-object-fit:cover;
-border-radius:12px;
-margin-bottom:15px;
-display:block;
-"
+class="banner"
 >
 
-<h2>${data.titulo}</h2>
+<h1>${data.titulo}</h1>
 
-${data.tipo === "Premium" ? `
+<div class="badge ${data.tipo === "Premium" ? "premium" : "gratis"}">
 
-<div style="
-background:#f59e0b;
-color:black;
-padding:6px 12px;
-border-radius:30px;
-display:inline-block;
-font-size:13px;
-font-weight:bold;
-margin-top:10px;
-margin-bottom:10px;
-">
-
-PREMIUM
+${data.tipo}
 
 </div>
 
-` : ""}
+<div class="box">
 
-<p>
+<h2>📂 Categoria</h2>
 
-${data.tipo === "Premium"
+<p>${data.categoria}</p>
 
-? "🔒 Conteúdo Premium"
+</div>
 
-: data.descricao
+<div class="box">
 
-}
+<h2>📖 Instruções</h2>
+
+<p class="prompt-text">
+
+${data.instrucoes || "Sem instruções"}
 
 </p>
 
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-top:15px;
-">
+</div>
 
-<span>
-${data.categoria}
-</span>
+<div class="box">
+
+<h2>🧠 Prompt</h2>
+
+${
+data.tipo === "Premium"
+
+? `
+
+<div class="lock">
+
+<h2>🔒 Conteúdo Premium</h2>
+
+<p>
+Este prompt é premium.
+</p>
+
+</div>
+
+`
+
+:
+
+`
+
+<p class="prompt-text" id="textoPrompt">
+
+${data.prompt}
+
+</p>
 
 <button
-class="like-btn"
-data-id="${data.id}"
-data-likes="${data.likes || 0}"
-style="
-background:#22c55e;
-color:white;
-border:none;
-padding:10px 14px;
-border-radius:8px;
-cursor:pointer;
-"
->
-
-❤️ ${data.likes || 0}
-
+class="copy-btn"
+id="copiar">
+📋 Copiar Prompt
 </button>
 
-</div>
+`
+
+}
 
 </div>
+
+${
+data.afiliado
+
+?
+
+`
+
+<button
+class="afiliado-btn"
+onclick="window.open('${data.afiliado}')">
+🚀 Acessar Oferta
+</button>
+
+`
+
+:
+
+""
+
+}
+
+${
+data.doacao
+
+?
+
+`
+
+<button
+class="doacao-btn"
+onclick="window.open('${data.doacao}')">
+💖 Apoiar Projeto
+</button>
+
+`
+
+:
+
+""
+
+}
 
 `;
 
+/* COPIAR */
+
+const copiar =
+document.getElementById("copiar");
+
+if(copiar){
+
+copiar.addEventListener("click", () => {
+
+const texto =
+document.getElementById("textoPrompt")
+.innerText;
+
+navigator.clipboard.writeText(texto);
+
+copiar.innerText = "✅ Copiado";
+
 });
 
 }
 
-/* =========================
-FILTRO
-========================= */
-
-function filtrarPrompts(){
-
-const pesquisa =
-pesquisaInput.value.toLowerCase();
-
-const categoria =
-filtroCategoria.value;
-
-const filtrados =
-todosPrompts.filter((prompt) => {
-
-const matchPesquisa =
-
-prompt.titulo.toLowerCase().includes(pesquisa)
-
-||
-
-prompt.descricao.toLowerCase().includes(pesquisa);
-
-const matchCategoria =
-
-categoria === ""
-
-||
-
-prompt.categoria === categoria;
-
-return matchPesquisa && matchCategoria;
-
-});
-
-mostrarPrompts(filtrados);
+carregarRelacionados(data.categoria);
 
 }
 
-/* =========================
-EVENTOS
-========================= */
+/* RELACIONADOS */
 
-pesquisaInput.addEventListener(
-"input",
-filtrarPrompts
-);
+async function carregarRelacionados(categoriaAtual){
 
-filtroCategoria.addEventListener(
-"change",
-filtrarPrompts
-);
+const snapshot =
+await getDocs(collection(db,"prompts"));
 
-/* =========================
-LIKES
-========================= */
+const relacionados =
+document.getElementById("relacionados");
 
-document.addEventListener("click", async (e) => {
+relacionados.innerHTML = "";
 
-if(e.target.classList.contains("like-btn")){
+snapshot.forEach((docItem) => {
 
-e.stopPropagation();
+const data = docItem.data();
 
-const id =
-e.target.dataset.id;
+if(
+data.categoria === categoriaAtual
+&&
+docItem.id !== id
+){
 
-const likesAtual =
-parseInt(e.target.dataset.likes);
+relacionados.innerHTML += `
 
-const ref =
-doc(db,"prompts",id);
+<a
+href="prompt.html?id=${docItem.id}"
+class="card"
+>
 
-await updateDoc(ref, {
+<img src="${data.imagem}">
 
-likes: likesAtual + 1
+<h3>${data.titulo}</h3>
 
-});
+<p style="margin-top:10px;">
+📂 ${data.categoria}
+</p>
 
-e.target.dataset.likes =
-likesAtual + 1;
+</a>
 
-e.target.innerHTML =
-`❤️ ${likesAtual + 1}`;
+`;
 
 }
 
 });
 
-/* =========================
-START
-========================= */
+}
 
-carregarPrompts();
+/* START */
+
+carregarPrompt();
 
 </script>
 
