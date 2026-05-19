@@ -105,7 +105,6 @@ margin-bottom:15px;
 .card-buttons{
 display:flex;
 gap:10px;
-flex-wrap:wrap;
 margin-top:15px;
 }
 
@@ -121,12 +120,6 @@ color:white;
 flex:1;
 }
 
-.like-btn{
-background:#22c55e;
-color:white;
-flex:1;
-}
-
 .categoria-item{
 background:#1e293b;
 padding:15px;
@@ -135,7 +128,6 @@ margin-bottom:10px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-gap:10px;
 }
 
 .categoria-buttons{
@@ -214,22 +206,13 @@ class="add-cat">
 
 </div>
 
-<!-- LISTA PROMPTS -->
+<!-- PROMPTS -->
 
 <div class="box">
 
 <h3>📚 Prompts Publicados</h3>
 
-<div id="listaPrompts">
-
-<p style="
-color:#94a3b8;
-margin-top:15px;
-">
-Nenhum prompt publicado ainda.
-</p>
-
-</div>
+<div id="listaPrompts"></div>
 
 </div>
 
@@ -295,8 +278,6 @@ Publicar Prompt
 
 <script type="module">
 
-/* FIREBASE */
-
 import { initializeApp }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
@@ -319,20 +300,13 @@ signOut
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-/* CONFIG */
-
 const firebaseConfig = {
 
 apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
-
 authDomain: "gamboprompts-8ff6d.firebaseapp.com",
-
 projectId: "gamboprompts-8ff6d",
-
 storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
-
 messagingSenderId: "92750073125",
-
 appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 
 };
@@ -343,31 +317,15 @@ const db = getFirestore(app);
 
 const auth = getAuth(app);
 
-/* LOGIN */
-
 onAuthStateChanged(auth, (user) => {
 
-if(user){
-
-console.log("ADMIN LOGADO");
-
-}else{
-
-setTimeout(() => {
-
-if(!auth.currentUser){
+if(!user){
 
 window.location.href = "login.html";
 
 }
 
-},1000);
-
-}
-
 });
-
-/* VARIÁVEIS */
 
 let editandoId = null;
 
@@ -379,8 +337,6 @@ let categorias = [
 "Vídeos IA",
 "Negócios"
 ];
-
-/* CATEGORIAS */
 
 function carregarCategorias(){
 
@@ -412,46 +368,62 @@ lista.innerHTML = "";
 
 categorias.forEach((cat,index) => {
 
-const div =
-document.createElement("div");
+lista.innerHTML += `
 
-div.className = "categoria-item";
-
-div.innerHTML = `
+<div class="categoria-item">
 
 <span>${cat}</span>
 
 <div class="categoria-buttons">
 
-<button class="editar-cat">
+<button
+class="editar-cat"
+onclick="editarCategoria(${index})">
 ✏️
 </button>
 
-<button class="apagar-cat">
+<button
+class="apagar-cat"
+onclick="apagarCategoria(${index})">
 🗑️
 </button>
 
 </div>
 
+</div>
+
 `;
 
-div.querySelector(".editar-cat")
-.addEventListener("click", () => {
-
-editarCategoria(index);
-
 });
 
-div.querySelector(".apagar-cat")
-.addEventListener("click", () => {
+}
 
-apagarCategoria(index);
+window.editarCategoria = function(index){
 
-});
+const novo =
+prompt(
+"Editar categoria:",
+categorias[index]
+);
 
-lista.appendChild(div);
+if(!novo) return;
 
-});
+categorias[index] = novo;
+
+carregarCategorias();
+
+}
+
+window.apagarCategoria = function(index){
+
+const confirmar =
+confirm("Apagar categoria?");
+
+if(!confirmar) return;
+
+categorias.splice(index,1);
+
+carregarCategorias();
 
 }
 
@@ -465,13 +437,7 @@ document
 .value
 .trim();
 
-if(nova === ""){
-
-alert("Digite categoria");
-
-return;
-
-}
+if(nova === "") return;
 
 if(categorias.includes(nova)){
 
@@ -488,36 +454,6 @@ document.getElementById("novaCategoria").value = "";
 carregarCategorias();
 
 });
-
-function editarCategoria(index){
-
-const atual = categorias[index];
-
-const novo =
-prompt("Editar categoria:", atual);
-
-if(!novo) return;
-
-categorias[index] = novo;
-
-carregarCategorias();
-
-}
-
-function apagarCategoria(index){
-
-const confirmar =
-confirm("Apagar categoria?");
-
-if(!confirmar) return;
-
-categorias.splice(index,1);
-
-carregarCategorias();
-
-}
-
-/* DASHBOARD */
 
 async function carregarDashboard(){
 
@@ -557,8 +493,6 @@ document.getElementById("totalCategorias")
 
 }
 
-/* LISTAR PROMPTS */
-
 async function listarPrompts(){
 
 const snapshot =
@@ -573,12 +507,9 @@ snapshot.forEach((docItem) => {
 
 const data = docItem.data();
 
-const card =
-document.createElement("div");
+lista.innerHTML += `
 
-card.className = "card";
-
-card.innerHTML = `
+<div class="card">
 
 <img src="${data.imagem}">
 
@@ -594,59 +525,75 @@ card.innerHTML = `
 
 <div class="card-buttons">
 
-<button class="editar-btn">
+<button
+class="editar-btn"
+onclick="editarPrompt('${docItem.id}')">
 ✏️ Editar
 </button>
 
-<button class="apagar-btn">
+<button
+class="apagar-btn"
+onclick="apagarPrompt('${docItem.id}')">
 🗑️ Apagar
 </button>
 
-<button class="like-btn">
-❤️ Like
-</button>
+</div>
 
 </div>
 
 `;
 
-card.querySelector(".editar-btn")
-.addEventListener("click", () => {
-
-editarPrompt(docItem.id);
-
-});
-
-card.querySelector(".apagar-btn")
-.addEventListener("click", () => {
-
-apagarPrompt(docItem.id);
-
-});
-
-card.querySelector(".like-btn")
-.addEventListener("click", () => {
-
-likePrompt(
-docItem.id,
-data.likes || 0
-);
-
-});
-
-lista.appendChild(card);
-
 });
 
 }
 
-/* PUBLICAR */
+window.editarPrompt = async function(id){
+
+const ref = doc(db,"prompts",id);
+
+const snap = await getDoc(ref);
+
+const data = snap.data();
+
+editandoId = id;
+
+document.getElementById("titulo").value = data.titulo || "";
+document.getElementById("prompt").value = data.prompt || "";
+document.getElementById("instrucoes").value = data.instrucoes || "";
+document.getElementById("categoria").value = data.categoria || "";
+document.getElementById("afiliado").value = data.afiliado || "";
+document.getElementById("doacao").value = data.doacao || "";
+document.getElementById("preco").value = data.preco || "";
+document.getElementById("tipo").value = data.tipo || "Grátis";
+
+document.getElementById("publicar")
+.innerText = "Atualizar Prompt";
+
+window.scrollTo({
+top:0,
+behavior:"smooth"
+});
+
+}
+
+window.apagarPrompt = async function(id){
+
+const confirmar =
+confirm("Deseja apagar?");
+
+if(!confirmar) return;
+
+await deleteDoc(doc(db,"prompts",id));
+
+listarPrompts();
+
+carregarDashboard();
+
+}
 
 document
 .getElementById("publicar")
-.addEventListener("click", salvarPrompt);
-
-async function salvarPrompt(){
+.addEventListener("click", async () => {
 
 try{
 
@@ -682,8 +629,6 @@ imagemInput.files[0];
 
 let imagemUrl = null;
 
-/* CLOUDINARY */
-
 if(imagemFile){
 
 const formData = new FormData();
@@ -710,8 +655,6 @@ imagemUrl =
 dados.secure_url;
 
 }
-
-/* EDITAR */
 
 if(editandoId){
 
@@ -740,16 +683,14 @@ imagem: imagemUrl || atual.imagem
 
 });
 
-alert("✅ Atualizado");
-
 editandoId = null;
 
 document.getElementById("publicar")
 .innerText = "Publicar Prompt";
 
-}else{
+alert("✅ Atualizado");
 
-/* NOVO */
+}else{
 
 await addDoc(
 collection(db,"prompts"),
@@ -774,8 +715,6 @@ alert("✅ Publicado");
 
 }
 
-/* LIMPAR */
-
 document.getElementById("titulo").value = "";
 document.getElementById("prompt").value = "";
 document.getElementById("instrucoes").value = "";
@@ -796,122 +735,7 @@ alert("Erro");
 
 }
 
-}
-
-/* EDITAR PROMPT */
-
-async function editarPrompt(id){
-
-try{
-
-const ref =
-doc(db,"prompts",id);
-
-const snap =
-await getDoc(ref);
-
-if(!snap.exists()){
-
-alert("Prompt não encontrado");
-
-return;
-
-}
-
-const data =
-snap.data();
-
-editandoId = id;
-
-document.getElementById("titulo").value =
-data.titulo || "";
-
-document.getElementById("prompt").value =
-data.prompt || "";
-
-document.getElementById("instrucoes").value =
-data.instrucoes || "";
-
-document.getElementById("categoria").value =
-data.categoria || "";
-
-document.getElementById("afiliado").value =
-data.afiliado || "";
-
-document.getElementById("doacao").value =
-data.doacao || "";
-
-document.getElementById("preco").value =
-data.preco || "";
-
-document.getElementById("tipo").value =
-data.tipo || "Grátis";
-
-document.getElementById("publicar")
-.innerText = "Atualizar Prompt";
-
-window.scrollTo({
-top:0,
-behavior:"smooth"
 });
-
-}catch(error){
-
-console.log(error);
-
-alert("Erro ao editar");
-
-}
-
-}
-
-/* APAGAR */
-
-async function apagarPrompt(id){
-
-try{
-
-const confirmar =
-confirm("Deseja apagar?");
-
-if(!confirmar) return;
-
-await deleteDoc(doc(db,"prompts",id));
-
-listarPrompts();
-
-carregarDashboard();
-
-alert("✅ Apagado");
-
-}catch(error){
-
-console.log(error);
-
-alert("Erro ao apagar");
-
-}
-
-}
-
-/* LIKE */
-
-async function likePrompt(id,likesAtual){
-
-const ref =
-doc(db,"prompts",id);
-
-await updateDoc(ref,{
-
-likes: likesAtual + 1
-
-});
-
-listarPrompts();
-
-}
-
-/* LOGOUT */
 
 document
 .getElementById("logout")
@@ -922,8 +746,6 @@ await signOut(auth);
 window.location.href = "login.html";
 
 });
-
-/* START */
 
 carregarCategorias();
 
