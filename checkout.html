@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Checkout Premium</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+.container{
+max-width:700px;
+margin:auto;
+}
+
+.box{
+background:#111827;
+padding:25px;
+border-radius:20px;
+margin-bottom:25px;
+}
+
+h1{
+margin-bottom:25px;
+font-size:35px;
+}
+
+h2{
+margin-bottom:20px;
+}
+
+input,
+select{
+width:100%;
+padding:16px;
+border:none;
+border-radius:12px;
+background:#1e293b;
+color:white;
+font-size:16px;
+margin-bottom:20px;
+}
+
+button{
+width:100%;
+padding:18px;
+border:none;
+border-radius:12px;
+font-size:17px;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+opacity:0.9;
+transform:translateY(-2px);
+}
+
+.binance-btn{
+background:#f0b90b;
+color:black;
+}
+
+.express-btn{
+background:#22c55e;
+color:white;
+margin-top:15px;
+}
+
+.info{
+background:#1e293b;
+padding:20px;
+border-radius:15px;
+line-height:1.8;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>💳 Checkout Premium</h1>
+
+<div class="box">
+
+<h2 id="tituloPrompt">
+Carregando...
+</h2>
+
+<div class="info">
+
+<p id="valorPrompt">
+Preço: --
+</p>
+
+<p style="margin-top:10px;">
+⚡ Entrega imediata após confirmação
+</p>
+
+</div>
+
+</div>
+
+<div class="box">
+
+<h2>👤 Seus Dados</h2>
+
+<input
+type="text"
+id="nome"
+placeholder="Seu nome">
+
+<input
+type="text"
+id="whatsapp"
+placeholder="Seu WhatsApp">
+
+<select id="metodo">
+
+<option value="binance">
+Binance Pay
+</option>
+
+<option value="express">
+Multicaixa Express
+</option>
+
+</select>
+
+<button
+id="comprar"
+class="binance-btn">
+🚀 Continuar Compra
+</button>
+
+</div>
+
+<div id="pagamento"></div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+collection,
+addDoc,
+serverTimestamp
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* FIREBASE */
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+
+authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+
+projectId: "gamboprompts-8ff6d",
+
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+
+messagingSenderId: "92750073125",
+
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+/* PEGAR ID */
+
+const params =
+new URLSearchParams(window.location.search);
+
+const id = params.get("id");
+
+let promptData = null;
+
+/* CARREGAR PROMPT */
+
+async function carregarPrompt(){
+
+try{
+
+const ref =
+doc(db,"prompts",id);
+
+const snap =
+await getDoc(ref);
+
+if(!snap.exists()){
+
+alert("Prompt não encontrado");
+
+return;
+
+}
+
+promptData = snap.data();
+
+document.getElementById("tituloPrompt")
+.innerText =
+promptData.titulo;
+
+document.getElementById("valorPrompt")
+.innerText =
+`Preço: ${promptData.preco || 0} Kz`;
+
+}catch(error){
+
+console.log(error);
+
+alert("Erro ao carregar");
+
+}
+
+}
+
+/* COMPRAR */
+
+document
+.getElementById("comprar")
+.addEventListener("click", async () => {
+
+const nome =
+document.getElementById("nome").value;
+
+const whatsapp =
+document.getElementById("whatsapp").value;
+
+const metodo =
+document.getElementById("metodo").value;
+
+if(nome === "" || whatsapp === ""){
+
+alert("Preencha os dados");
+
+return;
+
+}
+
+try{
+
+/* SALVAR PEDIDO */
+
+await addDoc(
+collection(db,"compras"),
+{
+
+nome,
+whatsapp,
+promptId:id,
+promptTitulo:promptData.titulo,
+valor:promptData.preco || 0,
+metodo,
+status:"pendente",
+data:serverTimestamp()
+
+}
+);
+
+/* BINANCE */
+
+if(metodo === "binance"){
+
+document.getElementById("pagamento")
+.innerHTML = `
+
+<div class="box">
+
+<h2>🟡 Binance Pay</h2>
+
+<div class="info">
+
+<p>
+Envie o valor para sua Binance Pay.
+</p>
+
+<p style="
+margin-top:15px;
+font-size:18px;
+font-weight:bold;
+color:#f0b90b;
+">
+
+${promptData.preco || 0} Kz
+
+</p>
+
+<p style="
+margin-top:15px;
+">
+
+Após pagamento envie comprovativo no WhatsApp.
+</p>
+
+</div>
+
+<button
+class="binance-btn"
+onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20paguei%20o%20prompt:%20${encodeURIComponent(promptData.titulo)}')"
+>
+
+📲 Enviar Comprovativo
+
+</button>
+
+</div>
+
+`;
+
+}else{
+
+/* EXPRESS */
+
+document.getElementById("pagamento")
+.innerHTML = `
+
+<div class="box">
+
+<h2>💚 Multicaixa Express</h2>
+
+<div class="info">
+
+<p>
+Número:
+</p>
+
+<p style="
+font-size:24px;
+font-weight:bold;
+margin-top:10px;
+color:#22c55e;
+">
+
+924539161
+
+</p>
+
+<p style="
+margin-top:20px;
+">
+
+Valor:
+<strong>
+${promptData.preco || 0} Kz
+</strong>
+
+</p>
+
+<p style="
+margin-top:20px;
+">
+
+Envie o comprovativo após pagamento.
+</p>
+
+</div>
+
+<button
+class="express-btn"
+onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20enviei%20o%20pagamento%20Express%20do%20prompt:%20${encodeURIComponent(promptData.titulo)}')"
+>
+
+📲 Enviar Comprovativo
+
+</button>
+
+</div>
+
+`;
+
+}
+
+}catch(error){
+
+console.log(error);
+
+alert("Erro ao criar pedido");
+
+}
+
+});
+
+/* START */
+
+carregarPrompt();
+
+</script>
+
+</body>
+
+</html>
