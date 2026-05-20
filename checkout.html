@@ -113,7 +113,7 @@ Preço: --
 </p>
 
 <p style="margin-top:10px;">
-⚡ Entrega imediata após confirmação
+⚡ Entrega após confirmação
 </p>
 
 </div>
@@ -301,32 +301,76 @@ document.getElementById("pagamento")
 <div class="info">
 
 <p>
-Envie o valor para sua Binance Pay.
+Pague usando Binance Pay
 </p>
 
+<img
+src="https://upload.wikimedia.org/wikipedia/commons/1/12/Binance_logo.svg"
+style="
+width:120px;
+margin-top:20px;
+margin-bottom:20px;
+background:white;
+padding:15px;
+border-radius:15px;
+"
+>
+
+<div style="
+background:#0f172a;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+">
+
 <p style="
-margin-top:15px;
-font-size:18px;
-font-weight:bold;
+margin-bottom:10px;
+color:#94a3b8;
+">
+Binance ID
+</p>
+
+<h2 id="binanceId" style="
 color:#f0b90b;
+font-size:28px;
+word-break:break-all;
 ">
+SEU_BINANCE_ID
+</h2>
 
-${promptData.preco || 0} Kz
+<button
+id="copiarBinance"
+style="
+margin-top:20px;
+background:#f0b90b;
+color:black;
+width:100%;
+"
+>
 
-</p>
+📋 Copiar Binance ID
+
+</button>
+
+</div>
 
 <p style="
-margin-top:15px;
+margin-top:25px;
+line-height:1.8;
+color:#cbd5e1;
 ">
 
-Após pagamento envie comprovativo no WhatsApp.
+1. Abra Binance Pay<br>
+2. Envie o valor<br>
+3. Envie comprovativo
+
 </p>
 
 </div>
 
 <button
 class="binance-btn"
-onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20paguei%20o%20prompt:%20${encodeURIComponent(promptData.titulo)}')"
+onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20enviei%20o%20pagamento%20Binance%20do%20prompt:%20${encodeURIComponent(promptData.titulo)}')"
 >
 
 📲 Enviar Comprovativo
@@ -399,6 +443,32 @@ onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20enviei%20o%20
 `;
 
 }
+
+/* COPIAR BINANCE */
+
+setTimeout(() => {
+
+const copiarBinance =
+document.getElementById("copiarBinance");
+
+if(copiarBinance){
+
+copiarBinance.addEventListener("click", () => {
+
+const texto =
+document.getElementById("binanceId")
+.innerText;
+
+navigator.clipboard.writeText(texto);
+
+copiarBinance.innerText =
+"✅ Copiado";
+
+});
+
+}
+
+},500);
 
 }catch(error){
 
