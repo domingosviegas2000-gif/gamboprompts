@@ -30,7 +30,7 @@ margin:auto;
 
 .banner{
 width:100%;
-max-height:600px;
+max-height:650px;
 object-fit:contain;
 border-radius:20px;
 margin-bottom:25px;
@@ -41,6 +41,7 @@ padding:10px;
 h1{
 font-size:35px;
 margin-bottom:20px;
+line-height:1.3;
 }
 
 .badge{
@@ -75,7 +76,7 @@ margin-bottom:20px;
 
 .prompt-text{
 white-space:pre-wrap;
-line-height:1.7;
+line-height:1.8;
 font-size:16px;
 color:#e2e8f0;
 }
@@ -88,6 +89,12 @@ cursor:pointer;
 font-size:16px;
 font-weight:bold;
 margin-top:15px;
+transition:0.3s;
+}
+
+button:hover{
+opacity:0.9;
+transform:translateY(-2px);
 }
 
 .copy-btn{
@@ -129,18 +136,32 @@ transform:translateY(-5px);
 
 .card img{
 width:100%;
-height:180px;
-object-fit:cover;
+height:220px;
+object-fit:contain;
+background:#0f172a;
 border-radius:10px;
 margin-bottom:10px;
+padding:5px;
 }
 
 .lock{
 background:#ef4444;
-padding:20px;
+padding:25px;
 border-radius:15px;
 text-align:center;
 margin-top:20px;
+}
+
+@media(max-width:768px){
+
+.banner{
+max-height:450px;
+}
+
+h1{
+font-size:28px;
+}
+
 }
 
 </style>
@@ -189,7 +210,7 @@ projectId: "gamboprompts-8ff6d",
 
 storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
 
-messagingSenderId: "92750073125",
+messagingSenderId: "244924539161",
 
 appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 
@@ -212,6 +233,8 @@ document.getElementById("conteudo");
 /* CARREGAR PROMPT */
 
 async function carregarPrompt(){
+
+try{
 
 const ref =
 doc(db,"prompts",id);
@@ -279,11 +302,72 @@ data.tipo === "Premium"
 
 <div class="lock">
 
-<h2>🔒 Conteúdo Premium</h2>
+<h2 style="
+margin-bottom:15px;
+font-size:28px;
+">
+🔒 Prompt Premium
+</h2>
 
-<p>
-Este prompt é premium.
+<p style="
+font-size:17px;
+line-height:1.7;
+margin-bottom:20px;
+color:#e2e8f0;
+">
+
+${data.prompt.substring(0,250)}...
+
 </p>
+
+<div style="
+background:#0f172a;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+">
+
+<h3 style="
+margin-bottom:15px;
+color:#f59e0b;
+">
+✨ O que você desbloqueia:
+</h3>
+
+<ul style="
+line-height:2;
+padding-left:20px;
+text-align:left;
+color:#cbd5e1;
+">
+
+<li>Prompt completo sem cortes</li>
+
+<li>Estratégia avançada</li>
+
+<li>Conteúdo exclusivo</li>
+
+<li>Uso comercial liberado</li>
+
+<li>Acesso imediato</li>
+
+</ul>
+
+</div>
+
+<button
+class="afiliado-btn"
+style="
+margin-top:25px;
+font-size:18px;
+padding:18px;
+"
+onclick="window.open('https://wa.me/244924539161?text=Olá%20quero%20comprar%20o%20prompt:%20${encodeURIComponent(data.titulo)}')"
+>
+
+🔓 Desbloquear Premium
+
+</button>
 
 </div>
 
@@ -377,6 +461,16 @@ copiar.innerText = "✅ Copiado";
 }
 
 carregarRelacionados(data.categoria);
+
+}catch(error){
+
+console.log(error);
+
+conteudo.innerHTML = `
+<h1>Erro ao carregar prompt</h1>
+`;
+
+}
 
 }
 
