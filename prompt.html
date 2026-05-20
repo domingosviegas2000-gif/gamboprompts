@@ -295,6 +295,10 @@ ${data.instrucoes || "Sem instruções"}
 
 <h2>🧠 Prompt</h2>
 
+<div class="box">
+
+<h2>🧠 Prompt</h2>
+
 ${
 data.tipo === "Premium"
 
@@ -337,7 +341,6 @@ color:#f59e0b;
 <ul style="
 line-height:2;
 padding-left:20px;
-text-align:left;
 color:#cbd5e1;
 ">
 
@@ -355,17 +358,64 @@ color:#cbd5e1;
 
 </div>
 
+<!-- BOTÃO WHATSAPP -->
+
 <button
 class="afiliado-btn"
 style="
 margin-top:25px;
 font-size:18px;
 padding:18px;
+background:#22c55e;
 "
 onclick="window.open('https://wa.me/244924539161?text=Olá%20quero%20comprar%20o%20prompt:%20${encodeURIComponent(data.titulo)}')"
 >
 
-🔓 Desbloquear Premium
+💬 Comprar via WhatsApp
+
+</button>
+
+<!-- BOTÃO BINANCE -->
+
+<button
+style="
+margin-top:15px;
+font-size:18px;
+padding:18px;
+background:#f0b90b;
+color:black;
+width:100%;
+border:none;
+border-radius:12px;
+font-weight:bold;
+cursor:pointer;
+"
+onclick="window.location.href='checkout.html?id=${id}'"
+>
+
+🟡 Comprar com Binance Pay
+
+</button>
+
+<!-- BOTÃO EXPRESS -->
+
+<button
+style="
+margin-top:15px;
+font-size:18px;
+padding:18px;
+background:#22c55e;
+color:white;
+width:100%;
+border:none;
+border-radius:12px;
+font-weight:bold;
+cursor:pointer;
+"
+onclick="window.location.href='checkout.html?id=${id}'"
+>
+
+💚 Pagar com Express
 
 </button>
 
@@ -376,6 +426,26 @@ onclick="window.open('https://wa.me/244924539161?text=Olá%20quero%20comprar%20o
 :
 
 `
+
+<p class="prompt-text" id="textoPrompt">
+
+${data.prompt}
+
+</p>
+
+<button
+class="copy-btn"
+id="copiar">
+📋 Copiar Prompt
+</button>
+
+`
+
+}
+
+</div>
+`
+
 
 <p class="prompt-text" id="textoPrompt">
 
