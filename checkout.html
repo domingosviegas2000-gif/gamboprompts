@@ -90,6 +90,15 @@ border-radius:15px;
 line-height:1.8;
 }
 
+.logo-binance{
+width:120px;
+margin-top:20px;
+margin-bottom:20px;
+background:white;
+padding:15px;
+border-radius:15px;
+}
+
 </style>
 
 </head>
@@ -238,7 +247,7 @@ document.getElementById("valorPrompt")
 
 console.log(error);
 
-alert("Erro ao carregar");
+alert("Erro ao carregar prompt");
 
 }
 
@@ -251,10 +260,10 @@ document
 .addEventListener("click", async () => {
 
 const nome =
-document.getElementById("nome").value;
+document.getElementById("nome").value.trim();
 
 const whatsapp =
-document.getElementById("whatsapp").value;
+document.getElementById("whatsapp").value.trim();
 
 const metodo =
 document.getElementById("metodo").value;
@@ -306,14 +315,7 @@ Pague usando Binance Pay
 
 <img
 src="https://upload.wikimedia.org/wikipedia/commons/1/12/Binance_logo.svg"
-style="
-width:120px;
-margin-top:20px;
-margin-bottom:20px;
-background:white;
-padding:15px;
-border-radius:15px;
-"
+class="logo-binance"
 >
 
 <div style="
@@ -344,7 +346,6 @@ style="
 margin-top:20px;
 background:#f0b90b;
 color:black;
-width:100%;
 "
 >
 
@@ -370,7 +371,7 @@ color:#cbd5e1;
 
 <button
 class="binance-btn"
-onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20enviei%20o%20pagamento%20Binance%20do%20prompt:%20${encodeURIComponent(promptData.titulo)}')"
+id="btnWhatsappBinance"
 >
 
 📲 Enviar Comprovativo
@@ -425,13 +426,14 @@ margin-top:20px;
 ">
 
 Envie o comprovativo após pagamento.
+
 </p>
 
 </div>
 
 <button
 class="express-btn"
-onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20enviei%20o%20pagamento%20Express%20do%20prompt:%20${encodeURIComponent(promptData.titulo)}')"
+id="btnWhatsappExpress"
 >
 
 📲 Enviar Comprovativo
@@ -444,9 +446,11 @@ onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20enviei%20o%20
 
 }
 
-/* COPIAR BINANCE */
+/* EVENTOS */
 
 setTimeout(() => {
+
+/* COPIAR BINANCE */
 
 const copiarBinance =
 document.getElementById("copiarBinance");
@@ -459,7 +463,7 @@ const texto =
 document.getElementById("binanceId")
 .innerText;
 
-navigator.clipboard.writeText("450040438");
+navigator.clipboard.writeText(texto);
 
 copiarBinance.innerText =
 "✅ Copiado";
@@ -468,7 +472,49 @@ copiarBinance.innerText =
 
 }
 
-},500);
+/* WHATSAPP BINANCE */
+
+const btnWhatsappBinance =
+document.getElementById("btnWhatsappBinance");
+
+if(btnWhatsappBinance){
+
+btnWhatsappBinance.addEventListener("click", () => {
+
+const mensagem =
+`Olá já enviei o pagamento Binance do prompt: ${promptData.titulo}`;
+
+const link =
+`https://wa.me/244924539161?text=${encodeURIComponent(mensagem)}`;
+
+window.open(link);
+
+});
+
+}
+
+/* WHATSAPP EXPRESS */
+
+const btnWhatsappExpress =
+document.getElementById("btnWhatsappExpress");
+
+if(btnWhatsappExpress){
+
+btnWhatsappExpress.addEventListener("click", () => {
+
+const mensagem =
+`Olá já enviei o pagamento Express do prompt: ${promptData.titulo}`;
+
+const link =
+`https://wa.me/244924539161?text=${encodeURIComponent(mensagem)}`;
+
+window.open(link);
+
+});
+
+}
+
+},300);
 
 }catch(error){
 
