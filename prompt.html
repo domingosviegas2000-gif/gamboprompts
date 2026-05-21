@@ -90,6 +90,7 @@ font-size:16px;
 font-weight:bold;
 margin-top:15px;
 transition:0.3s;
+width:100%;
 }
 
 button:hover{
@@ -100,19 +101,16 @@ transform:translateY(-2px);
 .copy-btn{
 background:#38bdf8;
 color:black;
-width:100%;
 }
 
 .afiliado-btn{
 background:#8b5cf6;
 color:white;
-width:100%;
 }
 
 .doacao-btn{
 background:#ef4444;
 color:white;
-width:100%;
 }
 
 .relacionados{
@@ -210,7 +208,7 @@ projectId: "gamboprompts-8ff6d",
 
 storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
 
-messagingSenderId: "244924539161",
+messagingSenderId: "92750073125",
 
 appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 
@@ -295,10 +293,6 @@ ${data.instrucoes || "Sem instruções"}
 
 <h2>🧠 Prompt</h2>
 
-<div class="box">
-
-<h2>🧠 Prompt</h2>
-
 ${
 data.tipo === "Premium"
 
@@ -342,31 +336,26 @@ color:#f59e0b;
 line-height:2;
 padding-left:20px;
 color:#cbd5e1;
+text-align:left;
 ">
 
 <li>Prompt completo sem cortes</li>
-
 <li>Estratégia avançada</li>
-
 <li>Conteúdo exclusivo</li>
-
 <li>Uso comercial liberado</li>
-
 <li>Acesso imediato</li>
 
 </ul>
 
 </div>
 
-<!-- BOTÃO WHATSAPP -->
-
 <button
-class="afiliado-btn"
 style="
 margin-top:25px;
 font-size:18px;
 padding:18px;
 background:#22c55e;
+color:white;
 "
 onclick="window.open('https://wa.me/244924539161?text=Olá%20quero%20comprar%20o%20prompt:%20${encodeURIComponent(data.titulo)}')"
 >
@@ -375,8 +364,6 @@ onclick="window.open('https://wa.me/244924539161?text=Olá%20quero%20comprar%20o
 
 </button>
 
-<!-- BOTÃO BINANCE -->
-
 <button
 style="
 margin-top:15px;
@@ -384,11 +371,6 @@ font-size:18px;
 padding:18px;
 background:#f0b90b;
 color:black;
-width:100%;
-border:none;
-border-radius:12px;
-font-weight:bold;
-cursor:pointer;
 "
 onclick="window.location.href='checkout.html?id=${id}'"
 >
@@ -397,8 +379,6 @@ onclick="window.location.href='checkout.html?id=${id}'"
 
 </button>
 
-<!-- BOTÃO EXPRESS -->
-
 <button
 style="
 margin-top:15px;
@@ -406,11 +386,6 @@ font-size:18px;
 padding:18px;
 background:#22c55e;
 color:white;
-width:100%;
-border:none;
-border-radius:12px;
-font-weight:bold;
-cursor:pointer;
 "
 onclick="window.location.href='checkout.html?id=${id}'"
 >
@@ -426,26 +401,6 @@ onclick="window.location.href='checkout.html?id=${id}'"
 :
 
 `
-
-<p class="prompt-text" id="textoPrompt">
-
-${data.prompt}
-
-</p>
-
-<button
-class="copy-btn"
-id="copiar">
-📋 Copiar Prompt
-</button>
-
-`
-
-}
-
-</div>
-`
-
 
 <p class="prompt-text" id="textoPrompt">
 
