@@ -59,6 +59,11 @@ margin-bottom:20px;
 outline:none;
 }
 
+input[type="file"]{
+padding:12px;
+background:#1e293b;
+}
+
 button{
 width:100%;
 padding:18px;
@@ -105,6 +110,24 @@ margin-bottom:20px;
 background:white;
 padding:15px;
 border-radius:15px;
+}
+
+.preview{
+width:100%;
+border-radius:15px;
+margin-top:15px;
+max-height:400px;
+object-fit:contain;
+background:#0f172a;
+padding:10px;
+}
+
+.sucesso{
+background:#14532d;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+line-height:1.8;
 }
 
 @media(max-width:768px){
@@ -158,7 +181,9 @@ Preço: --
 
 <div class="box">
 
-<h2>👤 Seus Dados</h2>
+<h2>
+👤 Seus Dados
+</h2>
 
 <input
 type="text"
@@ -184,12 +209,28 @@ placeholder="Seu WhatsApp"
 
 </select>
 
+<h2 style="margin-top:20px;">
+📤 Comprovativo
+</h2>
+
+<input
+type="file"
+id="comprovativo"
+accept="image/*"
+>
+
+<img
+id="preview"
+class="preview"
+style="display:none;"
+>
+
 <button
 id="comprar"
 class="binance-btn"
 >
 
-🚀 Continuar Compra
+🚀 Enviar Compra
 
 </button>
 
@@ -235,6 +276,14 @@ appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
+
+/* CLOUDINARY */
+
+const CLOUDINARY_URL =
+"https://api.cloudinary.com/v1_1/derwtydzg/image/upload";
+
+const CLOUDINARY_PRESET =
+"gamboprompts";
 
 /* PEGAR ID */
 
@@ -285,7 +334,38 @@ alert("Erro ao carregar prompt");
 
 }
 
-/* COMPRAR */
+/* PREVIEW IMAGEM */
+
+document
+.getElementById("comprovativo")
+.addEventListener("change",(e)=>{
+
+const file = e.target.files[0];
+
+if(file){
+
+const reader = new FileReader();
+
+reader.onload = function(event){
+
+const preview =
+document.getElementById("preview");
+
+preview.src =
+event.target.result;
+
+preview.style.display =
+"block";
+
+};
+
+reader.readAsDataURL(file);
+
+}
+
+});
+
+/* ENVIAR COMPRA */
 
 document
 .getElementById("comprar")
@@ -300,6 +380,9 @@ document.getElementById("whatsapp").value;
 const metodo =
 document.getElementById("metodo").value;
 
+const comprovativo =
+document.getElementById("comprovativo").files[0];
+
 if(nome === "" || whatsapp === ""){
 
 alert("Preencha os dados");
@@ -308,7 +391,44 @@ return;
 
 }
 
+if(!comprovativo){
+
+alert("Envie o comprovativo");
+
+return;
+
+}
+
 try{
+
+document.getElementById("comprar")
+.innerText =
+"Enviando...";
+
+/* UPLOAD CLOUDINARY */
+
+const formData = new FormData();
+
+formData.append("file", comprovativo);
+
+formData.append(
+"upload_preset",
+CLOUDINARY_PRESET
+);
+
+const resposta = await fetch(
+CLOUDINARY_URL,
+{
+method:"POST",
+body:formData
+}
+);
+
+const dados =
+await resposta.json();
+
+const comprovativoUrl =
+dados.secure_url;
 
 /* SALVAR COMPRA */
 
@@ -323,189 +443,77 @@ promptTitulo:promptData.titulo,
 valor:promptData.preco || 0,
 metodo,
 status:"pendente",
+comprovativo: comprovativoUrl,
 data:serverTimestamp()
 
 }
 );
 
-/* BINANCE */
-
-if(metodo === "binance"){
-
 document.getElementById("pagamento")
 .innerHTML = `
 
-<div class="box">
+<div class="sucesso">
 
 <h2>
-🟡 Binance Pay
+✅ Compra Enviada
 </h2>
 
-<div class="info">
+<p style="margin-top:15px;">
 
-<p>
-Pague usando Binance Pay
-</p>
-
-<img
-src="https://upload.wikimedia.org/wikipedia/commons/1/12/Binance_logo.svg"
-class="logo"
->
-
-<div style="
-background:#0f172a;
-padding:20px;
-border-radius:15px;
-margin-top:20px;
-">
-
-<p style="
-margin-bottom:10px;
-color:#94a3b8;
-">
-Binance ID
-</p>
-
-<h2 id="binanceId" style="
-color:#f0b90b;
-font-size:28px;
-word-break:break-all;
-">
-450040438
-</h2>
-
-<button
-id="copiarBinance"
-class="binance-btn"
->
-
-📋 Copiar Binance ID
-
-</button>
-
-</div>
-
-<p style="
-margin-top:25px;
-line-height:1.8;
-color:#cbd5e1;
-">
-
-1. Abra Binance Pay<br>
-2. Envie o valor<br>
-3. Envie comprovativo
+Seu pagamento foi enviado para análise.
 
 </p>
 
-</div>
+<p style="margin-top:15px;">
 
-<button
-class="whatsapp-btn"
-onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20enviei%20o%20pagamento%20Binance%20do%20prompt:%20${encodeURIComponent(promptData.titulo)}')"
->
-
-📲 Enviar Comprovativo
-
-</button>
-
-</div>
-
-`;
-
-}else{
-
-/* EXPRESS */
-
-document.getElementById("pagamento")
-.innerHTML = `
-
-<div class="box">
-
-<h2>
-💚 Multicaixa Express
-</h2>
-
-<div class="info">
-
-<p>
-Número:
-</p>
-
-<p style="
-font-size:28px;
-font-weight:bold;
-margin-top:10px;
-color:#22c55e;
-">
-
-924539161
-
-</p>
-
-<p style="
-margin-top:20px;
-">
-
-Valor:
+📦 Prompt:
 <strong>
-${promptData.preco || 0} Kz
+${promptData.titulo}
 </strong>
 
 </p>
 
-<p style="
-margin-top:20px;
-line-height:1.8;
-">
+<p style="margin-top:15px;">
 
-Envie o comprovativo após pagamento.
+💳 Método:
+<strong>
+${metodo}
+</strong>
+
+</p>
+
+<p style="margin-top:15px;">
+
+⏳ Status:
+<strong>
+PENDENTE
+</strong>
+
+</p>
+
+<p style="margin-top:15px;">
+
+Você receberá confirmação após validação.
 
 </p>
 
 </div>
 
-<button
-class="whatsapp-btn"
-onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20enviei%20o%20pagamento%20Express%20do%20prompt:%20${encodeURIComponent(promptData.titulo)}')"
->
-
-📲 Enviar Comprovativo
-
-</button>
-
-</div>
-
 `;
 
-}
-
-/* COPIAR BINANCE */
-
-setTimeout(() => {
-
-const copiarBinance =
-document.getElementById("copiarBinance");
-
-if(copiarBinance){
-
-copiarBinance.addEventListener("click", () => {
-
-navigator.clipboard.writeText("450040438");
-
-copiarBinance.innerText =
-"✅ Copiado";
-
-});
-
-}
-
-},500);
+document.getElementById("comprar")
+.style.display =
+"none";
 
 }catch(error){
 
 console.log(error);
 
-alert("Erro ao criar pedido");
+alert("Erro ao enviar compra");
+
+document.getElementById("comprar")
+.innerText =
+"🚀 Enviar Compra";
 
 }
 
