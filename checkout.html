@@ -61,7 +61,6 @@ outline:none;
 
 input[type="file"]{
 padding:12px;
-background:#1e293b;
 }
 
 button{
@@ -81,19 +80,9 @@ opacity:0.9;
 transform:translateY(-2px);
 }
 
-.binance-btn{
-background:#f0b90b;
+.enviar-btn{
+background:#38bdf8;
 color:black;
-}
-
-.express-btn{
-background:#22c55e;
-color:white;
-}
-
-.whatsapp-btn{
-background:#25d366;
-color:white;
 }
 
 .info{
@@ -101,33 +90,32 @@ background:#1e293b;
 padding:20px;
 border-radius:15px;
 line-height:1.8;
-}
-
-.logo{
-width:120px;
 margin-top:20px;
-margin-bottom:20px;
-background:white;
-padding:15px;
-border-radius:15px;
 }
 
 .preview{
 width:100%;
 border-radius:15px;
-margin-top:15px;
+margin-top:20px;
 max-height:400px;
 object-fit:contain;
 background:#0f172a;
 padding:10px;
+display:none;
 }
 
 .sucesso{
 background:#14532d;
-padding:20px;
-border-radius:15px;
-margin-top:20px;
+padding:25px;
+border-radius:20px;
 line-height:1.8;
+margin-top:20px;
+}
+
+.copy-btn{
+background:#f0b90b;
+color:black;
+margin-top:15px;
 }
 
 @media(max-width:768px){
@@ -138,11 +126,6 @@ font-size:28px;
 
 .box{
 padding:20px;
-}
-
-button{
-font-size:16px;
-padding:16px;
 }
 
 }
@@ -172,7 +155,7 @@ Preço: --
 </p>
 
 <p style="margin-top:10px;">
-⚡ Entrega após confirmação
+⚡ Acesso após validação
 </p>
 
 </div>
@@ -209,8 +192,12 @@ placeholder="Seu WhatsApp"
 
 </select>
 
-<h2 style="margin-top:20px;">
-📤 Comprovativo
+<!-- DADOS PAGAMENTO -->
+
+<div id="dadosPagamento"></div>
+
+<h2 style="margin-top:25px;">
+📤 Enviar Comprovativo
 </h2>
 
 <input
@@ -222,12 +209,11 @@ accept="image/*"
 <img
 id="preview"
 class="preview"
-style="display:none;"
 >
 
 <button
 id="comprar"
-class="binance-btn"
+class="enviar-btn"
 >
 
 🚀 Enviar Compra
@@ -236,7 +222,7 @@ class="binance-btn"
 
 </div>
 
-<div id="pagamento"></div>
+<div id="resultado"></div>
 
 </div>
 
@@ -334,17 +320,153 @@ alert("Erro ao carregar prompt");
 
 }
 
-/* PREVIEW IMAGEM */
+/* MOSTRAR PAGAMENTO */
+
+function mostrarPagamento(){
+
+const metodo =
+document.getElementById("metodo").value;
+
+const box =
+document.getElementById("dadosPagamento");
+
+if(metodo === "binance"){
+
+box.innerHTML = `
+
+<div class="info">
+
+<h2 style="
+color:#f0b90b;
+">
+🟡 Binance Pay
+</h2>
+
+<p style="
+margin-top:15px;
+">
+Binance ID:
+</p>
+
+<h1 style="
+margin-top:10px;
+color:#f0b90b;
+font-size:35px;
+">
+450040438
+</h1>
+
+<button
+class="copy-btn"
+id="copiarBinance"
+>
+
+📋 Copiar Binance ID
+
+</button>
+
+<p style="
+margin-top:20px;
+line-height:1.8;
+">
+
+1. Abra Binance Pay<br>
+2. Envie o valor<br>
+3. Tire screenshot<br>
+4. Envie comprovativo abaixo
+
+</p>
+
+</div>
+
+`;
+
+setTimeout(()=>{
+
+const copiar =
+document.getElementById("copiarBinance");
+
+if(copiar){
+
+copiar.addEventListener("click",()=>{
+
+navigator.clipboard.writeText(
+"450040438"
+);
+
+copiar.innerText =
+"✅ Copiado";
+
+});
+
+}
+
+},200);
+
+}else{
+
+box.innerHTML = `
+
+<div class="info">
+
+<h2 style="
+color:#22c55e;
+">
+💚 Multicaixa Express
+</h2>
+
+<p style="
+margin-top:15px;
+">
+Número:
+</p>
+
+<h1 style="
+margin-top:10px;
+color:#22c55e;
+font-size:35px;
+">
+924539161
+</h1>
+
+<p style="
+margin-top:20px;
+line-height:1.8;
+">
+
+1. Faça transferência<br>
+2. Tire screenshot<br>
+3. Envie comprovativo abaixo
+
+</p>
+
+</div>
+
+`;
+
+}
+
+}
+
+/* ALTERAR MÉTODO */
+
+document
+.getElementById("metodo")
+.addEventListener("change",mostrarPagamento);
+
+/* PREVIEW */
 
 document
 .getElementById("comprovativo")
 .addEventListener("change",(e)=>{
 
-const file = e.target.files[0];
+const file =
+e.target.files[0];
 
 if(file){
 
-const reader = new FileReader();
+const reader =
+new FileReader();
 
 reader.onload = function(event){
 
@@ -365,11 +487,11 @@ reader.readAsDataURL(file);
 
 });
 
-/* ENVIAR COMPRA */
+/* ENVIAR */
 
 document
 .getElementById("comprar")
-.addEventListener("click", async () => {
+.addEventListener("click", async ()=>{
 
 const nome =
 document.getElementById("nome").value;
@@ -393,7 +515,7 @@ return;
 
 if(!comprovativo){
 
-alert("Envie o comprovativo");
+alert("Envie comprovativo");
 
 return;
 
@@ -407,16 +529,21 @@ document.getElementById("comprar")
 
 /* UPLOAD CLOUDINARY */
 
-const formData = new FormData();
+const formData =
+new FormData();
 
-formData.append("file", comprovativo);
+formData.append(
+"file",
+comprovativo
+);
 
 formData.append(
 "upload_preset",
 CLOUDINARY_PRESET
 );
 
-const resposta = await fetch(
+const resposta =
+await fetch(
 CLOUDINARY_URL,
 {
 method:"POST",
@@ -430,7 +557,7 @@ await resposta.json();
 const comprovativoUrl =
 dados.secure_url;
 
-/* SALVAR COMPRA */
+/* SALVAR FIREBASE */
 
 await addDoc(
 collection(db,"compras"),
@@ -449,7 +576,7 @@ data:serverTimestamp()
 }
 );
 
-document.getElementById("pagamento")
+document.getElementById("resultado")
 .innerHTML = `
 
 <div class="sucesso">
@@ -458,13 +585,17 @@ document.getElementById("pagamento")
 ✅ Compra Enviada
 </h2>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
 
 Seu pagamento foi enviado para análise.
 
 </p>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
 
 📦 Prompt:
 <strong>
@@ -473,7 +604,9 @@ ${promptData.titulo}
 
 </p>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
 
 💳 Método:
 <strong>
@@ -482,7 +615,9 @@ ${metodo}
 
 </p>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
 
 ⏳ Status:
 <strong>
@@ -491,9 +626,11 @@ PENDENTE
 
 </p>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
 
-Você receberá confirmação após validação.
+Você receberá acesso após validação.
 
 </p>
 
@@ -509,7 +646,7 @@ document.getElementById("comprar")
 
 console.log(error);
 
-alert("Erro ao enviar compra");
+alert("Erro ao enviar");
 
 document.getElementById("comprar")
 .innerText =
@@ -522,6 +659,8 @@ document.getElementById("comprar")
 /* START */
 
 carregarPrompt();
+
+mostrarPagamento();
 
 </script>
 
