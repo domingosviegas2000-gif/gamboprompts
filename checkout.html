@@ -38,6 +38,7 @@ margin-bottom:25px;
 h1{
 margin-bottom:25px;
 font-size:35px;
+line-height:1.3;
 }
 
 h2{
@@ -53,7 +54,9 @@ border-radius:12px;
 background:#1e293b;
 color:white;
 font-size:16px;
+margin-top:15px;
 margin-bottom:20px;
+outline:none;
 }
 
 button{
@@ -65,6 +68,7 @@ font-size:17px;
 font-weight:bold;
 cursor:pointer;
 transition:0.3s;
+margin-top:15px;
 }
 
 button:hover{
@@ -80,7 +84,11 @@ color:black;
 .express-btn{
 background:#22c55e;
 color:white;
-margin-top:15px;
+}
+
+.whatsapp-btn{
+background:#25d366;
+color:white;
 }
 
 .info{
@@ -90,13 +98,30 @@ border-radius:15px;
 line-height:1.8;
 }
 
-.logo-binance{
+.logo{
 width:120px;
 margin-top:20px;
 margin-bottom:20px;
 background:white;
 padding:15px;
 border-radius:15px;
+}
+
+@media(max-width:768px){
+
+h1{
+font-size:28px;
+}
+
+.box{
+padding:20px;
+}
+
+button{
+font-size:16px;
+padding:16px;
+}
+
 }
 
 </style>
@@ -107,7 +132,9 @@ border-radius:15px;
 
 <div class="container">
 
-<h1>💳 Checkout Premium</h1>
+<h1>
+💳 Checkout Premium
+</h1>
 
 <div class="box">
 
@@ -136,29 +163,34 @@ Preço: --
 <input
 type="text"
 id="nome"
-placeholder="Seu nome">
+placeholder="Seu nome"
+>
 
 <input
 type="text"
 id="whatsapp"
-placeholder="Seu WhatsApp">
+placeholder="Seu WhatsApp"
+>
 
 <select id="metodo">
 
 <option value="binance">
-Binance Pay
+🟡 Binance Pay
 </option>
 
 <option value="express">
-Multicaixa Express
+💚 Multicaixa Express
 </option>
 
 </select>
 
 <button
 id="comprar"
-class="binance-btn">
+class="binance-btn"
+>
+
 🚀 Continuar Compra
+
 </button>
 
 </div>
@@ -260,10 +292,10 @@ document
 .addEventListener("click", async () => {
 
 const nome =
-document.getElementById("nome").value.trim();
+document.getElementById("nome").value;
 
 const whatsapp =
-document.getElementById("whatsapp").value.trim();
+document.getElementById("whatsapp").value;
 
 const metodo =
 document.getElementById("metodo").value;
@@ -278,7 +310,7 @@ return;
 
 try{
 
-/* SALVAR PEDIDO */
+/* SALVAR COMPRA */
 
 await addDoc(
 collection(db,"compras"),
@@ -305,7 +337,9 @@ document.getElementById("pagamento")
 
 <div class="box">
 
-<h2>🟡 Binance Pay</h2>
+<h2>
+🟡 Binance Pay
+</h2>
 
 <div class="info">
 
@@ -315,7 +349,7 @@ Pague usando Binance Pay
 
 <img
 src="https://upload.wikimedia.org/wikipedia/commons/1/12/Binance_logo.svg"
-class="logo-binance"
+class="logo"
 >
 
 <div style="
@@ -342,11 +376,7 @@ word-break:break-all;
 
 <button
 id="copiarBinance"
-style="
-margin-top:20px;
-background:#f0b90b;
-color:black;
-"
+class="binance-btn"
 >
 
 📋 Copiar Binance ID
@@ -370,8 +400,8 @@ color:#cbd5e1;
 </div>
 
 <button
-class="binance-btn"
-id="btnWhatsappBinance"
+class="whatsapp-btn"
+onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20enviei%20o%20pagamento%20Binance%20do%20prompt:%20${encodeURIComponent(promptData.titulo)}')"
 >
 
 📲 Enviar Comprovativo
@@ -391,7 +421,9 @@ document.getElementById("pagamento")
 
 <div class="box">
 
-<h2>💚 Multicaixa Express</h2>
+<h2>
+💚 Multicaixa Express
+</h2>
 
 <div class="info">
 
@@ -400,7 +432,7 @@ Número:
 </p>
 
 <p style="
-font-size:24px;
+font-size:28px;
 font-weight:bold;
 margin-top:10px;
 color:#22c55e;
@@ -423,6 +455,7 @@ ${promptData.preco || 0} Kz
 
 <p style="
 margin-top:20px;
+line-height:1.8;
 ">
 
 Envie o comprovativo após pagamento.
@@ -432,8 +465,8 @@ Envie o comprovativo após pagamento.
 </div>
 
 <button
-class="express-btn"
-id="btnWhatsappExpress"
+class="whatsapp-btn"
+onclick="window.open('https://wa.me/244924539161?text=Olá%20já%20enviei%20o%20pagamento%20Express%20do%20prompt:%20${encodeURIComponent(promptData.titulo)}')"
 >
 
 📲 Enviar Comprovativo
@@ -446,11 +479,9 @@ id="btnWhatsappExpress"
 
 }
 
-/* EVENTOS */
+/* COPIAR BINANCE */
 
 setTimeout(() => {
-
-/* COPIAR BINANCE */
 
 const copiarBinance =
 document.getElementById("copiarBinance");
@@ -459,11 +490,7 @@ if(copiarBinance){
 
 copiarBinance.addEventListener("click", () => {
 
-const texto =
-document.getElementById("binanceId")
-.innerText;
-
-navigator.clipboard.writeText(texto);
+navigator.clipboard.writeText("450040438");
 
 copiarBinance.innerText =
 "✅ Copiado";
@@ -472,49 +499,7 @@ copiarBinance.innerText =
 
 }
 
-/* WHATSAPP BINANCE */
-
-const btnWhatsappBinance =
-document.getElementById("btnWhatsappBinance");
-
-if(btnWhatsappBinance){
-
-btnWhatsappBinance.addEventListener("click", () => {
-
-const mensagem =
-`Olá já enviei o pagamento Binance do prompt: ${promptData.titulo}`;
-
-const link =
-`https://wa.me/244924539161?text=${encodeURIComponent(mensagem)}`;
-
-window.open(link);
-
-});
-
-}
-
-/* WHATSAPP EXPRESS */
-
-const btnWhatsappExpress =
-document.getElementById("btnWhatsappExpress");
-
-if(btnWhatsappExpress){
-
-btnWhatsappExpress.addEventListener("click", () => {
-
-const mensagem =
-`Olá já enviei o pagamento Express do prompt: ${promptData.titulo}`;
-
-const link =
-`https://wa.me/244924539161?text=${encodeURIComponent(mensagem)}`;
-
-window.open(link);
-
-});
-
-}
-
-},300);
+},500);
 
 }catch(error){
 
