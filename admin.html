@@ -77,7 +77,6 @@ color:black;
 .logout-btn{
 background:#ef4444;
 color:white;
-margin-bottom:25px;
 }
 
 #dashboard{
@@ -152,27 +151,22 @@ color:white;
 margin-bottom:20px;
 }
 
-.comp-img{
-width:100%;
-max-height:300px;
-object-fit:contain;
-background:#0f172a;
-padding:10px;
+.top-buttons{
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:25px;
+}
+
+.link-btn{
+background:#22c55e;
+color:white;
+padding:14px 20px;
 border-radius:10px;
-margin-top:15px;
-}
-
-.status{
-margin-top:10px;
+text-decoration:none;
 font-weight:bold;
-}
-
-.pendente{
-color:#f59e0b;
-}
-
-.aprovado{
-color:#22c55e;
+display:flex;
+align-items:center;
 }
 
 </style>
@@ -183,12 +177,7 @@ color:#22c55e;
 
 <h1>🔥 Painel Administrativo</h1>
 
-<div style="
-display:flex;
-gap:15px;
-flex-wrap:wrap;
-margin-bottom:25px;
-">
+<div class="top-buttons">
 
 <button id="logout" class="logout-btn">
 🚪 Terminar Sessão
@@ -196,16 +185,8 @@ margin-bottom:25px;
 
 <a
 href="compras.html"
-style="
-background:#22c55e;
-color:white;
-padding:14px 20px;
-border-radius:10px;
-text-decoration:none;
-font-weight:bold;
-display:flex;
-align-items:center;
-">
+class="link-btn"
+>
 
 💳 Lista de Compras
 
@@ -233,8 +214,6 @@ align-items:center;
 </div>
 
 </div>
-
-
 
 <!-- CATEGORIAS -->
 
@@ -354,10 +333,15 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 const firebaseConfig = {
 
 apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+
 authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+
 projectId: "gamboprompts-8ff6d",
+
 storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+
 messagingSenderId: "92750073125",
+
 appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 
 };
@@ -399,9 +383,11 @@ select.innerHTML = "";
 categorias.forEach((cat) => {
 
 select.innerHTML += `
+
 <option value="${cat}">
 ${cat}
 </option>
+
 `;
 
 });
@@ -544,7 +530,61 @@ document.getElementById("totalCategorias")
 
 }
 
+async function listarPrompts(){
 
+const snapshot =
+await getDocs(collection(db,"prompts"));
+
+const lista =
+document.getElementById("listaPrompts");
+
+lista.innerHTML = "";
+
+snapshot.forEach((docItem) => {
+
+const data = docItem.data();
+
+lista.innerHTML += `
+
+<div class="card">
+
+<img src="${data.imagem}">
+
+<h2>${data.titulo}</h2>
+
+<p style="margin-top:10px;">
+📂 ${data.categoria}
+</p>
+
+<p style="margin-top:10px;">
+❤️ ${data.likes || 0} Likes
+</p>
+
+<div class="card-buttons">
+
+<button
+class="editar-btn"
+onclick="editarPrompt('${docItem.id}')">
+✏️ Editar
+</button>
+
+<button
+class="apagar-btn"
+onclick="apagarPrompt('${docItem.id}')">
+🗑️ Apagar
+</button>
+
+</div>
+
+</div>
+
+`;
+
+});
+
+}
+
+window.editarPrompt = async function(id){
 
 const ref = doc(db,"prompts",id);
 
@@ -749,8 +789,6 @@ carregarCategorias();
 listarPrompts();
 
 carregarDashboard();
-
-listarCompras();
 
 </script>
 
