@@ -4,9 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Checkout Premium</title>
 
@@ -198,36 +196,57 @@ placeholder="Seu WhatsApp"
 
 </select>
 
+<!-- DADOS PAGAMENTO -->
+
 <div id="dadosPagamento"></div>
 
 <h2 style="margin-top:25px;">
 📤 Enviar Comprovativo
 </h2>
 
+<!-- BOTÃO GALERIA -->
+
+<button
+type="button"
+id="abrirGaleria"
+style="
+background:#22c55e;
+color:white;
+width:100%;
+padding:18px;
+border:none;
+border-radius:12px;
+font-size:16px;
+font-weight:bold;
+margin-top:15px;
+cursor:pointer;
+"
+>
+
+📷 Selecionar Comprovativo
+
+</button>
+
+<!-- INPUT FILE -->
+
 <input
 type="file"
 id="comprovativo"
 accept="image/*"
->
-
-<div
-class="erro"
-id="erroUpload"
 style="display:none;"
 >
+
+<div class="erro" id="erroUpload" style="display:none;">
 
 ⚠️ Se não conseguir selecionar imagem:
 <br><br>
 
 • Abra o site no Chrome
 <br>
-
 • Não abra dentro do WhatsApp/Facebook
 <br>
-
 • Permita acesso às fotos
 <br>
-
 • Atualize o navegador
 
 </div>
@@ -271,31 +290,23 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
 
-apiKey:
-"AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
 
-authDomain:
-"gamboprompts-8ff6d.firebaseapp.com",
+authDomain: "gamboprompts-8ff6d.firebaseapp.com",
 
-projectId:
-"gamboprompts-8ff6d",
+projectId: "gamboprompts-8ff6d",
 
-storageBucket:
-"gamboprompts-8ff6d.firebasestorage.app",
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
 
-messagingSenderId:
-"92750073125",
+messagingSenderId: "92750073125",
 
-appId:
-"1:92750073125:web:d29723c203a0468ecf1ecc"
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 
 };
 
-const app =
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-const db =
-getFirestore(app);
+const db = getFirestore(app);
 
 /* CLOUDINARY */
 
@@ -310,8 +321,7 @@ const CLOUDINARY_PRESET =
 const params =
 new URLSearchParams(window.location.search);
 
-const id =
-params.get("id");
+const id = params.get("id");
 
 let promptData = null;
 
@@ -371,11 +381,15 @@ box.innerHTML = `
 
 <div class="info">
 
-<h2 style="color:#f0b90b;">
+<h2 style="
+color:#f0b90b;
+">
 🟡 Binance Pay
 </h2>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
 Binance ID:
 </p>
 
@@ -440,11 +454,15 @@ box.innerHTML = `
 
 <div class="info">
 
-<h2 style="color:#22c55e;">
+<h2 style="
+color:#22c55e;
+">
 💚 Multicaixa Express
 </h2>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
 Número:
 </p>
 
@@ -481,14 +499,25 @@ document
 .getElementById("metodo")
 .addEventListener("change",mostrarPagamento);
 
+/* ABRIR GALERIA */
+
+document
+.getElementById("abrirGaleria")
+.addEventListener("click",()=>{
+
+document
+.getElementById("comprovativo")
+.click();
+
+});
+
 /* PREVIEW */
 
 document
 .getElementById("comprovativo")
 .addEventListener("change",(e)=>{
 
-const file =
-e.target.files[0];
+const file = e.target.files[0];
 
 if(!file){
 
@@ -507,8 +536,7 @@ return;
 
 }
 
-const reader =
-new FileReader();
+const reader = new FileReader();
 
 reader.onload = function(event){
 
@@ -524,26 +552,6 @@ preview.style.display =
 };
 
 reader.readAsDataURL(file);
-
-});
-
-/* DETECTAR ERRO */
-
-window.addEventListener("load",()=>{
-
-setTimeout(()=>{
-
-const input =
-document.getElementById("comprovativo");
-
-if(input.disabled){
-
-document.getElementById("erroUpload")
-.style.display = "block";
-
-}
-
-},1000);
 
 });
 
@@ -586,6 +594,8 @@ try{
 document.getElementById("comprar")
 .innerText =
 "Enviando...";
+
+/* CLOUDINARY */
 
 const formData =
 new FormData();
@@ -643,33 +653,53 @@ document.getElementById("resultado")
 ✅ Compra Enviada
 </h2>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
+
 Seu pagamento foi enviado para análise.
+
 </p>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
+
 📦 Prompt:
 <strong>
 ${promptData.titulo}
 </strong>
+
 </p>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
+
 💳 Método:
 <strong>
 ${metodo}
 </strong>
+
 </p>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
+
 ⏳ Status:
 <strong>
 PENDENTE
 </strong>
+
 </p>
 
-<p style="margin-top:15px;">
+<p style="
+margin-top:15px;
+">
+
 Você receberá acesso após validação.
+
 </p>
 
 </div>
@@ -677,7 +707,8 @@ Você receberá acesso após validação.
 `;
 
 document.getElementById("comprar")
-.style.display = "none";
+.style.display =
+"none";
 
 }catch(error){
 
