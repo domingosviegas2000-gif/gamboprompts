@@ -59,10 +59,6 @@ margin-bottom:20px;
 outline:none;
 }
 
-input[type="file"]{
-padding:12px;
-}
-
 button{
 width:100%;
 padding:18px;
@@ -116,6 +112,14 @@ margin-top:20px;
 background:#f0b90b;
 color:black;
 margin-top:15px;
+}
+
+.erro{
+background:#7f1d1d;
+padding:18px;
+border-radius:15px;
+margin-top:20px;
+line-height:1.7;
 }
 
 @media(max-width:768px){
@@ -204,7 +208,23 @@ placeholder="Seu WhatsApp"
 type="file"
 id="comprovativo"
 accept="image/*"
+capture="environment"
 >
+
+<div class="erro" id="erroUpload" style="display:none;">
+
+⚠️ Se não conseguir selecionar imagem:
+<br><br>
+
+• Abra o site no Chrome
+<br>
+• Não abra dentro do WhatsApp/Facebook
+<br>
+• Permita acesso às fotos
+<br>
+• Atualize o navegador
+
+</div>
 
 <img
 id="preview"
@@ -417,30 +437,26 @@ color:#22c55e;
 
 <p style="
 margin-top:15px;
-font-size:18px;
 ">
-Número Multicaixa:
+Número:
 </p>
 
 <h1 style="
 margin-top:10px;
 color:#22c55e;
 font-size:35px;
-letter-spacing:2px;
 ">
 924539161
 </h1>
 
 <p style="
-margin-top:25px;
-line-height:2;
-color:#cbd5e1;
+margin-top:20px;
+line-height:1.8;
 ">
 
-1. Abra o Multicaixa Express<br>
-2. Envie o valor do prompt<br>
-3. Tire screenshot do comprovativo<br>
-4. Faça upload abaixo
+1. Faça transferência<br>
+2. Tire screenshot<br>
+3. Envie comprovativo abaixo
 
 </p>
 
@@ -464,13 +480,26 @@ document
 .getElementById("comprovativo")
 .addEventListener("change",(e)=>{
 
-const file =
-e.target.files[0];
+const file = e.target.files[0];
 
-if(file){
+if(!file){
 
-const reader =
-new FileReader();
+document.getElementById("preview")
+.style.display = "none";
+
+return;
+
+}
+
+if(!file.type.startsWith("image/")){
+
+alert("Selecione apenas imagem");
+
+return;
+
+}
+
+const reader = new FileReader();
 
 reader.onload = function(event){
 
@@ -487,7 +516,25 @@ preview.style.display =
 
 reader.readAsDataURL(file);
 
+});
+
+/* DETECTAR BLOQUEIO */
+
+window.addEventListener("load",()=>{
+
+setTimeout(()=>{
+
+const input =
+document.getElementById("comprovativo");
+
+if(input.disabled){
+
+document.getElementById("erroUpload")
+.style.display = "block";
+
 }
+
+},1000);
 
 });
 
@@ -531,7 +578,7 @@ document.getElementById("comprar")
 .innerText =
 "Enviando...";
 
-/* UPLOAD CLOUDINARY */
+/* CLOUDINARY */
 
 const formData =
 new FormData();
@@ -561,7 +608,7 @@ await resposta.json();
 const comprovativoUrl =
 dados.secure_url;
 
-/* SALVAR FIREBASE */
+/* FIREBASE */
 
 await addDoc(
 collection(db,"compras"),
