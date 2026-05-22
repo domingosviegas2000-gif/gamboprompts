@@ -102,11 +102,12 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
 getFirestore,
+doc,
+getDoc,
 collection,
 getDocs,
-doc,
-updateDoc,
-addDoc
+query,
+where
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -121,87 +122,133 @@ appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 
 };
 
-const app =
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-const db =
-getFirestore(app);
+const db = getFirestore(app);
 
-const lista =
-document.getElementById("lista");
+const params =
+new URLSearchParams(window.location.search);
 
-async function carregarCompras(){
+const id =
+params.get("id");
+
+const conteudo =
+document.getElementById("conteudo");
+
+/* PEGAR WHATSAPP SALVO */
+
+const whatsappCliente =
+localStorage.getItem("clienteWhatsapp");
+
+/* VERIFICAR ACESSO */
+
+async function verificarAcesso(){
+
+if(!whatsappCliente){
+
+return false;
+
+}
+
+const q = query(
+collection(db,"acessos"),
+where("promptId","==",id),
+where("whatsapp","==",whatsappCliente),
+where("status","==","aprovado")
+);
 
 const snapshot =
-await getDocs(collection(db,"compras"));
+await getDocs(q);
 
-lista.innerHTML = "";
+return !snapshot.empty;
 
-snapshot.forEach((docItem)=>{
+}
+
+/* CARREGAR PROMPT */
+
+async function carregarPrompt(){
+
+const ref =
+doc(db,"prompts",id);
+
+const snap =
+await getDoc(ref);
+
+if(!snap.exists()){
+
+conteudo.innerHTML =
+"<h1>Prompt não encontrado</h1>";
+
+return;
+
+}
 
 const data =
-docItem.data();
+snap.data();
 
-lista.innerHTML += `
+document.title =
+data.titulo;
+
+const temAcesso =
+await verificarAcesso();
+
+let html = `
+
+<img
+src="${data.imagem}"
+class="banner"
+>
 
 <div class="box">
 
+<h1>${data.titulo}</h1>
+
+<p>
+📂 ${data.categoria}
+</p>
+
+</div>
+
+`;
+
+if(
+data.tipo === "Premium"
+&&
+!temAcesso
+){
+
+html += `
+
+<div class="lock">
+
 <h2>
-${data.promptTitulo}
+🔒 Prompt Premium
 </h2>
 
-<p>
-👤 ${data.nome}
-</p>
+<p style="
+margin-top:20px;
+line-height:1.8;
+">
 
-<p>
-📱 ${data.whatsapp}
-</p>
-
-<p>
-💳 ${data.metodo}
-</p>
-
-<p>
-💰 ${data.valor} Kz
-</p>
-
-<p class="status ${data.status}">
-
-${data.status.toUpperCase()}
+${data.prompt.substring(0,250)}...
 
 </p>
-
-<img src="${data.comprovativo}">
-
-<button
-class="aprovar"
-onclick="aprovarCompra(
-'${docItem.id}',
-'${data.promptId}',
-'${data.whatsapp}'
-)"
->
-
-✅ Aprovar
-
-</button>
-
-<button
-class="rejeitar"
-onclick="rejeitarCompra('${docItem.id}')"
->
-
-❌ Rejeitar
-
-</button>
 
 <button
 class="whatsapp"
-onclick="window.open('https://wa.me/244${data.whatsapp}')"
+onclick="window.open('https://wa.me/244924539161?text=Olá%20quero%20comprar%20o%20prompt:%20${encodeURIComponent(data.titulo)}')"
 >
 
-💬 WhatsApp
+💬 Comprar via WhatsApp
+
+</button>
+
+<button
+class="binance"
+onclick="window.location.href='checkout.html?id=${id}'"
+>
+
+🟡 Comprar com Binance
 
 </button>
 
@@ -209,57 +256,34 @@ onclick="window.open('https://wa.me/244${data.whatsapp}')"
 
 `;
 
-});
+}else{
+
+html += `
+
+<div class="box">
+
+<h2>
+🧠 Prompt Completo
+</h2>
+
+<p class="prompt-text">
+
+${data.prompt}
+
+</p>
+
+</div>
+
+`;
 
 }
 
-window.aprovarCompra =
-async function(id,promptId,whatsapp){
-
-await updateDoc(
-doc(db,"compras",id),
-{
-status:"aprovado"
-}
-);
-
-await addDoc(
-collection(db,"acessos"),
-{
-promptId,
-whatsapp,
-status:"aprovado"
-}
-);
-
-localStorage.setItem(
-"acessoPremium",
-promptId
-);
-
-alert("✅ Compra aprovada");
-
-carregarCompras();
+conteudo.innerHTML =
+html;
 
 }
 
-window.rejeitarCompra =
-async function(id){
-
-await updateDoc(
-doc(db,"compras",id),
-{
-status:"rejeitado"
-}
-);
-
-alert("❌ Compra rejeitada");
-
-carregarCompras();
-
-}
-
-carregarCompras();
+carregarPrompt();
 
 </script>
 
