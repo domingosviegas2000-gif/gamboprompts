@@ -1,139 +1,647 @@
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Prompt</title>
 
 <style>
-body{margin:0;background:#0f172a;color:#fff;font-family:Arial;padding:20px}
-.container{max-width:1000px;margin:auto}
-.box{background:#111827;padding:20px;border-radius:15px;margin-top:20px}
-.banner{width:100%;border-radius:15px}
-button{padding:15px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;margin-top:10px;width:100%}
-.whatsapp{background:#22c55e}
-.binance{background:#f0b90b}
-.express{background:#38bdf8}
-.lock{background:#1e293b;padding:20px;border-radius:15px}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+}
+
+.banner{
+width:100%;
+max-height:650px;
+object-fit:contain;
+border-radius:20px;
+margin-bottom:25px;
+background:#111827;
+padding:10px;
+}
+
+h1{
+font-size:35px;
+margin-bottom:20px;
+line-height:1.3;
+}
+
+.badge{
+display:inline-block;
+padding:8px 15px;
+border-radius:30px;
+font-size:14px;
+font-weight:bold;
+margin-bottom:20px;
+}
+
+.premium{
+background:#f59e0b;
+color:black;
+}
+
+.gratis{
+background:#22c55e;
+color:white;
+}
+
+.box{
+background:#111827;
+padding:25px;
+border-radius:20px;
+margin-bottom:25px;
+}
+
+.box h2{
+margin-bottom:20px;
+}
+
+.prompt-text{
+white-space:pre-wrap;
+line-height:1.8;
+font-size:16px;
+color:#e2e8f0;
+}
+
+button{
+padding:15px 20px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+font-size:16px;
+font-weight:bold;
+margin-top:15px;
+transition:0.3s;
+}
+
+button:hover{
+opacity:0.9;
+transform:translateY(-2px);
+}
+
+.copy-btn{
+background:#38bdf8;
+color:black;
+width:100%;
+}
+
+.afiliado-btn{
+background:#8b5cf6;
+color:white;
+width:100%;
+}
+
+.doacao-btn{
+background:#ef4444;
+color:white;
+width:100%;
+}
+
+.relacionados{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+gap:20px;
+}
+
+.card{
+background:#1e293b;
+padding:15px;
+border-radius:15px;
+text-decoration:none;
+color:white;
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.card img{
+width:100%;
+height:220px;
+object-fit:contain;
+background:#0f172a;
+border-radius:10px;
+margin-bottom:10px;
+padding:5px;
+}
+
+.lock{
+background:#ef4444;
+padding:25px;
+border-radius:15px;
+text-align:center;
+margin-top:20px;
+}
+
+@media(max-width:768px){
+
+.banner{
+max-height:450px;
+}
+
+h1{
+font-size:28px;
+}
+
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div class="container" id="conteudo"></div>
+<div class="container">
+
+<div id="conteudo"></div>
+
+<div class="box">
+
+<h2>🔥 Prompts Relacionados</h2>
+
+<div id="relacionados" class="relacionados"></div>
+
+</div>
+
+</div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc, collection, getDocs, query, where } 
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+doc,
+getDoc,
+collection,
+getDocs,
+query,
+where
+}
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+/* FIREBASE */
+
 const firebaseConfig = {
-apiKey: "AIzaSyD...",
+
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+
 authDomain: "gamboprompts-8ff6d.firebaseapp.com",
-projectId: "gamboprompts-8ff6d"
+
+projectId: "gamboprompts-8ff6d",
+
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+
+messagingSenderId: "92750073125",
+
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
 
-const id = new URLSearchParams(location.search).get("id");
-const conteudo = document.getElementById("conteudo");
+/* PEGAR ID */
 
-let promptData = null;
+const params =
+new URLSearchParams(window.location.search);
 
-/* VERIFICAR COMPRA APROVADA */
-async function temAcesso(){
+const id = params.get("id");
 
-const whatsapp = localStorage.getItem("whatsapp");
+const conteudo =
+document.getElementById("conteudo");
 
-if(!whatsapp) return false;
+/* WHATSAPP CLIENTE */
+
+const whatsappCliente =
+localStorage.getItem("clienteWhatsapp");
+
+/* VERIFICAR ACESSO */
+
+async function verificarAcesso(){
+
+try{
+
+if(!whatsappCliente){
+
+return false;
+
+}
 
 const q = query(
 collection(db,"compras"),
 where("promptId","==",id),
-where("whatsapp","==",whatsapp),
+where("whatsapp","==",whatsappCliente),
 where("status","==","aprovado")
 );
 
-const snap = await getDocs(q);
+const snapshot =
+await getDocs(q);
 
-return !snap.empty;
+return !snapshot.empty;
+
+}catch(error){
+
+console.log(error);
+
+return false;
+
 }
+
+}
+
+/* GUMROAD */
+
+function comprarGumroad(id){
+
+const gumroadBase =
+"https://gumroad.com/l/TEU_LINK";
+
+const url =
+gumroadBase + "?promptId=" + id;
+
+window.location.href = url;
+
+}
+
+window.comprarGumroad =
+comprarGumroad;
 
 /* CARREGAR PROMPT */
-async function load(){
 
-const ref = doc(db,"prompts",id);
-const snap = await getDoc(ref);
+async function carregarPrompt(){
+
+try{
+
+const ref =
+doc(db,"prompts",id);
+
+const snap =
+await getDoc(ref);
 
 if(!snap.exists()){
-conteudo.innerHTML = "Não encontrado";
+
+conteudo.innerHTML = `
+<h1>Prompt não encontrado</h1>
+`;
+
 return;
+
 }
 
-promptData = snap.data();
+const data = snap.data();
 
-const acesso = await temAcesso();
+document.title = data.titulo;
+
+const temAcesso =
+await verificarAcesso();
 
 conteudo.innerHTML = `
 
-<img src="${promptData.imagem}" class="banner">
+<img
+src="${data.imagem}"
+class="banner"
+>
 
-<h1>${promptData.titulo}</h1>
+<h1>${data.titulo}</h1>
 
-<div class="box">
-${promptData.categoria}
+<div class="badge ${data.tipo === "Premium" ? "premium" : "gratis"}">
+
+${data.tipo}
+
 </div>
 
 <div class="box">
-${promptData.instrucoes}
+
+<h2>📂 Categoria</h2>
+
+<p>${data.categoria}</p>
+
 </div>
 
 <div class="box">
+
+<h2>📖 Instruções</h2>
+
+<p class="prompt-text">
+
+${data.instrucoes || "Sem instruções"}
+
+</p>
+
+</div>
+
+<div class="box">
+
+<h2>🧠 Prompt</h2>
 
 ${
-(promptData.tipo === "Premium" && !acesso)
+data.tipo === "Premium" && !temAcesso
+
 ?
+
 `
+
 <div class="lock">
 
-<h2>🔒 Conteúdo Premium</h2>
+<h2 style="
+margin-bottom:15px;
+font-size:28px;
+">
+🔒 Prompt Premium
+</h2>
 
-<p>${promptData.prompt.substring(0,200)}...</p>
+<p style="
+font-size:17px;
+line-height:1.7;
+margin-bottom:20px;
+color:#e2e8f0;
+">
 
-<button class="whatsapp"
-onclick="window.open('https://wa.me/244924539161?text=Quero%20comprar%20${promptData.titulo}')">
-WhatsApp
+${data.prompt.substring(0,250)}...
+
+</p>
+
+<div style="
+background:#0f172a;
+padding:20px;
+border-radius:15px;
+margin-top:20px;
+">
+
+<h3 style="
+margin-bottom:15px;
+color:#f59e0b;
+">
+✨ O que você desbloqueia:
+</h3>
+
+<ul style="
+line-height:2;
+padding-left:20px;
+color:#cbd5e1;
+">
+
+<li>Prompt completo sem cortes</li>
+
+<li>Estratégia avançada</li>
+
+<li>Conteúdo exclusivo</li>
+
+<li>Uso comercial liberado</li>
+
+<li>Acesso imediato</li>
+
+</ul>
+
+</div>
+
+<!-- GUMROAD -->
+
+<button
+onclick="comprarGumroad('${id}')"
+style="
+margin-top:25px;
+font-size:18px;
+padding:18px;
+background:#ff90e8;
+color:black;
+width:100%;
+border:none;
+border-radius:12px;
+font-weight:bold;
+cursor:pointer;
+">
+
+💳 Comprar Automaticamente
+
 </button>
 
-<button class="binance"
-onclick="location.href='checkout.html?id=${id}&metodo=binance'">
-Binance Pay
+<!-- BINANCE -->
+
+<button
+style="
+margin-top:15px;
+font-size:18px;
+padding:18px;
+background:#f0b90b;
+color:black;
+width:100%;
+border:none;
+border-radius:12px;
+font-weight:bold;
+cursor:pointer;
+"
+onclick="window.location.href='checkout.html?id=${id}'"
+>
+
+🟡 Binance Pay
+
 </button>
 
-<button class="express"
-onclick="location.href='checkout.html?id=${id}&metodo=express'">
-Express
+<!-- EXPRESS -->
+
+<button
+style="
+margin-top:15px;
+font-size:18px;
+padding:18px;
+background:#22c55e;
+color:white;
+width:100%;
+border:none;
+border-radius:12px;
+font-weight:bold;
+cursor:pointer;
+"
+onclick="window.location.href='checkout.html?id=${id}'"
+>
+
+💚 Multicaixa Express
+
 </button>
 
 </div>
+
 `
+
 :
+
 `
-<p>${promptData.prompt}</p>
+
+<p class="prompt-text" id="textoPrompt">
+
+${data.prompt}
+
+</p>
+
+<button
+class="copy-btn"
+id="copiar">
+
+📋 Copiar Prompt
+
+</button>
+
 `
+
 }
 
 </div>
+
+${
+data.afiliado
+
+?
+
+`
+
+<button
+class="afiliado-btn"
+onclick="window.open('${data.afiliado}')">
+🚀 Acessar Oferta
+</button>
+
+`
+
+:
+
+""
+
+}
+
+${
+data.doacao
+
+?
+
+`
+
+<button
+class="doacao-btn"
+onclick="window.open('${data.doacao}')">
+💖 Apoiar Projeto
+</button>
+
+`
+
+:
+
+""
+
+}
+
+`;
+
+/* COPIAR */
+
+const copiar =
+document.getElementById("copiar");
+
+if(copiar){
+
+copiar.addEventListener("click", () => {
+
+const texto =
+document.getElementById("textoPrompt")
+.innerText;
+
+navigator.clipboard.writeText(texto);
+
+copiar.innerText = "✅ Copiado";
+
+});
+
+}
+
+carregarRelacionados(data.categoria);
+
+}catch(error){
+
+console.log(error);
+
+conteudo.innerHTML = `
+<h1>Erro ao carregar prompt</h1>
+`;
+
+}
+
+}
+
+/* RELACIONADOS */
+
+async function carregarRelacionados(categoriaAtual){
+
+const snapshot =
+await getDocs(collection(db,"prompts"));
+
+const relacionados =
+document.getElementById("relacionados");
+
+relacionados.innerHTML = "";
+
+snapshot.forEach((docItem) => {
+
+const data = docItem.data();
+
+if(
+data.categoria === categoriaAtual
+&&
+docItem.id !== id
+){
+
+relacionados.innerHTML += `
+
+<a
+href="prompt.html?id=${docItem.id}"
+class="card"
+>
+
+<img src="${data.imagem}">
+
+<h3>${data.titulo}</h3>
+
+<p style="margin-top:10px;">
+📂 ${data.categoria}
+</p>
+
+</a>
 
 `;
 
 }
 
-load();
+});
+
+}
+
+/* START */
+
+carregarPrompt();
 
 </script>
 
 </body>
+
 </html>
