@@ -1,265 +1,129 @@
-<!-- ========================= -->
-<!-- prompt.html COMPLETO -->
-<!-- ========================= -->
-
 <!DOCTYPE html>
 <html lang="pt">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Prompt</title>
 
 <style>
-
-body{
-background:#0f172a;
-color:white;
-font-family:Arial;
-padding:20px;
-}
-
-.container{
-max-width:1000px;
-margin:auto;
-}
-
-.box{
-background:#111827;
-padding:20px;
-border-radius:15px;
-margin-bottom:20px;
-}
-
-.banner{
-width:100%;
-border-radius:15px;
-margin-bottom:20px;
-}
-
-.lock{
-background:#7f1d1d;
-padding:25px;
-border-radius:15px;
-text-align:center;
-}
-
-button{
-width:100%;
-padding:16px;
-border:none;
-border-radius:10px;
-font-weight:bold;
-cursor:pointer;
-margin-top:15px;
-}
-
-.whatsapp{
-background:#22c55e;
-color:white;
-}
-
-.binance{
-background:#f0b90b;
-color:black;
-}
-
-.prompt-text{
-white-space:pre-wrap;
-line-height:1.8;
-}
-
+body{margin:0;background:#0f172a;color:#fff;font-family:Arial;padding:20px}
+.container{max-width:1000px;margin:auto}
+.box{background:#111827;padding:20px;border-radius:15px;margin-top:20px}
+.banner{width:100%;border-radius:15px}
+button{padding:15px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;margin-top:10px;width:100%}
+.whatsapp{background:#22c55e}
+.binance{background:#f0b90b}
+.express{background:#38bdf8}
+.lock{background:#1e293b;padding:20px;border-radius:15px}
 </style>
-
 </head>
 
 <body>
 
-<div class="container">
-
-<div id="conteudo"></div>
-
-</div>
+<div class="container" id="conteudo"></div>
 
 <script type="module">
-<script type="module">
 
-import { initializeApp }
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
-import {
-getFirestore,
-doc,
-getDoc,
-collection,
-getDocs,
-query,
-where
-}
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, getDoc, collection, getDocs, query, where } 
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-
-apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+apiKey: "AIzaSyD...",
 authDomain: "gamboprompts-8ff6d.firebaseapp.com",
-projectId: "gamboprompts-8ff6d",
-storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
-messagingSenderId: "92750073125",
-appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
-
+projectId: "gamboprompts-8ff6d"
 };
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
 
-const params =
-new URLSearchParams(window.location.search);
+const id = new URLSearchParams(location.search).get("id");
+const conteudo = document.getElementById("conteudo");
 
-const id =
-params.get("id");
+let promptData = null;
 
-const conteudo =
-document.getElementById("conteudo");
+/* VERIFICAR COMPRA APROVADA */
+async function temAcesso(){
 
-/* PEGAR WHATSAPP SALVO */
+const whatsapp = localStorage.getItem("whatsapp");
 
-const whatsappCliente =
-localStorage.getItem("clienteWhatsapp");
-
-/* VERIFICAR ACESSO */
-
-async function verificarAcesso(){
-
-if(!whatsappCliente){
-
-return false;
-
-}
+if(!whatsapp) return false;
 
 const q = query(
-collection(db,"acessos"),
+collection(db,"compras"),
 where("promptId","==",id),
-where("whatsapp","==",whatsappCliente),
+where("whatsapp","==",whatsapp),
 where("status","==","aprovado")
 );
 
-const snapshot =
-await getDocs(q);
+const snap = await getDocs(q);
 
-return !snapshot.empty;
-
+return !snap.empty;
 }
 
 /* CARREGAR PROMPT */
+async function load(){
 
-async function carregarPrompt(){
-
-const ref =
-doc(db,"prompts",id);
-
-const snap =
-await getDoc(ref);
+const ref = doc(db,"prompts",id);
+const snap = await getDoc(ref);
 
 if(!snap.exists()){
-
-conteudo.innerHTML =
-"<h1>Prompt não encontrado</h1>";
-
+conteudo.innerHTML = "Não encontrado";
 return;
-
 }
 
-const data =
-snap.data();
+promptData = snap.data();
 
-document.title =
-data.titulo;
+const acesso = await temAcesso();
 
-const temAcesso =
-await verificarAcesso();
+conteudo.innerHTML = `
 
-let html = `
+<img src="${promptData.imagem}" class="banner">
 
-<img
-src="${data.imagem}"
-class="banner"
->
+<h1>${promptData.titulo}</h1>
+
+<div class="box">
+${promptData.categoria}
+</div>
+
+<div class="box">
+${promptData.instrucoes}
+</div>
 
 <div class="box">
 
-<h1>${data.titulo}</h1>
-
-<p>
-📂 ${data.categoria}
-</p>
-
-</div>
-
-`;
-
-if(
-data.tipo === "Premium"
-&&
-!temAcesso
-){
-
-html += `
-
+${
+(promptData.tipo === "Premium" && !acesso)
+?
+`
 <div class="lock">
 
-<h2>
-🔒 Prompt Premium
-</h2>
+<h2>🔒 Conteúdo Premium</h2>
 
-<p style="
-margin-top:20px;
-line-height:1.8;
-">
+<p>${promptData.prompt.substring(0,200)}...</p>
 
-${data.prompt.substring(0,250)}...
-
-</p>
-
-<button
-class="whatsapp"
-onclick="window.open('https://wa.me/244924539161?text=Olá%20quero%20comprar%20o%20prompt:%20${encodeURIComponent(data.titulo)}')"
->
-
-💬 Comprar via WhatsApp
-
+<button class="whatsapp"
+onclick="window.open('https://wa.me/244924539161?text=Quero%20comprar%20${promptData.titulo}')">
+WhatsApp
 </button>
 
-<button
-class="binance"
-onclick="window.location.href='checkout.html?id=${id}'"
->
+<button class="binance"
+onclick="location.href='checkout.html?id=${id}&metodo=binance'">
+Binance Pay
+</button>
 
-🟡 Comprar com Binance
-
+<button class="express"
+onclick="location.href='checkout.html?id=${id}&metodo=express'">
+Express
 </button>
 
 </div>
-
-`;
-
-}else{
-
-html += `
-
-<div class="box">
-
-<h2>
-🧠 Prompt Completo
-</h2>
-
-<p class="prompt-text">
-
-${data.prompt}
-
-</p>
+`
+:
+`
+<p>${promptData.prompt}</p>
+`
+}
 
 </div>
 
@@ -267,15 +131,9 @@ ${data.prompt}
 
 }
 
-conteudo.innerHTML =
-html;
-
-}
-
-carregarPrompt();
+load();
 
 </script>
 
 </body>
-
 </html>
