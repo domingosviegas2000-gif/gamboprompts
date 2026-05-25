@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login Cliente</title>
+
+<style>
+
+body{
+background:#0f172a;
+font-family:Arial;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+color:white;
+}
+
+.box{
+background:#111827;
+padding:30px;
+border-radius:20px;
+width:90%;
+max-width:400px;
+}
+
+input{
+width:100%;
+padding:15px;
+border:none;
+border-radius:10px;
+background:#1e293b;
+color:white;
+margin-top:20px;
+font-size:16px;
+}
+
+button{
+width:100%;
+padding:15px;
+margin-top:20px;
+border:none;
+border-radius:10px;
+background:#22c55e;
+color:white;
+font-size:17px;
+font-weight:bold;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h1>🔐 Área Cliente</h1>
+
+<input
+type="text"
+id="whatsapp"
+placeholder="Seu WhatsApp"
+>
+
+<button id="entrar">
+Entrar
+</button>
+
+</div>
+
+<script>
+
+document
+.getElementById("entrar")
+.addEventListener("click",()=>{
+
+const whatsapp =
+document.getElementById("whatsapp").value;
+
+if(whatsapp === ""){
+
+alert("Digite WhatsApp");
+
+return;
+
+}
+
+localStorage.setItem(
+"cliente_whatsapp",
+whatsapp
+);
+
+window.location.href =
+"index.html";
+
+});
+
+</script>
+
+</body>
+
+</html>
