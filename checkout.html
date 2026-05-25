@@ -122,16 +122,10 @@ margin-top:20px;
 line-height:1.7;
 }
 
-.whatsapp-ajuda{
-display:block;
-background:#22c55e;
-padding:18px;
-border-radius:12px;
-text-align:center;
-text-decoration:none;
+.logout{
+background:#ef4444;
 color:white;
-font-weight:bold;
-margin-top:15px;
+margin-bottom:20px;
 }
 
 @media(max-width:768px){
@@ -153,6 +147,15 @@ padding:20px;
 <body>
 
 <div class="container">
+
+<button
+id="logout"
+class="logout"
+>
+
+🚪 Sair da Conta
+
+</button>
 
 <h1>
 💳 Checkout Premium
@@ -194,6 +197,7 @@ placeholder="Seu nome"
 type="text"
 id="whatsapp"
 placeholder="Seu WhatsApp"
+readonly
 >
 
 <select id="metodo">
@@ -208,30 +212,19 @@ placeholder="Seu WhatsApp"
 
 </select>
 
-<!-- DADOS PAGAMENTO -->
-
 <div id="dadosPagamento"></div>
 
 <h2 style="margin-top:25px;">
 📤 Enviar Comprovativo
 </h2>
 
-<!-- INPUT FILE -->
-
 <input
 type="file"
 id="comprovativo"
-accept="*/*"
-style="
-background:#1e293b;
-padding:20px;
-border-radius:12px;
-color:white;
-cursor:pointer;
-"
+accept="image/*"
 >
 
-<div class="erro">
+<div class="erro" id="erroUpload" style="display:none;">
 
 ⚠️ Se não conseguir selecionar imagem:
 <br><br>
@@ -245,18 +238,6 @@ cursor:pointer;
 • Atualize o navegador
 
 </div>
-
-<!-- AJUDA -->
-
-<a
-href="https://wa.me/244924539161"
-class="whatsapp-ajuda"
->
-
-📲 Não consegue enviar?
-Clique aqui
-
-</a>
 
 <img
 id="preview"
@@ -315,6 +296,36 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
+/* LOGIN CLIENTE */
+
+const whatsappCliente =
+localStorage.getItem("cliente_whatsapp");
+
+if(!whatsappCliente){
+
+window.location.href =
+"login-cliente.html";
+
+}
+
+document.getElementById("whatsapp").value =
+whatsappCliente;
+
+/* LOGOUT */
+
+document
+.getElementById("logout")
+.addEventListener("click",()=>{
+
+localStorage.removeItem(
+"cliente_whatsapp"
+);
+
+window.location.href =
+"login-cliente.html";
+
+});
+
 /* CLOUDINARY */
 
 const CLOUDINARY_URL =
@@ -372,7 +383,7 @@ alert("Erro ao carregar prompt");
 
 }
 
-/* MOSTRAR PAGAMENTO */
+/* PAGAMENTO */
 
 function mostrarPagamento(){
 
@@ -388,15 +399,11 @@ box.innerHTML = `
 
 <div class="info">
 
-<h2 style="
-color:#f0b90b;
-">
+<h2 style="color:#f0b90b;">
 🟡 Binance Pay
 </h2>
 
-<p style="
-margin-top:15px;
-">
+<p style="margin-top:15px;">
 Binance ID:
 </p>
 
@@ -425,7 +432,7 @@ line-height:1.8;
 1. Abra Binance Pay<br>
 2. Envie o valor<br>
 3. Tire screenshot<br>
-4. Envie comprovativo abaixo
+4. Envie comprovativo
 
 </p>
 
@@ -461,15 +468,11 @@ box.innerHTML = `
 
 <div class="info">
 
-<h2 style="
-color:#22c55e;
-">
+<h2 style="color:#22c55e;">
 💚 Multicaixa Express
 </h2>
 
-<p style="
-margin-top:15px;
-">
+<p style="margin-top:15px;">
 Número:
 </p>
 
@@ -481,6 +484,19 @@ font-size:35px;
 924539161
 </h1>
 
+<button
+class="copy-btn"
+id="copiarExpress"
+style="
+background:#22c55e;
+color:white;
+"
+>
+
+📋 Copiar Número
+
+</button>
+
 <p style="
 margin-top:20px;
 line-height:1.8;
@@ -488,13 +504,35 @@ line-height:1.8;
 
 1. Faça transferência<br>
 2. Tire screenshot<br>
-3. Envie comprovativo abaixo
+3. Envie comprovativo
 
 </p>
 
 </div>
 
 `;
+
+setTimeout(()=>{
+
+const copiar =
+document.getElementById("copiarExpress");
+
+if(copiar){
+
+copiar.addEventListener("click",()=>{
+
+navigator.clipboard.writeText(
+"924539161"
+);
+
+copiar.innerText =
+"✅ Copiado";
+
+});
+
+}
+
+},200);
 
 }
 
@@ -508,10 +546,9 @@ document
 
 /* PREVIEW */
 
-const comprovativoInput =
-document.getElementById("comprovativo");
-
-comprovativoInput.addEventListener("change",(e)=>{
+document
+.getElementById("comprovativo")
+.addEventListener("change",(e)=>{
 
 const file = e.target.files[0];
 
@@ -523,39 +560,6 @@ document.getElementById("preview")
 return;
 
 }
-
-/* VALIDAR IMAGEM */
-
-const tiposPermitidos = [
-"image/jpeg",
-"image/png",
-"image/webp",
-"image/jpg"
-];
-
-if(!tiposPermitidos.includes(file.type)){
-
-alert("Selecione uma imagem válida");
-
-comprovativoInput.value = "";
-
-return;
-
-}
-
-/* TAMANHO */
-
-if(file.size > 10 * 1024 * 1024){
-
-alert("Imagem muito pesada. Máximo 10MB");
-
-comprovativoInput.value = "";
-
-return;
-
-}
-
-/* MOSTRAR PREVIEW */
 
 const reader = new FileReader();
 
@@ -594,9 +598,9 @@ document.getElementById("metodo").value;
 const comprovativo =
 document.getElementById("comprovativo").files[0];
 
-if(nome === "" || whatsapp === ""){
+if(nome === ""){
 
-alert("Preencha os dados");
+alert("Digite seu nome");
 
 return;
 
@@ -616,7 +620,7 @@ document.getElementById("comprar")
 .innerText =
 "Enviando...";
 
-/* CLOUDINARY */
+/* UPLOAD */
 
 const formData =
 new FormData();
@@ -660,7 +664,7 @@ valor:promptData.preco || 0,
 metodo,
 status:"pendente",
 comprovativo: comprovativoUrl,
-data:serverTimestamp()
+createdAt: serverTimestamp()
 
 }
 );
@@ -674,17 +678,13 @@ document.getElementById("resultado")
 ✅ Compra Enviada
 </h2>
 
-<p style="
-margin-top:15px;
-">
+<p style="margin-top:15px;">
 
-Seu pagamento foi enviado para análise.
+Seu pagamento foi enviado.
 
 </p>
 
-<p style="
-margin-top:15px;
-">
+<p style="margin-top:15px;">
 
 📦 Prompt:
 <strong>
@@ -693,33 +693,9 @@ ${promptData.titulo}
 
 </p>
 
-<p style="
-margin-top:15px;
-">
+<p style="margin-top:15px;">
 
-💳 Método:
-<strong>
-${metodo}
-</strong>
-
-</p>
-
-<p style="
-margin-top:15px;
-">
-
-⏳ Status:
-<strong>
-PENDENTE
-</strong>
-
-</p>
-
-<p style="
-margin-top:15px;
-">
-
-Você receberá acesso após validação.
+⏳ Aguarde aprovação.
 
 </p>
 
