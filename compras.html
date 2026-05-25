@@ -1,7 +1,3 @@
-<!-- ========================= -->
-<!-- compras.html COMPLETO -->
-<!-- ========================= -->
-
 <!DOCTYPE html>
 <html lang="pt">
 
@@ -14,32 +10,123 @@
 
 <style>
 
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
 body{
 background:#0f172a;
 color:white;
-font-family:Arial;
 padding:20px;
 }
 
-.container{
-max-width:1200px;
-margin:auto;
+h1{
+margin-bottom:25px;
 }
 
-.box{
+.top{
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:25px;
+}
+
+.btn{
+padding:14px 20px;
+border:none;
+border-radius:10px;
+font-weight:bold;
+cursor:pointer;
+text-decoration:none;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+}
+
+.home{
+background:#38bdf8;
+color:black;
+}
+
+.refresh{
+background:#22c55e;
+color:white;
+}
+
+.dashboard{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:20px;
+margin-bottom:30px;
+}
+
+.card{
 background:#111827;
 padding:20px;
 border-radius:15px;
-margin-bottom:20px;
 }
 
-button{
-padding:14px;
-border:none;
-border-radius:10px;
-cursor:pointer;
+.card h3{
+margin-bottom:10px;
+}
+
+.card h1{
+font-size:40px;
+}
+
+.lista{
+display:grid;
+gap:20px;
+}
+
+.compra{
+background:#111827;
+padding:25px;
+border-radius:20px;
+}
+
+.compra img{
+width:100%;
+max-height:350px;
+object-fit:contain;
+background:#0f172a;
+padding:10px;
+border-radius:15px;
+margin-top:20px;
+}
+
+.status{
+padding:8px 15px;
+border-radius:30px;
+display:inline-block;
+font-size:14px;
 font-weight:bold;
-margin-top:10px;
+margin-top:15px;
+}
+
+.pendente{
+background:#f59e0b;
+color:black;
+}
+
+.aprovado{
+background:#22c55e;
+color:white;
+}
+
+.rejeitado{
+background:#ef4444;
+color:white;
+}
+
+.actions{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+gap:15px;
+margin-top:20px;
 }
 
 .aprovar{
@@ -53,30 +140,45 @@ color:white;
 }
 
 .whatsapp{
-background:#38bdf8;
+background:#25d366;
+color:white;
+}
+
+.gumroad{
+background:#ff90e8;
 color:black;
 }
 
-img{
+.search{
 width:100%;
-max-height:400px;
-object-fit:contain;
-background:#0f172a;
-border-radius:10px;
-margin-top:15px;
+padding:15px;
+border:none;
+border-radius:12px;
+background:#111827;
+color:white;
+font-size:16px;
+margin-bottom:25px;
+outline:none;
 }
 
-.status{
-font-weight:bold;
-margin-top:10px;
+select{
+width:100%;
+padding:15px;
+border:none;
+border-radius:12px;
+background:#111827;
+color:white;
+font-size:16px;
+margin-bottom:25px;
+outline:none;
 }
 
-.pendente{
-color:#f59e0b;
-}
-
-.aprovado{
-color:#22c55e;
+.empty{
+background:#111827;
+padding:40px;
+border-radius:20px;
+text-align:center;
+font-size:18px;
 }
 
 </style>
@@ -85,15 +187,78 @@ color:#22c55e;
 
 <body>
 
-<div class="container">
+<h1>💳 Painel de Compras</h1>
 
-<h1>
-💳 Painel de Compras
-</h1>
+<div class="top">
 
-<div id="lista"></div>
+<a href="admin.html" class="btn home">
+🏠 Painel Admin
+</a>
+
+<button class="btn refresh" onclick="carregarCompras()">
+🔄 Atualizar
+</button>
 
 </div>
+
+<!-- DASHBOARD -->
+
+<div class="dashboard">
+
+<div class="card">
+<h3>🛒 Total Compras</h3>
+<h1 id="totalCompras">0</h1>
+</div>
+
+<div class="card">
+<h3>🟡 Pendentes</h3>
+<h1 id="pendentes">0</h1>
+</div>
+
+<div class="card">
+<h3>✅ Aprovadas</h3>
+<h1 id="aprovadas">0</h1>
+</div>
+
+<div class="card">
+<h3>❌ Rejeitadas</h3>
+<h1 id="rejeitadas">0</h1>
+</div>
+
+</div>
+
+<!-- PESQUISA -->
+
+<input
+type="text"
+id="pesquisa"
+class="search"
+placeholder="Pesquisar cliente..."
+>
+
+<select id="filtro">
+
+<option value="todos">
+Todos
+</option>
+
+<option value="pendente">
+Pendentes
+</option>
+
+<option value="aprovado">
+Aprovadas
+</option>
+
+<option value="rejeitado">
+Rejeitadas
+</option>
+
+</select>
+
+<!-- LISTA -->
+
+<div id="lista" class="lista"></div>
 
 <script type="module">
 
@@ -104,83 +269,216 @@ import {
 getFirestore,
 collection,
 getDocs,
-doc,
 updateDoc,
-addDoc
+doc,
+addDoc,
+serverTimestamp
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* FIREBASE */
 
 const firebaseConfig = {
 
 apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+
 authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+
 projectId: "gamboprompts-8ff6d",
+
 storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+
 messagingSenderId: "92750073125",
+
 appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
 
 };
 
-const app =
-initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-const db =
-getFirestore(app);
+const db = getFirestore(app);
+
+let comprasGlobal = [];
+
+/* CARREGAR */
+
+async function carregarCompras(){
 
 const lista =
 document.getElementById("lista");
 
-async function carregarCompras(){
+lista.innerHTML = `
+<div class="empty">
+Carregando compras...
+</div>
+`;
 
-const snapshot =
+const snap =
 await getDocs(collection(db,"compras"));
+
+comprasGlobal = [];
+
+snap.forEach((d)=>{
+
+comprasGlobal.push({
+id:d.id,
+...d.data()
+});
+
+});
+
+comprasGlobal.reverse();
+
+renderizar();
+
+dashboard();
+
+}
+
+/* DASHBOARD */
+
+function dashboard(){
+
+const total =
+comprasGlobal.length;
+
+const pendentes =
+comprasGlobal.filter(x=>x.status==="pendente").length;
+
+const aprovadas =
+comprasGlobal.filter(x=>x.status==="aprovado").length;
+
+const rejeitadas =
+comprasGlobal.filter(x=>x.status==="rejeitado").length;
+
+document.getElementById("totalCompras")
+.innerText = total;
+
+document.getElementById("pendentes")
+.innerText = pendentes;
+
+document.getElementById("aprovadas")
+.innerText = aprovadas;
+
+document.getElementById("rejeitadas")
+.innerText = rejeitadas;
+
+}
+
+/* RENDER */
+
+function renderizar(){
+
+const lista =
+document.getElementById("lista");
+
+const pesquisa =
+document.getElementById("pesquisa")
+.value
+.toLowerCase();
+
+const filtro =
+document.getElementById("filtro")
+.value;
+
+let compras =
+comprasGlobal;
+
+if(filtro !== "todos"){
+
+compras =
+compras.filter(x=>x.status===filtro);
+
+}
+
+if(pesquisa){
+
+compras =
+compras.filter(x=>
+
+(x.nome || "")
+.toLowerCase()
+.includes(pesquisa)
+
+);
+
+}
+
+if(compras.length === 0){
+
+lista.innerHTML = `
+<div class="empty">
+Nenhuma compra encontrada
+</div>
+`;
+
+return;
+
+}
 
 lista.innerHTML = "";
 
-snapshot.forEach((docItem)=>{
-
-const data =
-docItem.data();
+compras.forEach((x)=>{
 
 lista.innerHTML += `
 
-<div class="box">
+<div class="compra">
 
 <h2>
-${data.promptTitulo}
+${x.promptTitulo || "Prompt"}
 </h2>
 
-<p>
-👤 ${data.nome}
+<p style="margin-top:15px;">
+🆔 Pedido:
+<strong>${x.id}</strong>
 </p>
 
-<p>
-📱 ${data.whatsapp}
+<p style="margin-top:10px;">
+👤 Cliente:
+<strong>${x.nome}</strong>
 </p>
 
-<p>
-💳 ${data.metodo}
+<p style="margin-top:10px;">
+📱 WhatsApp:
+<strong>${x.whatsapp}</strong>
 </p>
 
-<p>
-💰 ${data.valor} Kz
+<p style="margin-top:10px;">
+💳 Método:
+<strong>${x.metodo}</strong>
 </p>
 
-<p class="status ${data.status}">
-
-${data.status.toUpperCase()}
-
+<p style="margin-top:10px;">
+💰 Valor:
+<strong>${x.valor || 0} Kz</strong>
 </p>
 
-<img src="${data.comprovativo}">
+<div class="status ${x.status}">
+${x.status.toUpperCase()}
+</div>
+
+${
+x.comprovativo
+
+?
+
+`
+
+<img src="${x.comprovativo}">
+
+`
+
+:
+
+""
+
+}
+
+<div class="actions">
 
 <button
-class="aprovar"
-onclick="aprovarCompra(
-'${docItem.id}',
-'${data.promptId}',
-'${data.whatsapp}'
-)"
+class="btn aprovar"
+onclick="aprovarCompra('${x.id}')"
 >
 
 ✅ Aprovar
@@ -188,8 +486,8 @@ onclick="aprovarCompra(
 </button>
 
 <button
-class="rejeitar"
-onclick="rejeitarCompra('${docItem.id}')"
+class="btn rejeitar"
+onclick="rejeitarCompra('${x.id}')"
 >
 
 ❌ Rejeitar
@@ -197,13 +495,24 @@ onclick="rejeitarCompra('${docItem.id}')"
 </button>
 
 <button
-class="whatsapp"
-onclick="window.open('https://wa.me/244${data.whatsapp}')"
+class="btn whatsapp"
+onclick="abrirWhatsapp('${x.whatsapp}')"
 >
 
 💬 WhatsApp
 
 </button>
+
+<button
+class="btn gumroad"
+onclick="abrirGumroad()"
+>
+
+💳 Gumroad
+
+</button>
+
+</div>
 
 </div>
 
@@ -213,8 +522,22 @@ onclick="window.open('https://wa.me/244${data.whatsapp}')"
 
 }
 
-window.aprovarCompra =
-async function(id,promptId,whatsapp){
+/* APROVAR */
+
+window.aprovarCompra = async function(id){
+
+const compra =
+comprasGlobal.find(x=>x.id===id);
+
+if(!compra){
+
+alert("Compra não encontrada");
+
+return;
+
+}
+
+/* STATUS */
 
 await updateDoc(
 doc(db,"compras",id),
@@ -223,28 +546,30 @@ status:"aprovado"
 }
 );
 
+/* ACESSO PREMIUM */
+
 await addDoc(
 collection(db,"acessos"),
 {
-promptId,
-whatsapp,
-status:"aprovado"
+
+promptId: compra.promptId,
+whatsapp: compra.whatsapp,
+nome: compra.nome,
+origem: compra.metodo,
+createdAt: serverTimestamp()
+
 }
 );
 
-localStorage.setItem(
-"acessoPremium",
-promptId
-);
-
-alert("✅ Compra aprovada");
+alert("✅ Compra aprovada e acesso liberado");
 
 carregarCompras();
 
 }
 
-window.rejeitarCompra =
-async function(id){
+/* REJEITAR */
+
+window.rejeitarCompra = async function(id){
 
 await updateDoc(
 doc(db,"compras",id),
@@ -258,6 +583,46 @@ alert("❌ Compra rejeitada");
 carregarCompras();
 
 }
+
+/* WHATSAPP */
+
+window.abrirWhatsapp = function(numero){
+
+window.open(
+`https://wa.me/244${numero}`
+);
+
+}
+
+/* GUMROAD */
+
+window.abrirGumroad = function(){
+
+window.open(
+"https://gumroad.com"
+);
+
+}
+
+/* EVENTOS */
+
+document
+.getElementById("pesquisa")
+.addEventListener("input",renderizar);
+
+document
+.getElementById("filtro")
+.addEventListener("change",renderizar);
+
+/* AUTO REFRESH */
+
+setInterval(()=>{
+
+carregarCompras();
+
+},15000);
+
+/* START */
 
 carregarCompras();
 
