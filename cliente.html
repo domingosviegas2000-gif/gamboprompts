@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Área do Cliente</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+}
+
+.topo{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
+flex-wrap:wrap;
+gap:15px;
+}
+
+h1{
+font-size:35px;
+}
+
+.logout{
+background:#ef4444;
+color:white;
+border:none;
+padding:14px 20px;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:20px;
+}
+
+.card{
+background:#111827;
+padding:15px;
+border-radius:20px;
+}
+
+.card img{
+width:100%;
+height:220px;
+object-fit:contain;
+background:#1e293b;
+border-radius:15px;
+margin-bottom:15px;
+padding:10px;
+}
+
+.card h2{
+margin-bottom:10px;
+font-size:22px;
+}
+
+.card p{
+color:#cbd5e1;
+line-height:1.6;
+margin-bottom:10px;
+}
+
+.abrir{
+display:block;
+width:100%;
+text-align:center;
+background:#38bdf8;
+color:black;
+padding:15px;
+border-radius:12px;
+text-decoration:none;
+font-weight:bold;
+margin-top:15px;
+}
+
+.vazio{
+background:#111827;
+padding:40px;
+border-radius:20px;
+text-align:center;
+line-height:2;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="topo">
+
+<h1>
+👤 Área do Cliente
+</h1>
+
+<button
+class="logout"
+id="logout"
+>
+🚪 Sair
+</button>
+
+</div>
+
+<div id="lista" class="grid"></div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+getDocs,
+query,
+where,
+doc,
+getDoc
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* FIREBASE */
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+
+authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+
+projectId: "gamboprompts-8ff6d",
+
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+
+messagingSenderId: "92750073125",
+
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+/* CLIENTE */
+
+const whatsapp =
+localStorage.getItem("cliente_whatsapp");
+
+if(!whatsapp){
+
+window.location.href =
+"login-cliente.html";
+
+}
+
+/* LOGOUT */
+
+document
+.getElementById("logout")
+.addEventListener("click",()=>{
+
+localStorage.removeItem(
+"cliente_whatsapp"
+);
+
+window.location.href =
+"login-cliente.html";
+
+});
+
+/* CARREGAR */
+
+async function carregarPrompts(){
+
+const lista =
+document.getElementById("lista");
+
+lista.innerHTML = "";
+
+try{
+
+const q = query(
+collection(db,"acessos"),
+where("whatsapp","==",whatsapp)
+);
+
+const acessos =
+await getDocs(q);
+
+if(acessos.empty){
+
+lista.innerHTML = `
+
+<div class="vazio">
+
+<h2>
+📦 Nenhum Prompt
+</h2>
+
+<p style="margin-top:15px;">
+
+Você ainda não comprou prompts premium.
+
+</p>
+
+</div>
+
+`;
+
+return;
+
+}
+
+for(const item of acessos.docs){
+
+const acesso = item.data();
+
+const ref =
+doc(db,"prompts",acesso.promptId);
+
+const snap =
+await getDoc(ref);
+
+if(snap.exists()){
+
+const data = snap.data();
+
+lista.innerHTML += `
+
+<div class="card">
+
+<img
+src="${data.imagem || 'https://via.placeholder.com/400'}"
+>
+
+<h2>
+${data.titulo || "Sem título"}
+</h2>
+
+<p>
+📂 ${data.categoria || "Sem categoria"}
+</p>
+
+<p>
+💎 ${data.tipo || "Premium"}
+</p>
+
+<a
+href="prompt.html?id=${snap.id}"
+class="abrir"
+>
+
+🚀 Abrir Prompt
+
+</a>
+
+</div>
+
+`;
+
+}
+
+}
+
+}catch(error){
+
+console.log(error);
+
+lista.innerHTML = `
+
+<div class="vazio">
+
+<h2>
+❌ Erro ao carregar
+</h2>
+
+</div>
+
+`;
+
+}
+
+}
+
+carregarPrompts();
+
+</script>
+
+</body>
+
+</html>
