@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Criar Conta</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0f172a;
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+padding:20px;
+color:white;
+}
+
+.box{
+background:#111827;
+padding:35px;
+border-radius:25px;
+width:100%;
+max-width:450px;
+}
+
+h1{
+font-size:32px;
+margin-bottom:10px;
+}
+
+p{
+color:#94a3b8;
+margin-bottom:25px;
+line-height:1.6;
+}
+
+input{
+width:100%;
+padding:15px;
+border:none;
+border-radius:12px;
+background:#1e293b;
+color:white;
+margin-top:15px;
+font-size:16px;
+outline:none;
+}
+
+button{
+width:100%;
+padding:16px;
+margin-top:20px;
+border:none;
+border-radius:12px;
+background:#22c55e;
+color:white;
+font-size:17px;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+opacity:0.9;
+transform:translateY(-2px);
+}
+
+.login{
+display:block;
+text-align:center;
+margin-top:20px;
+color:#38bdf8;
+text-decoration:none;
+font-weight:bold;
+}
+
+.msg{
+padding:14px;
+border-radius:12px;
+margin-top:20px;
+text-align:center;
+display:none;
+}
+
+.erro{
+background:#ef4444;
+}
+
+.sucesso{
+background:#22c55e;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h1>
+📝 Criar Conta
+</h1>
+
+<p>
+
+Crie sua conta e tenha acesso à biblioteca completa de prompts IA.
+
+</p>
+
+<input
+type="text"
+id="nome"
+placeholder="Seu nome"
+>
+
+<input
+type="text"
+id="whatsapp"
+placeholder="Seu WhatsApp"
+>
+
+<input
+type="password"
+id="senha"
+placeholder="Sua senha"
+>
+
+<button id="criar">
+
+🚀 Criar Conta
+
+</button>
+
+<div
+id="erro"
+class="msg erro"
+>
+
+Erro
+
+</div>
+
+<div
+id="sucesso"
+class="msg sucesso"
+>
+
+Conta criada
+
+</div>
+
+<a
+href="login-cliente.html"
+class="login"
+>
+
+🔐 Já tenho conta
+
+</a>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+getDocs,
+query,
+where
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* FIREBASE */
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+
+authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+
+projectId: "gamboprompts-8ff6d",
+
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+
+messagingSenderId: "92750073125",
+
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+/* ELEMENTOS */
+
+const erro =
+document.getElementById("erro");
+
+const sucesso =
+document.getElementById("sucesso");
+
+/* CRIAR */
+
+document
+.getElementById("criar")
+.addEventListener("click", async ()=>{
+
+erro.style.display = "none";
+
+sucesso.style.display = "none";
+
+const nome =
+document.getElementById("nome")
+.value.trim();
+
+const whatsapp =
+document.getElementById("whatsapp")
+.value.trim();
+
+const senha =
+document.getElementById("senha")
+.value.trim();
+
+/* VALIDAÇÃO */
+
+if(
+nome === ""
+||
+whatsapp === ""
+||
+senha === ""
+){
+
+erro.innerText =
+"Preencha todos campos";
+
+erro.style.display = "block";
+
+return;
+
+}
+
+try{
+
+/* VERIFICAR */
+
+const q = query(
+collection(db,"usuarios"),
+where("whatsapp","==",whatsapp)
+);
+
+const existe =
+await getDocs(q);
+
+if(!existe.empty){
+
+erro.innerText =
+"WhatsApp já cadastrado";
+
+erro.style.display = "block";
+
+return;
+
+}
+
+/* SALVAR */
+
+await addDoc(
+collection(db,"usuarios"),
+{
+
+nome,
+whatsapp,
+senha,
+
+data:
+new Date()
+
+}
+);
+
+/* LOGIN AUTOMÁTICO */
+
+localStorage.setItem(
+"cliente_whatsapp",
+whatsapp
+);
+
+sucesso.innerText =
+"Conta criada com sucesso";
+
+sucesso.style.display =
+"block";
+
+/* REDIRECIONAR */
+
+setTimeout(()=>{
+
+window.location.href =
+"cliente.html";
+
+},1500);
+
+}catch(error){
+
+console.log(error);
+
+erro.innerText =
+"Erro ao criar conta";
+
+erro.style.display = "block";
+
+}
+
+});
+
+</script>
+
+</body>
+
+</html>
