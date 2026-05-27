@@ -42,4 +42,507 @@ padding:12px 18px;
 border-radius:12px;
 text-decoration:none;
 font-weight:bold;
-transition:0.
+transition:0.3s;
+}
+
+.menu a:hover{
+background:#38bdf8;
+color:black;
+}
+
+/* HEADER */
+
+.header{
+text-align:center;
+margin-bottom:35px;
+}
+
+.header h1{
+font-size:42px;
+margin-bottom:10px;
+}
+
+.header p{
+color:#94a3b8;
+font-size:18px;
+}
+
+/* TOP BAR */
+
+.top-bar{
+display:flex;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:30px;
+}
+
+.top-bar input,
+.top-bar select{
+flex:1;
+padding:15px;
+border:none;
+border-radius:12px;
+background:#1e293b;
+color:white;
+font-size:16px;
+min-width:180px;
+}
+
+/* GRID */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:25px;
+}
+
+/* CARD */
+
+.card{
+background:#111827;
+padding:18px;
+border-radius:20px;
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.card img{
+width:100%;
+height:240px;
+object-fit:contain;
+background:#0f172a;
+border-radius:15px;
+padding:10px;
+margin-bottom:15px;
+}
+
+.card h2{
+font-size:24px;
+margin-bottom:12px;
+}
+
+.card p{
+color:#cbd5e1;
+line-height:1.6;
+margin-bottom:10px;
+}
+
+/* BADGE */
+
+.badge{
+display:inline-block;
+padding:7px 14px;
+border-radius:30px;
+font-weight:bold;
+margin-bottom:12px;
+}
+
+.premium{
+background:#f59e0b;
+color:black;
+}
+
+.gratis{
+background:#22c55e;
+color:white;
+}
+
+/* FOOTER */
+
+.card-footer{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+margin-top:18px;
+flex-wrap:wrap;
+}
+
+.categoria{
+background:#0f172a;
+padding:8px 12px;
+border-radius:10px;
+font-size:14px;
+}
+
+/* BOTÕES */
+
+.btn{
+display:block;
+width:100%;
+padding:15px;
+text-align:center;
+border-radius:12px;
+text-decoration:none;
+font-weight:bold;
+margin-top:15px;
+}
+
+.abrir{
+background:#38bdf8;
+color:black;
+}
+
+.login{
+background:#ef4444;
+color:white;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:768px){
+
+.header h1{
+font-size:34px;
+}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- MENU -->
+
+<div class="menu">
+
+<a href="index.html">
+🏠 Início
+</a>
+
+<a href="login-cliente.html">
+🔐 Login
+</a>
+
+<a href="cadastro.html">
+📝 Criar Conta
+</a>
+
+<a href="checkout.html">
+💎 Premium
+</a>
+
+</div>
+
+<!-- HEADER -->
+
+<div class="header">
+
+<h1>
+🔥 GamboPrompts
+</h1>
+
+<p>
+Biblioteca Profissional de Prompts IA
+</p>
+
+</div>
+
+<!-- PESQUISA -->
+
+<div class="top-bar">
+
+<input
+type="text"
+id="pesquisa"
+placeholder="Pesquisar prompts..."
+>
+
+<select id="filtro">
+
+<option value="">
+Todas Categorias
+</option>
+
+</select>
+
+</div>
+
+<!-- GRID -->
+
+<div id="prompts" class="grid"></div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+getDocs
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* FIREBASE */
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+
+authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+
+projectId: "gamboprompts-8ff6d",
+
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+
+messagingSenderId: "92750073125",
+
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+/* ELEMENTOS */
+
+const container =
+document.getElementById("prompts");
+
+const pesquisa =
+document.getElementById("pesquisa");
+
+const filtro =
+document.getElementById("filtro");
+
+/* VARIÁVEIS */
+
+let prompts = [];
+
+/* CARREGAR */
+
+async function carregar(){
+
+const snapshot =
+await getDocs(
+collection(db,"prompts")
+);
+
+prompts = [];
+
+/* LIMITAR 20 */
+
+snapshot.forEach((docItem)=>{
+
+if(prompts.length < 20){
+
+prompts.push({
+
+id: docItem.id,
+...docItem.data()
+
+});
+
+}
+
+});
+
+criarCategorias();
+
+mostrar(prompts);
+
+}
+
+/* CATEGORIAS */
+
+function criarCategorias(){
+
+const categorias = [
+
+...new Set(
+prompts.map(p => p.categoria)
+)
+
+];
+
+categorias.forEach((cat)=>{
+
+filtro.innerHTML += `
+
+<option value="${cat}">
+${cat}
+</option>
+
+`;
+
+});
+
+}
+
+/* MOSTRAR */
+
+function mostrar(lista){
+
+container.innerHTML = "";
+
+lista.forEach((data)=>{
+
+container.innerHTML += `
+
+<div class="card">
+
+<img
+src="${data.imagem || 'https://via.placeholder.com/500'}"
+>
+
+<h2>
+${data.titulo || "Sem título"}
+</h2>
+
+<div class="
+badge
+${data.tipo === "Premium"
+? "premium"
+: "gratis"}
+">
+
+${data.tipo === "Premium"
+? "💎 PREMIUM"
+: "🟢 GRÁTIS"}
+
+</div>
+
+<p>
+
+${data.tipo === "Premium"
+
+?
+
+"🔒 Faça login para acessar prompts premium."
+
+:
+
+(data.descricao || "Sem descrição")
+
+}
+
+</p>
+
+<div class="card-footer">
+
+<span class="categoria">
+📂 ${data.categoria || "Sem categoria"}
+</span>
+
+</div>
+
+${
+data.tipo === "Premium"
+
+?
+
+`
+
+<a
+href="login-cliente.html"
+class="btn login"
+>
+
+🔐 Fazer Login
+
+</a>
+
+`
+
+:
+
+`
+
+<a
+href="prompt.html?id=${data.id}"
+class="btn abrir"
+>
+
+🚀 Abrir Prompt
+
+</a>
+
+`
+
+}
+
+</div>
+
+`;
+
+});
+
+}
+
+/* FILTRO */
+
+function filtrar(){
+
+const texto =
+pesquisa.value.toLowerCase();
+
+const categoria =
+filtro.value;
+
+const resultado =
+prompts.filter((item)=>{
+
+const titulo =
+(item.titulo || "")
+.toLowerCase();
+
+const descricao =
+(item.descricao || "")
+.toLowerCase();
+
+const pesquisaOk =
+
+titulo.includes(texto)
+
+||
+
+descricao.includes(texto);
+
+const categoriaOk =
+
+categoria === ""
+
+||
+
+item.categoria === categoria;
+
+return pesquisaOk && categoriaOk;
+
+});
+
+mostrar(resultado);
+
+}
+
+/* EVENTOS */
+
+pesquisa.addEventListener(
+"input",
+filtrar
+);
+
+filtro.addEventListener(
+"change",
+filtrar
+);
+
+/* START */
+
+carregar();
+
+</script>
+
+</body>
+
+</html>
