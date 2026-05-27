@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Biblioteca Premium</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+/* MENU */
+
+.menu{
+display:flex;
+justify-content:center;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:30px;
+}
+
+.menu a{
+background:#1e293b;
+color:white;
+padding:12px 18px;
+border-radius:12px;
+text-decoration:none;
+font-weight:bold;
+transition:0.3s;
+}
+
+.menu a:hover{
+background:#38bdf8;
+color:black;
+}
+
+/* TOPO */
+
+.topo{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+margin-bottom:30px;
+}
+
+.user-box{
+background:#111827;
+padding:25px;
+border-radius:20px;
+flex:1;
+min-width:280px;
+}
+
+.user-box h1{
+font-size:34px;
+margin-bottom:10px;
+}
+
+.user-box p{
+color:#94a3b8;
+font-size:16px;
+}
+
+/* PESQUISA */
+
+.search-box{
+margin-bottom:30px;
+}
+
+.search-box input{
+width:100%;
+padding:16px;
+border:none;
+border-radius:15px;
+background:#111827;
+color:white;
+font-size:16px;
+}
+
+/* STATS */
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+gap:20px;
+margin-bottom:35px;
+}
+
+.stat{
+background:#111827;
+padding:25px;
+border-radius:20px;
+text-align:center;
+}
+
+.stat h2{
+font-size:38px;
+margin-bottom:10px;
+color:#38bdf8;
+}
+
+.stat p{
+color:#94a3b8;
+}
+
+/* CATEGORIAS */
+
+.categorias{
+display:flex;
+gap:12px;
+overflow:auto;
+padding-bottom:10px;
+margin-bottom:30px;
+}
+
+.cat-btn{
+background:#111827;
+border:none;
+color:white;
+padding:12px 18px;
+border-radius:12px;
+cursor:pointer;
+white-space:nowrap;
+font-weight:bold;
+}
+
+.cat-btn.active{
+background:#38bdf8;
+color:black;
+}
+
+/* GRID */
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:25px;
+}
+
+/* CARD */
+
+.card{
+background:#111827;
+padding:18px;
+border-radius:22px;
+transition:0.3s;
+position:relative;
+overflow:hidden;
+}
+
+.card:hover{
+transform:translateY(-5px);
+}
+
+.card img{
+width:100%;
+height:230px;
+object-fit:contain;
+background:#0b1220;
+border-radius:15px;
+padding:10px;
+margin-bottom:15px;
+}
+
+/* BADGES */
+
+.badge{
+display:inline-block;
+padding:7px 14px;
+border-radius:30px;
+font-weight:bold;
+margin-bottom:12px;
+font-size:14px;
+}
+
+.premium{
+background:#f59e0b;
+color:black;
+}
+
+.gratis{
+background:#22c55e;
+color:white;
+}
+
+/* TEXTOS */
+
+.card h2{
+font-size:24px;
+margin-bottom:10px;
+}
+
+.card p{
+color:#cbd5e1;
+line-height:1.6;
+margin-bottom:10px;
+}
+
+/* BOTÕES */
+
+.btn{
+display:block;
+width:100%;
+text-align:center;
+padding:15px;
+border-radius:12px;
+text-decoration:none;
+font-weight:bold;
+margin-top:15px;
+}
+
+.abrir{
+background:#38bdf8;
+color:black;
+}
+
+.lock{
+background:#ef4444;
+color:white;
+}
+
+/* FAVORITO */
+
+.favorito{
+position:absolute;
+top:15px;
+right:15px;
+background:#1e293b;
+border:none;
+width:42px;
+height:42px;
+border-radius:50%;
+cursor:pointer;
+font-size:18px;
+color:white;
+}
+
+/* LOGOUT */
+
+.logout{
+background:#ef4444;
+color:white;
+border:none;
+padding:15px 20px;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+font-size:16px;
+}
+
+/* RESPONSIVO */
+
+@media(max-width:768px){
+
+.topo{
+flex-direction:column;
+align-items:stretch;
+}
+
+.user-box h1{
+font-size:28px;
+}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- MENU -->
+
+<div class="menu">
+
+<a href="index.html">
+🏠 Início
+</a>
+
+<a href="cliente.html">
+📚 Biblioteca
+</a>
+
+<a href="checkout.html">
+💎 Premium
+</a>
+
+</div>
+
+<!-- TOPO -->
+
+<div class="topo">
+
+<div class="user-box">
+
+<h1 id="saudacao">
+🚀 Biblioteca IA
+</h1>
+
+<p id="numeroCliente">
+Carregando...
+</p>
+
+</div>
+
+<button
+class="logout"
+id="logout"
+>
+
+🚪 Sair
+
+</button>
+
+</div>
+
+<!-- PESQUISA -->
+
+<div class="search-box">
+
+<input
+type="text"
+id="pesquisa"
+placeholder="Pesquisar prompts..."
+>
+
+</div>
+
+<!-- STATS -->
+
+<div class="stats">
+
+<div class="stat">
+
+<h2 id="totalPrompts">
+0
+</h2>
+
+<p>
+📦 Total Prompts
+</p>
+
+</div>
+
+<div class="stat">
+
+<h2 id="premiumLiberados">
+0
+</h2>
+
+<p>
+💎 Premium Liberados
+</p>
+
+</div>
+
+<div class="stat">
+
+<h2>
+VIP
+</h2>
+
+<p>
+🚀 Conta Ativa
+</p>
+
+</div>
+
+</div>
+
+<!-- CATEGORIAS -->
+
+<div
+class="categorias"
+id="categorias"
+>
+
+<button
+class="cat-btn active"
+data-cat=""
+>
+
+Todos
+
+</button>
+
+</div>
+
+<!-- GRID -->
+
+<div
+id="lista"
+class="grid"
+>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getFirestore,
+collection,
+getDocs,
+query,
+where
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* FIREBASE */
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+
+authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+
+projectId: "gamboprompts-8ff6d",
+
+storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+
+messagingSenderId: "92750073125",
+
+appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+
+};
+
+const app =
+initializeApp(firebaseConfig);
+
+const db =
+getFirestore(app);
+
+/* CLIENTE */
+
+const whatsapp =
+localStorage.getItem(
+"cliente_whatsapp"
+);
+
+if(!whatsapp){
+
+window.location.href =
+"login-cliente.html";
+
+}
+
+document.getElementById(
+"numeroCliente"
+).innerText =
+"📱 " + whatsapp;
+
+/* LOGOUT */
+
+document
+.getElementById("logout")
+.addEventListener("click",()=>{
+
+localStorage.removeItem(
+"cliente_whatsapp"
+);
+
+window.location.href =
+"login-cliente.html";
+
+});
+
+/* VARIÁVEIS */
+
+let prompts = [];
+
+let acessos = [];
+
+let categoriaAtual = "";
+
+/* CARREGAR */
+
+async function carregar(){
+
+const promptsSnap =
+await getDocs(
+collection(db,"prompts")
+);
+
+const acessoQuery = query(
+collection(db,"acessos"),
+where("whatsapp","==",whatsapp)
+);
+
+const acessosSnap =
+await getDocs(acessoQuery);
+
+/* ACESSOS */
+
+acessos = [];
+
+acessosSnap.forEach((doc)=>{
+
+acessos.push(
+doc.data().promptId
+);
+
+});
+
+/* PROMPTS */
+
+prompts = [];
+
+promptsSnap.forEach((docItem)=>{
+
+prompts.push({
+
+id: docItem.id,
+...docItem.data()
+
+});
+
+});
+
+/* STATS */
+
+document.getElementById(
+"totalPrompts"
+).innerText =
+prompts.length;
+
+document.getElementById(
+"premiumLiberados"
+).innerText =
+acessos.length;
+
+/* CATEGORIAS */
+
+criarCategorias();
+
+/* MOSTRAR */
+
+mostrar(prompts);
+
+}
+
+/* CATEGORIAS */
+
+function criarCategorias(){
+
+const categorias =
+[
+...new Set(
+prompts.map(
+p => p.categoria
+)
+)
+];
+
+const box =
+document.getElementById(
+"categorias"
+);
+
+categorias.forEach((cat)=>{
+
+box.innerHTML += `
+
+<button
+class="cat-btn"
+data-cat="${cat}"
+>
+
+${cat}
+
+</button>
+
+`;
+
+});
+
+/* EVENTO */
+
+document
+.querySelectorAll(".cat-btn")
+.forEach((btn)=>{
+
+btn.addEventListener(
+"click",
+()=>{
+
+document
+.querySelectorAll(".cat-btn")
+.forEach((b)=>{
+
+b.classList.remove(
+"active"
+);
+
+});
+
+btn.classList.add(
+"active"
+);
+
+categoriaAtual =
+btn.dataset.cat;
+
+filtrar();
+
+});
+
+});
+
+}
+
+/* MOSTRAR */
+
+function mostrar(lista){
+
+const listaBox =
+document.getElementById(
+"lista"
+);
+
+listaBox.innerHTML = "";
+
+lista.forEach((data)=>{
+
+const premium =
+data.tipo === "Premium";
+
+const liberado =
+acessos.includes(data.id);
+
+listaBox.innerHTML += `
+
+<div class="card">
+
+<button class="favorito">
+❤️
+</button>
+
+<img
+src="${data.imagem || 'https://via.placeholder.com/500'}"
+>
+
+<div class="
+badge
+${premium ? 'premium' : 'gratis'}
+">
+
+${premium
+? '💎 PREMIUM'
+: '🟢 GRÁTIS'}
+
+</div>
+
+<h2>
+
+${data.titulo}
+
+</h2>
+
+<p>
+
+${premium && !liberado
+
+?
+
+'🔒 Prompt premium bloqueado.'
+
+:
+
+(data.descricao || 'Sem descrição')
+
+}
+
+</p>
+
+${
+premium
+
+?
+
+(
+
+liberado
+
+?
+
+`
+
+<a
+href="prompt.html?id=${data.id}"
+class="btn abrir"
+>
+
+🚀 Abrir Prompt
+
+</a>
+
+`
+
+:
+
+`
+
+<a
+href="checkout.html?id=${data.id}"
+class="btn lock"
+>
+
+🔓 Desbloquear
+
+</a>
+
+`
+
+)
+
+:
+
+`
+
+<a
+href="prompt.html?id=${data.id}"
+class="btn abrir"
+>
+
+📂 Abrir Prompt
+
+</a>
+
+`
+
+}
+
+</div>
+
+`;
+
+});
+
+}
+
+/* FILTRO */
+
+function filtrar(){
+
+const texto =
+document
+.getElementById("pesquisa")
+.value
+.toLowerCase();
+
+let filtrados =
+prompts.filter((item)=>{
+
+const titulo =
+(item.titulo || "")
+.toLowerCase();
+
+const descricao =
+(item.descricao || "")
+.toLowerCase();
+
+const pesquisaOk =
+
+titulo.includes(texto)
+
+||
+
+descricao.includes(texto);
+
+const categoriaOk =
+
+categoriaAtual === ""
+
+||
+
+item.categoria === categoriaAtual;
+
+return pesquisaOk && categoriaOk;
+
+});
+
+mostrar(filtrados);
+
+}
+
+/* PESQUISA */
+
+document
+.getElementById("pesquisa")
+.addEventListener(
+"input",
+filtrar
+);
+
+/* START */
+
+carregar();
+
+</script>
+
+</body>
+
+</html>
