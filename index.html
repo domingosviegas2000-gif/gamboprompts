@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt">
-
 <head>
 
 <meta charset="UTF-8">
@@ -8,201 +7,154 @@
 
 <title>GamboPrompts</title>
 
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
 
-/* RESET */
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
 body{
-background:#0f172a;
+font-family:'Space Grotesk',sans-serif;
+background:#07070C;
 color:white;
-padding:20px;
+overflow-x:hidden;
 }
 
-/* MENU */
+/* FUNDO */
 
-.menu{
-display:flex;
-justify-content:center;
-gap:15px;
-flex-wrap:wrap;
-margin-bottom:30px;
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:
+radial-gradient(
+ellipse at top,
+rgba(168,85,247,0.15) 0%,
+transparent 50%
+),
+
+radial-gradient(
+ellipse at bottom,
+rgba(59,130,246,0.12) 0%,
+transparent 50%
+),
+
+#07070C;
+
+z-index:-2;
 }
 
-.menu a{
-background:#1e293b;
-color:white;
-padding:12px 18px;
-border-radius:12px;
-text-decoration:none;
-font-weight:bold;
+/* GRAIN */
+
+body::after{
+content:"";
+position:fixed;
+inset:0;
+
+background-image:url(
+"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E"
+);
+
+pointer-events:none;
+z-index:-1;
+}
+
+/* GLASS */
+
+.glass{
+background:rgba(28,28,36,0.6);
+backdrop-filter:blur(12px);
+border:1px solid rgba(45,45,58,0.8);
+}
+
+/* BOTÃO */
+
+.gradient-btn{
+background:
+linear-gradient(
+90deg,
+#A855F7 0%,
+#60A5FA 100%
+);
+
 transition:0.3s;
+
+box-shadow:
+0 0 20px rgba(168,85,247,0.4);
 }
 
-.menu a:hover{
-background:#38bdf8;
-color:black;
+.gradient-btn:hover{
+transform:translateY(-2px);
+
+box-shadow:
+0 0 30px rgba(168,85,247,0.6);
 }
 
-/* HEADER */
+/* TEXTO */
 
-.header{
-text-align:center;
-margin-bottom:35px;
-}
+.gradient-text{
+background:
+linear-gradient(
+90deg,
+#A855F7 0%,
+#60A5FA 100%
+);
 
-.header h1{
-font-size:42px;
-margin-bottom:10px;
-}
-
-.header p{
-color:#94a3b8;
-font-size:18px;
-}
-
-/* TOP BAR */
-
-.top-bar{
-display:flex;
-gap:15px;
-flex-wrap:wrap;
-margin-bottom:30px;
-}
-
-.top-bar input,
-.top-bar select{
-flex:1;
-padding:15px;
-border:none;
-border-radius:12px;
-background:#1e293b;
-color:white;
-font-size:16px;
-min-width:180px;
-}
-
-/* GRID */
-
-.grid{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-gap:25px;
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
 }
 
 /* CARD */
 
 .card{
-background:#111827;
-padding:18px;
-border-radius:20px;
+background:rgba(20,20,30,0.7);
+backdrop-filter:blur(12px);
+
+border:1px solid rgba(45,45,58,0.8);
+
 transition:0.3s;
 }
 
 .card:hover{
 transform:translateY(-5px);
+
+border-color:
+rgba(168,85,247,0.5);
 }
+
+/* TAG */
+
+.tag{
+background:rgba(28,28,36,0.8);
+border:1px solid rgba(45,45,58,1);
+transition:0.2s;
+}
+
+.tag:hover{
+border-color:#A855F7;
+background:rgba(168,85,247,0.1);
+}
+
+/* IMG */
 
 .card img{
-width:100%;
-height:240px;
-object-fit:contain;
-background:#0f172a;
-border-radius:15px;
-padding:10px;
-margin-bottom:15px;
+background:#0b1220;
 }
 
-.card h2{
-font-size:24px;
-margin-bottom:12px;
+/* SCROLL */
+
+::-webkit-scrollbar{
+width:8px;
+height:8px;
 }
 
-.card p{
-color:#cbd5e1;
-line-height:1.6;
-margin-bottom:10px;
-}
-
-/* BADGE */
-
-.badge{
-display:inline-block;
-padding:7px 14px;
-border-radius:30px;
-font-weight:bold;
-margin-bottom:12px;
-}
-
-.premium{
-background:#f59e0b;
-color:black;
-}
-
-.gratis{
-background:#22c55e;
-color:white;
-}
-
-/* FOOTER */
-
-.card-footer{
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-margin-top:18px;
-flex-wrap:wrap;
-}
-
-.categoria{
-background:#0f172a;
-padding:8px 12px;
-border-radius:10px;
-font-size:14px;
-}
-
-/* BOTÕES */
-
-.btn{
-display:block;
-width:100%;
-padding:15px;
-text-align:center;
-border-radius:12px;
-text-decoration:none;
-font-weight:bold;
-margin-top:15px;
-}
-
-.abrir{
-background:#38bdf8;
-color:black;
-}
-
-.login{
-background:#ef4444;
-color:white;
-}
-
-/* RESPONSIVO */
-
-@media(max-width:768px){
-
-.header h1{
-font-size:34px;
-}
-
-.grid{
-grid-template-columns:1fr;
-}
-
+::-webkit-scrollbar-thumb{
+background:#A855F7;
+border-radius:20px;
 }
 
 </style>
@@ -211,65 +163,155 @@ grid-template-columns:1fr;
 
 <body>
 
-<!-- MENU -->
-
-<div class="menu">
-
-<a href="index.html">
-🏠 Início
-</a>
-
-<a href="login-cliente.html">
-🔐 Login
-</a>
-
-<a href="cadastro.html">
-📝 Criar Conta
-</a>
-
-<a href="checkout.html">
-💎 Premium
-</a>
-
-</div>
-
 <!-- HEADER -->
 
-<div class="header">
+<header class="sticky top-0 z-50 glass border-b border-[#2D2D3A]">
 
-<h1>
-🔥 GamboPrompts
-</h1>
+<div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between">
 
-<p>
-Biblioteca Profissional de Prompts IA
-</p>
+<div class="flex items-center gap-3">
+
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+
+✨
 
 </div>
+
+<h1 class="text-xl font-bold">
+
+GamboPrompts
+
+</h1>
+
+</div>
+
+<div class="flex items-center gap-3">
+
+<a
+href="login-cliente.html"
+class="gradient-btn px-5 py-2 rounded-full text-black font-semibold text-sm"
+>
+
+Entrar
+
+</a>
+
+</div>
+
+</div>
+
+</header>
+
+<!-- MAIN -->
+
+<main class="max-w-7xl mx-auto px-5 py-12">
+
+<!-- HERO -->
+
+<section class="text-center mb-14">
+
+<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-gray-300 mb-6">
+
+🚀 Biblioteca IA Cinematográfica
+
+</div>
+
+<h2 class="text-5xl font-bold leading-tight mb-5">
+
+Prompts IA para gerar<br>
+
+<span class="gradient-text">
+
+cenas cinematográficas
+
+</span>
+
+</h2>
+
+<p class="text-gray-400 text-lg max-w-2xl mx-auto">
+
+Prompts profissionais para Midjourney, SORA, Runway, Kling, Pika Labs e geradores IA.
+
+</p>
+
+</section>
 
 <!-- PESQUISA -->
 
-<div class="top-bar">
+<section class="mb-10">
+
+<div class="relative max-w-3xl mx-auto">
 
 <input
 type="text"
 id="pesquisa"
 placeholder="Pesquisar prompts..."
+class="w-full pl-6 pr-6 py-5 rounded-2xl glass text-white placeholder-gray-500 focus:outline-none"
 >
-
-<select id="filtro">
-
-<option value="">
-Todas Categorias
-</option>
-
-</select>
 
 </div>
 
+</section>
+
+<!-- CATEGORIAS -->
+
+<section class="flex gap-3 overflow-auto pb-3 mb-12" id="categorias">
+
+<button
+class="gradient-btn px-5 py-2 rounded-full text-black font-semibold text-sm categoria-btn"
+data-cat=""
+>
+
+Todos
+
+</button>
+
+</section>
+
 <!-- GRID -->
 
-<div id="prompts" class="grid"></div>
+<section
+id="prompts"
+class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+>
+
+</section>
+
+</main>
+
+<!-- FOOTER -->
+
+<footer class="border-t border-[#2D2D3A] py-10 mt-16">
+
+<div class="max-w-6xl mx-auto px-5 text-center">
+
+<p class="text-gray-600 text-sm mb-4">
+
+© 2026 GamboPrompts
+
+</p>
+
+<div class="flex justify-center gap-6 text-sm">
+
+<a href="#" class="text-gray-400 hover:text-white">
+Packs
+</a>
+
+<a href="#" class="text-gray-400 hover:text-white">
+Afiliados
+</a>
+
+<a href="#" class="text-gray-400 hover:text-white">
+Premium
+</a>
+
+</div>
+
+</div>
+
+</footer>
+
+<!-- FIREBASE -->
 
 <script type="module">
 
@@ -287,68 +329,70 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+apiKey:"AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
 
-authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+authDomain:"gamboprompts-8ff6d.firebaseapp.com",
 
-projectId: "gamboprompts-8ff6d",
+projectId:"gamboprompts-8ff6d",
 
-storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+storageBucket:"gamboprompts-8ff6d.firebasestorage.app",
 
-messagingSenderId: "92750073125",
+messagingSenderId:"92750073125",
 
-appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+appId:"1:92750073125:web:d29723c203a0468ecf1ecc"
 
 };
 
-const app = initializeApp(firebaseConfig);
+const app =
+initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+const db =
+getFirestore(app);
 
 /* ELEMENTOS */
 
-const container =
+const promptsBox =
 document.getElementById("prompts");
 
 const pesquisa =
 document.getElementById("pesquisa");
 
-const filtro =
-document.getElementById("filtro");
+const categoriasBox =
+document.getElementById("categorias");
 
 /* VARIÁVEIS */
 
 let prompts = [];
 
+let categoriaAtual = "";
+
 /* CARREGAR */
 
 async function carregar(){
 
-const snapshot =
+const snap =
 await getDocs(
 collection(db,"prompts")
 );
 
 prompts = [];
 
-/* LIMITAR 20 */
-
-snapshot.forEach((docItem)=>{
-
-if(prompts.length < 20){
+snap.forEach((doc)=>{
 
 prompts.push({
 
-id: docItem.id,
-...docItem.data()
+id:doc.id,
+...doc.data()
 
 });
 
-}
-
 });
+
+/* CATEGORIAS */
 
 criarCategorias();
+
+/* MOSTRAR */
 
 mostrar(prompts);
 
@@ -358,23 +402,49 @@ mostrar(prompts);
 
 function criarCategorias(){
 
-const categorias = [
+const cats = [
 
 ...new Set(
-prompts.map(p => p.categoria)
+prompts.map(
+p => p.categoria
+)
 )
 
 ];
 
-categorias.forEach((cat)=>{
+cats.forEach((cat)=>{
 
-filtro.innerHTML += `
+categoriasBox.innerHTML += `
 
-<option value="${cat}">
+<button
+class="tag px-5 py-2 rounded-full text-white text-sm categoria-btn"
+data-cat="${cat}"
+>
+
 ${cat}
-</option>
+
+</button>
 
 `;
+
+});
+
+/* EVENTO */
+
+document
+.querySelectorAll(".categoria-btn")
+.forEach((btn)=>{
+
+btn.addEventListener(
+"click",
+()=>{
+
+categoriaAtual =
+btn.dataset.cat;
+
+filtrar();
+
+});
 
 });
 
@@ -384,74 +454,59 @@ ${cat}
 
 function mostrar(lista){
 
-container.innerHTML = "";
+promptsBox.innerHTML = "";
 
-lista.forEach((data)=>{
+if(lista.length === 0){
 
-container.innerHTML += `
+promptsBox.innerHTML = `
 
-<div class="card">
+<div class="col-span-full text-center py-20">
 
-<img
-src="${data.imagem || 'https://via.placeholder.com/500'}"
->
+<p class="text-gray-400 text-xl">
 
-<h2>
-${data.titulo || "Sem título"}
-</h2>
-
-<div class="
-badge
-${data.tipo === "Premium"
-? "premium"
-: "gratis"}
-">
-
-${data.tipo === "Premium"
-? "💎 PREMIUM"
-: "🟢 GRÁTIS"}
-
-</div>
-
-<p>
-
-${data.tipo === "Premium"
-
-?
-
-"🔒 Faça login para acessar prompts premium."
-
-:
-
-(data.descricao || "Sem descrição")
-
-}
+Nenhum prompt encontrado
 
 </p>
 
-<div class="card-footer">
+</div>
 
-<span class="categoria">
-📂 ${data.categoria || "Sem categoria"}
-</span>
+`;
+
+return;
+
+}
+
+lista.forEach((item)=>{
+
+promptsBox.innerHTML += `
+
+<div class="card rounded-3xl overflow-hidden p-5">
+
+<img
+src="${item.imagem}"
+class="w-full h-64 object-contain rounded-2xl mb-5"
+>
+
+<div class="flex items-center justify-between mb-4">
+
+<div class="text-xs px-3 py-1 rounded-full bg-purple-500/20 text-purple-300">
+
+${item.categoria || 'Prompt'}
 
 </div>
 
 ${
-data.tipo === "Premium"
+item.tipo === "Premium"
 
 ?
 
 `
 
-<a
-href="login-cliente.html"
-class="btn login"
->
+<div class="text-xs px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300">
 
-🔐 Fazer Login
+PREMIUM
 
-</a>
+</div>
 
 `
 
@@ -459,18 +514,39 @@ class="btn login"
 
 `
 
-<a
-href="prompt.html?id=${data.id}"
-class="btn abrir"
->
+<div class="text-xs px-3 py-1 rounded-full bg-green-500/20 text-green-300">
 
-🚀 Abrir Prompt
+GRÁTIS
 
-</a>
+</div>
 
 `
 
 }
+
+</div>
+
+<h2 class="text-2xl font-bold mb-3">
+
+${item.titulo}
+
+</h2>
+
+<p class="text-gray-400 leading-7 mb-5">
+
+${(item.descricao || '')
+.substring(0,120)}...
+
+</p>
+
+<a
+href="prompt.html?id=${item.id}"
+class="gradient-btn w-full py-3 rounded-2xl text-black font-bold text-center block"
+>
+
+Abrir Prompt
+
+</a>
 
 </div>
 
@@ -487,10 +563,7 @@ function filtrar(){
 const texto =
 pesquisa.value.toLowerCase();
 
-const categoria =
-filtro.value;
-
-const resultado =
+const filtrados =
 prompts.filter((item)=>{
 
 const titulo =
@@ -511,29 +584,24 @@ descricao.includes(texto);
 
 const categoriaOk =
 
-categoria === ""
+categoriaAtual === ""
 
 ||
 
-item.categoria === categoria;
+item.categoria === categoriaAtual;
 
 return pesquisaOk && categoriaOk;
 
 });
 
-mostrar(resultado);
+mostrar(filtrados);
 
 }
 
-/* EVENTOS */
+/* PESQUISA */
 
 pesquisa.addEventListener(
 "input",
-filtrar
-);
-
-filtro.addEventListener(
-"change",
 filtrar
 );
 
@@ -544,5 +612,4 @@ carregar();
 </script>
 
 </body>
-
 </html>
