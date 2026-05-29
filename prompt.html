@@ -6,169 +6,134 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Prompt</title>
+<title>Prompt Premium</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
 body{
-background:#0f172a;
+font-family:'Space Grotesk',sans-serif;
+background:#07070C;
 color:white;
-padding:20px;
+overflow-x:hidden;
 }
 
-.container{
-max-width:1100px;
-margin:auto;
+/* FUNDO */
+
+body::before{
+content:"";
+position:fixed;
+inset:0;
+
+background:
+
+radial-gradient(
+ellipse at top,
+rgba(168,85,247,0.15) 0%,
+transparent 50%
+),
+
+radial-gradient(
+ellipse at bottom,
+rgba(59,130,246,0.12) 0%,
+transparent 50%
+),
+
+#07070C;
+
+z-index:-2;
 }
 
-.banner{
-width:100%;
-max-height:650px;
-object-fit:contain;
-border-radius:20px;
-margin-bottom:25px;
-background:#111827;
-padding:10px;
+/* GRAIN */
+
+body::after{
+content:"";
+position:fixed;
+inset:0;
+
+background-image:url(
+"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E"
+);
+
+pointer-events:none;
+z-index:-1;
 }
 
-h1{
-font-size:35px;
-margin-bottom:20px;
-line-height:1.3;
+/* GLASS */
+
+.glass{
+background:rgba(28,28,36,0.6);
+backdrop-filter:blur(12px);
+border:1px solid rgba(45,45,58,0.8);
 }
 
-.badge{
-display:inline-block;
-padding:8px 15px;
-border-radius:30px;
-font-size:14px;
-font-weight:bold;
-margin-bottom:20px;
-}
+/* BOTÃO */
 
-.premium{
-background:#f59e0b;
-color:black;
-}
+.gradient-btn{
+background:
+linear-gradient(
+90deg,
+#A855F7 0%,
+#60A5FA 100%
+);
 
-.gratis{
-background:#22c55e;
-color:white;
-}
-
-.box{
-background:#111827;
-padding:25px;
-border-radius:20px;
-margin-bottom:25px;
-}
-
-.box h2{
-margin-bottom:20px;
-}
-
-.prompt-text{
-white-space:pre-wrap;
-line-height:1.8;
-font-size:16px;
-color:#e2e8f0;
-}
-
-button{
-padding:15px 20px;
-border:none;
-border-radius:12px;
-cursor:pointer;
-font-size:16px;
-font-weight:bold;
-margin-top:15px;
 transition:0.3s;
+
+box-shadow:
+0 0 20px rgba(168,85,247,0.4);
 }
 
-button:hover{
-opacity:0.9;
+.gradient-btn:hover{
 transform:translateY(-2px);
+
+box-shadow:
+0 0 30px rgba(168,85,247,0.6);
 }
 
-.copy-btn{
-background:#38bdf8;
-color:black;
-width:100%;
+/* TEXTO */
+
+.gradient-text{
+background:
+linear-gradient(
+90deg,
+#A855F7 0%,
+#60A5FA 100%
+);
+
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
 }
 
-.afiliado-btn{
-background:#8b5cf6;
-color:white;
-width:100%;
+/* LOCK */
+
+.lock-box{
+background:
+linear-gradient(
+180deg,
+rgba(255,255,255,0.04),
+rgba(255,255,255,0.02)
+);
+
+border:
+1px solid rgba(255,255,255,0.08);
 }
 
-.doacao-btn{
-background:#ef4444;
-color:white;
-width:100%;
+/* SCROLL */
+
+::-webkit-scrollbar{
+width:8px;
 }
 
-.relacionados{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-gap:20px;
-}
-
-.card{
-background:#1e293b;
-padding:15px;
-border-radius:15px;
-text-decoration:none;
-color:white;
-transition:0.3s;
-}
-
-.card:hover{
-transform:translateY(-5px);
-}
-
-.card img{
-width:100%;
-height:220px;
-object-fit:contain;
-background:#0f172a;
-border-radius:10px;
-margin-bottom:10px;
-padding:5px;
-}
-
-.lock{
-background:#ef4444;
-padding:25px;
-border-radius:15px;
-text-align:center;
-margin-top:20px;
-}
-
-.login-box{
-background:#1e293b;
-padding:20px;
-border-radius:15px;
-margin-top:20px;
-}
-
-@media(max-width:768px){
-
-.banner{
-max-height:450px;
-}
-
-h1{
-font-size:28px;
-}
-
+::-webkit-scrollbar-thumb{
+background:#A855F7;
+border-radius:20px;
 }
 
 </style>
@@ -177,19 +142,78 @@ font-size:28px;
 
 <body>
 
-<div class="container">
+<!-- HEADER -->
+
+<header class="sticky top-0 z-50 glass border-b border-[#2D2D3A]">
+
+<div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between">
+
+<a
+href="index.html"
+class="flex items-center gap-3"
+>
+
+<div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+
+✨
+
+</div>
+
+<h1 class="text-xl font-bold">
+
+GamboPrompts
+
+</h1>
+
+</a>
+
+<a
+href="cliente.html"
+class="gradient-btn px-5 py-2 rounded-full text-black font-semibold text-sm"
+>
+
+Minha Conta
+
+</a>
+
+</div>
+
+</header>
+
+<!-- MAIN -->
+
+<main
+class="max-w-7xl mx-auto px-5 py-12"
+>
 
 <div id="conteudo"></div>
 
-<div class="box">
+<!-- RELACIONADOS -->
 
-<h2>🔥 Prompts Relacionados</h2>
+<section class="mt-20">
 
-<div id="relacionados" class="relacionados"></div>
+<div class="flex items-center justify-between mb-8">
+
+<h2 class="text-3xl font-bold">
+
+🔥 Prompts Relacionados
+
+</h2>
 
 </div>
 
+<div
+id="relacionados"
+class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+>
+
 </div>
+
+</section>
+
+</main>
+
+<!-- FIREBASE -->
 
 <script type="module">
 
@@ -211,40 +235,49 @@ from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
 
-apiKey: "AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
+apiKey:"AIzaSyDtej7UQeiU-c9if4EKQH62j-PlS1gHTxA",
 
-authDomain: "gamboprompts-8ff6d.firebaseapp.com",
+authDomain:"gamboprompts-8ff6d.firebaseapp.com",
 
-projectId: "gamboprompts-8ff6d",
+projectId:"gamboprompts-8ff6d",
 
-storageBucket: "gamboprompts-8ff6d.firebasestorage.app",
+storageBucket:"gamboprompts-8ff6d.firebasestorage.app",
 
-messagingSenderId: "92750073125",
+messagingSenderId:"92750073125",
 
-appId: "1:92750073125:web:d29723c203a0468ecf1ecc"
+appId:"1:92750073125:web:d29723c203a0468ecf1ecc"
 
 };
 
-const app = initializeApp(firebaseConfig);
+const app =
+initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+const db =
+getFirestore(app);
 
-/* PEGAR ID */
-
-const params =
-new URLSearchParams(window.location.search);
-
-const id = params.get("id");
+/* ELEMENTOS */
 
 const conteudo =
 document.getElementById("conteudo");
 
+/* ID */
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const id =
+params.get("id");
+
 /* CLIENTE */
 
 const whatsappCliente =
-localStorage.getItem("cliente_whatsapp");
+localStorage.getItem(
+"cliente_whatsapp"
+);
 
-/* VERIFICAR ACESSO */
+/* VERIFICAR */
 
 async function verificarAcesso(){
 
@@ -257,9 +290,13 @@ return false;
 }
 
 const q = query(
+
 collection(db,"acessos"),
+
 where("promptId","==",id),
+
 where("whatsapp","==",whatsappCliente)
+
 );
 
 const snapshot =
@@ -277,24 +314,7 @@ return false;
 
 }
 
-/* GUMROAD */
-
-function comprarGumroad(id){
-
-const gumroadBase =
-"https://gumroad.com/l/TEU_LINK";
-
-const url =
-gumroadBase + "?promptId=" + id;
-
-window.location.href = url;
-
-}
-
-window.comprarGumroad =
-comprarGumroad;
-
-/* CARREGAR PROMPT */
+/* PROMPT */
 
 async function carregarPrompt(){
 
@@ -309,51 +329,120 @@ await getDoc(ref);
 if(!snap.exists()){
 
 conteudo.innerHTML = `
-<h1>Prompt não encontrado</h1>
+
+<div class="text-center py-32">
+
+<h1 class="text-4xl font-bold">
+
+Prompt não encontrado
+
+</h1>
+
+</div>
+
 `;
 
 return;
 
 }
 
-const data = snap.data();
+const data =
+snap.data();
 
-document.title = data.titulo || "Prompt";
-
-const temAcesso =
-await verificarAcesso();
+document.title =
+data.titulo || "Prompt";
 
 const premium =
 data.tipo === "Premium";
 
+const temAcesso =
+await verificarAcesso();
+
 conteudo.innerHTML = `
 
+<!-- HERO -->
+
+<section class="grid lg:grid-cols-2 gap-10 items-center mb-16">
+
+<div class="relative">
+
+<div class="absolute inset-0 blur-[120px] bg-orange-500/20 rounded-full"></div>
+
 <img
-src="${data.imagem || 'https://via.placeholder.com/800'}"
-class="banner"
+src="${data.imagem}"
+class="relative z-10 w-full rounded-[30px] glass p-3 object-contain max-h-[650px]"
 >
 
-<h1>${data.titulo || "Sem título"}</h1>
+</div>
 
-<div class="badge ${premium ? "premium" : "gratis"}">
+<div>
 
-${data.tipo || "Grátis"}
+<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm text-gray-300 mb-5">
+
+✨ Prompt Premium IA
 
 </div>
 
-<div class="box">
+<h1 class="text-5xl font-bold leading-tight mb-6">
 
-<h2>📂 Categoria</h2>
+${data.titulo}
 
-<p>${data.categoria || "Sem categoria"}</p>
+</h1>
+
+<div class="flex flex-wrap gap-3 mb-8">
+
+<div class="px-4 py-2 rounded-full bg-purple-500/20 text-purple-300 text-sm">
+
+📂 ${data.categoria || "Prompt"}
 
 </div>
 
-<div class="box">
+${
+premium
 
-<h2>📖 Instruções</h2>
+?
 
-<p class="prompt-text">
+`
+
+<div class="px-4 py-2 rounded-full bg-yellow-500/20 text-yellow-300 text-sm">
+
+💎 PREMIUM
+
+</div>
+
+`
+
+:
+
+`
+
+<div class="px-4 py-2 rounded-full bg-green-500/20 text-green-300 text-sm">
+
+🟢 GRÁTIS
+
+</div>
+
+`
+
+}
+
+</div>
+
+<p class="text-gray-400 text-lg leading-8 mb-10">
+
+${data.descricao || "Prompt profissional IA"}
+
+</p>
+
+<div class="glass rounded-3xl p-6">
+
+<h2 class="text-2xl font-bold mb-5">
+
+📖 Instruções
+
+</h2>
+
+<p class="text-gray-300 leading-8 whitespace-pre-wrap">
 
 ${data.instrucoes || "Sem instruções"}
 
@@ -361,9 +450,23 @@ ${data.instrucoes || "Sem instruções"}
 
 </div>
 
-<div class="box">
+</div>
 
-<h2>🧠 Prompt</h2>
+</section>
+
+<!-- PROMPT -->
+
+<section class="glass rounded-[35px] p-8">
+
+<div class="flex items-center justify-between mb-8">
+
+<h2 class="text-3xl font-bold">
+
+🧠 Prompt
+
+</h2>
+
+</div>
 
 ${
 premium && !temAcesso
@@ -372,57 +475,48 @@ premium && !temAcesso
 
 `
 
-<div class="lock">
+<div class="lock-box rounded-[30px] p-8 text-center">
 
-<h2 style="
-margin-bottom:15px;
-font-size:28px;
-">
-🔒 Prompt Premium
+<div class="text-7xl mb-6">
+
+🔒
+
+</div>
+
+<h2 class="text-4xl font-bold mb-5">
+
+Prompt Premium
+
 </h2>
 
-<p style="
-font-size:17px;
-line-height:1.7;
-margin-bottom:20px;
-color:#e2e8f0;
-">
+<p class="text-gray-400 text-lg leading-8 max-w-2xl mx-auto mb-8">
 
-${(data.prompt || "").substring(0,250)}...
+${(data.prompt || '')
+.substring(0,250)}...
 
 </p>
 
-<div style="
-background:#0f172a;
-padding:20px;
-border-radius:15px;
-margin-top:20px;
-">
+<div class="glass rounded-3xl p-6 mb-8 text-left max-w-2xl mx-auto">
 
-<h3 style="
-margin-bottom:15px;
-color:#f59e0b;
-">
-✨ O que você desbloqueia:
+<h3 class="text-2xl font-bold mb-5 gradient-text">
+
+✨ O que desbloqueia
+
 </h3>
 
-<ul style="
-line-height:2;
-padding-left:20px;
-color:#cbd5e1;
-">
+<ul class="space-y-4 text-gray-300">
 
-<li>Prompt completo sem cortes</li>
+<li>✅ Prompt completo</li>
 
-<li>Estratégia avançada</li>
+<li>✅ Qualidade profissional</li>
 
-<li>Conteúdo exclusivo</li>
+<li>✅ Uso comercial</li>
 
-<li>Uso comercial liberado</li>
+<li>✅ Atualizações futuras</li>
 
-<li>Acesso vitalício</li>
+<li>✅ Acesso vitalício</li>
 
-<li>Atualizações futuras</li>
+<li>✅ Estratégia avançada</li>
 
 </ul>
 
@@ -435,39 +529,14 @@ ${
 
 `
 
-<div class="login-box">
-
-<h3 style="
-margin-bottom:15px;
-">
-📱 Login Necessário
-</h3>
-
-<p style="
-line-height:1.7;
-color:#cbd5e1;
-">
-
-Faça login com WhatsApp para comprar
-e desbloquear automaticamente.
-
-</p>
-
-<button
-onclick="window.location.href='login-cliente.html'"
-style="
-margin-top:20px;
-background:#22c55e;
-color:white;
-width:100%;
-"
+<a
+href="login-cliente.html"
+class="gradient-btn w-full md:w-auto px-8 py-4 rounded-2xl text-black font-bold inline-block"
 >
 
-🔑 Entrar Agora
+🔑 Entrar para desbloquear
 
-</button>
-
-</div>
+</a>
 
 `
 
@@ -475,64 +544,27 @@ width:100%;
 
 `
 
-<button
-onclick="comprarGumroad('${id}')"
-style="
-margin-top:25px;
-font-size:18px;
-padding:18px;
-background:#ff90e8;
-color:black;
-width:100%;
-border:none;
-border-radius:12px;
-font-weight:bold;
-cursor:pointer;
-">
+<div class="flex flex-col md:flex-row gap-4 justify-center">
 
-💳 Comprar Automaticamente
+<a
+href="checkout.html?id=${id}"
+class="gradient-btn px-8 py-4 rounded-2xl text-black font-bold"
+>
 
-</button>
+💳 Comprar Agora
 
-<button
-style="
-margin-top:15px;
-font-size:18px;
-padding:18px;
-background:#f0b90b;
-color:black;
-width:100%;
-border:none;
-border-radius:12px;
-font-weight:bold;
-cursor:pointer;
-"
-onclick="window.location.href='checkout.html?id=${id}'"
+</a>
+
+<a
+href="checkout.html?id=${id}"
+class="glass px-8 py-4 rounded-2xl font-bold"
 >
 
 🟡 Binance Pay
 
-</button>
+</a>
 
-<button
-style="
-margin-top:15px;
-font-size:18px;
-padding:18px;
-background:#22c55e;
-color:white;
-width:100%;
-border:none;
-border-radius:12px;
-font-weight:bold;
-cursor:pointer;
-"
-onclick="window.location.href='checkout.html?id=${id}'"
->
-
-💚 Multicaixa Express
-
-</button>
+</div>
 
 `
 
@@ -546,67 +578,33 @@ onclick="window.location.href='checkout.html?id=${id}'"
 
 `
 
-<p class="prompt-text" id="textoPrompt">
+<div class="glass rounded-[25px] p-8">
+
+<pre
+id="textoPrompt"
+class="whitespace-pre-wrap text-gray-200 leading-8 text-lg"
+>
 
 ${data.prompt || ""}
 
-</p>
+</pre>
 
 <button
-class="copy-btn"
-id="copiar">
+id="copiar"
+class="gradient-btn mt-8 w-full py-5 rounded-2xl text-black font-bold text-lg"
+>
 
 📋 Copiar Prompt
 
 </button>
 
-`
-
-}
-
 </div>
 
-${
-data.afiliado
-
-?
-
 `
-
-<button
-class="afiliado-btn"
-onclick="window.open('${data.afiliado}')">
-🚀 Acessar Oferta
-</button>
-
-`
-
-:
-
-""
 
 }
 
-${
-data.doacao
-
-?
-
-`
-
-<button
-class="doacao-btn"
-onclick="window.open('${data.doacao}')">
-💖 Apoiar Projeto
-</button>
-
-`
-
-:
-
-""
-
-}
+</section>
 
 `;
 
@@ -617,28 +615,49 @@ document.getElementById("copiar");
 
 if(copiar){
 
-copiar.addEventListener("click", () => {
+copiar.addEventListener(
+"click",
+()=>{
 
 const texto =
-document.getElementById("textoPrompt")
-.innerText;
+document.getElementById(
+"textoPrompt"
+).innerText;
 
-navigator.clipboard.writeText(texto);
+navigator.clipboard.writeText(
+texto
+);
 
-copiar.innerText = "✅ Copiado";
+copiar.innerText =
+"✅ Copiado";
 
-});
+}
+);
 
 }
 
-carregarRelacionados(data.categoria);
+/* RELACIONADOS */
+
+carregarRelacionados(
+data.categoria
+);
 
 }catch(error){
 
 console.log(error);
 
 conteudo.innerHTML = `
-<h1>Erro ao carregar prompt</h1>
+
+<div class="text-center py-32">
+
+<h1 class="text-4xl font-bold">
+
+Erro ao carregar
+
+</h1>
+
+</div>
+
 `;
 
 }
@@ -652,16 +671,21 @@ async function carregarRelacionados(categoriaAtual){
 try{
 
 const snapshot =
-await getDocs(collection(db,"prompts"));
+await getDocs(
+collection(db,"prompts")
+);
 
 const relacionados =
-document.getElementById("relacionados");
+document.getElementById(
+"relacionados"
+);
 
 relacionados.innerHTML = "";
 
-snapshot.forEach((docItem) => {
+snapshot.forEach((docItem)=>{
 
-const data = docItem.data();
+const data =
+docItem.data();
 
 if(
 data.categoria === categoriaAtual
@@ -673,15 +697,24 @@ relacionados.innerHTML += `
 
 <a
 href="prompt.html?id=${docItem.id}"
-class="card"
+class="glass rounded-[30px] overflow-hidden p-5 hover:scale-[1.02] transition-all"
 >
 
-<img src="${data.imagem || 'https://via.placeholder.com/300'}">
+<img
+src="${data.imagem}"
+class="w-full h-64 object-contain rounded-2xl mb-5 bg-[#0b1220]"
+>
 
-<h3>${data.titulo || "Sem título"}</h3>
+<h3 class="text-2xl font-bold mb-3">
 
-<p style="margin-top:10px;">
-📂 ${data.categoria || "Sem categoria"}
+${data.titulo}
+
+</h3>
+
+<p class="text-gray-400">
+
+📂 ${data.categoria}
+
 </p>
 
 </a>
