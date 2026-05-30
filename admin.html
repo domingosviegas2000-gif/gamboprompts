@@ -494,6 +494,9 @@ onclick="apagarCategoria(${index})">
 });
 
 }
+  window.editarCategoria = function(index){ ... }
+
+window.apagarCategoria = function(index){ ... }
 window.editarPrompt = async function(id){
 
 const ref = doc(db,"prompts",id);
@@ -608,7 +611,61 @@ document.getElementById(
 document.getElementById(
 "totalCategorias"
 ).innerText = cats.length;
+const comprasSnap =
+await getDocs(
+collection(db,"acessos")
+);
 
+let clientes = [];
+
+let totalCompras = 0;
+
+let receita = 0;
+
+comprasSnap.forEach((docItem)=>{
+
+const compra =
+docItem.data();
+
+totalCompras++;
+
+if(compra.whatsapp){
+
+if(
+!clientes.includes(
+compra.whatsapp
+)
+){
+
+clientes.push(
+compra.whatsapp
+);
+
+}
+
+}
+
+receita += Number(
+compra.valor || 0
+);
+
+});
+
+document.getElementById(
+"totalClientes"
+).innerText =
+clientes.length;
+
+document.getElementById(
+"totalCompras"
+).innerText =
+totalCompras;
+
+document.getElementById(
+"receitaTotal"
+).innerText =
+receita.toLocaleString()
++ " Kz";
 }
 
 async function listarPrompts(){
@@ -659,42 +716,6 @@ class="apagar-btn"
 onclick="apagarPrompt('${docItem.id}')">
 🗑️ Apagar
 </button>
-const comprasSnap =
-await getDocs(collection(db,"acessos"));
-
-let clientes = [];
-let totalCompras = 0;
-let receita = 0;
-
-comprasSnap.forEach((docItem)=>{
-
-const compra = docItem.data();
-
-totalCompras++;
-
-if(compra.whatsapp){
-
-if(!clientes.includes(compra.whatsapp)){
-
-clientes.push(compra.whatsapp);
-
-}
-
-}
-
-receita += Number(compra.valor || 0);
-
-});
-
-document.getElementById("totalClientes")
-.innerText = clientes.length;
-
-document.getElementById("totalCompras")
-.innerText = totalCompras;
-
-document.getElementById("receitaTotal")
-.innerText =
-receita.toLocaleString() + " Kz";
 
 </div>
 
